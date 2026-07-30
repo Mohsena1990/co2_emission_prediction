@@ -1,0 +1,161 @@
+2026-02-14 13:19:15 | INFO     | co2_forecast | Logging to: outputs\runs\run_20260214_1319\logs\run_20260214_1319.log
+2026-02-14 13:19:15 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:19:15 | INFO     | co2_forecast | Script 01: Run Feature Selection
+2026-02-14 13:19:15 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:19:15 | INFO     | co2_forecast | Loading processed data...
+2026-02-14 13:19:15 | INFO     | co2_forecast | Loaded: 101 samples, 23 features
+2026-02-14 13:19:15 | INFO     | co2_forecast | ----------------------------------------
+2026-02-14 13:19:15 | INFO     | co2_forecast | Running all feature selection methods...
+2026-02-14 13:19:15 | INFO     | co2_forecast | Running all feature selection options...
+2026-02-14 13:19:15 | INFO     | co2_forecast | ==================================================
+2026-02-14 13:19:15 | INFO     | co2_forecast | Running linear feature selection (FS_linear)...
+2026-02-14 13:19:16 | INFO     | co2_forecast | Iteration 0: Removed 'Air_Temp' (VIF=inf)
+2026-02-14 13:19:16 | INFO     | co2_forecast | Iteration 1: Removed 'CO2e_per_Population' (VIF=1751.71)
+2026-02-14 13:19:17 | INFO     | co2_forecast | Iteration 2: Removed 'CO2e_lag1' (VIF=272.88)
+2026-02-14 13:19:17 | INFO     | co2_forecast | Iteration 3: Removed 'CEI' (VIF=252.43)
+2026-02-14 13:19:17 | INFO     | co2_forecast | Iteration 4: Removed 'TEC_dlog' (VIF=88.79)
+2026-02-14 13:19:17 | INFO     | co2_forecast | Iteration 5: Removed 'Q3' (VIF=68.50)
+2026-02-14 13:19:17 | INFO     | co2_forecast | Iteration 6: Removed 'Population' (VIF=60.40)
+2026-02-14 13:19:17 | INFO     | co2_forecast | Iteration 7: Removed 'CO2e_lag3' (VIF=38.27)
+2026-02-14 13:19:17 | INFO     | co2_forecast | Iteration 8: Removed 'TEC' (VIF=33.64)
+2026-02-14 13:19:17 | INFO     | co2_forecast | Iteration 9: Removed 'HDD_proxy' (VIF=20.50)
+2026-02-14 13:19:17 | INFO     | co2_forecast | Iteration 10: Removed 'CO2e_lag2' (VIF=13.40)
+2026-02-14 13:19:17 | INFO     | co2_forecast | VIF filter: 23 -> 12 features
+2026-02-14 13:19:18 | INFO     | co2_forecast | Ridge stability: Selected 7 features (stability >= 0.5)
+2026-02-14 13:19:19 | INFO     | co2_forecast | ElasticNet: Only 0 features passed threshold, adding top features to reach 3
+2026-02-14 13:19:19 | INFO     | co2_forecast | ElasticNet stability: Selected 3 features (stability >= 0.5)
+2026-02-14 13:19:19 | INFO     | co2_forecast | FS_linear final: 9 features selected
+2026-02-14 13:19:19 | INFO     | co2_forecast | ==================================================
+2026-02-14 13:19:19 | INFO     | co2_forecast | Running nonlinear feature selection (FS_nonlinear)...
+2026-02-14 13:19:36 | INFO     | co2_forecast | RF importance: Selected 3 features
+2026-02-14 13:19:36 | WARNING  | co2_forecast | LightGBM not installed, skipping LightGBM importance
+2026-02-14 13:19:36 | WARNING  | co2_forecast | CatBoost not installed, skipping CatBoost importance
+2026-02-14 13:19:36 | INFO     | co2_forecast | FS_nonlinear final: 3 features selected
+2026-02-14 13:19:36 | INFO     | co2_forecast | ==================================================
+2026-02-14 13:19:36 | INFO     | co2_forecast | Running consensus feature selection (FS_consensus)...
+2026-02-14 13:19:36 | INFO     | co2_forecast | Vote-based selection: 9 features with >= 2 votes
+2026-02-14 13:19:50 | INFO     | co2_forecast | Stability-based selection: 9 features with stability >= 0.5
+2026-02-14 13:19:50 | INFO     | co2_forecast | FS_consensus final: 3 features selected
+2026-02-14 13:19:50 | INFO     | co2_forecast | ==================================================
+2026-02-14 13:19:50 | INFO     | co2_forecast | Running filter methods...
+2026-02-14 13:19:50 | INFO     | co2_forecast | ==================================================
+2026-02-14 13:19:50 | INFO     | co2_forecast | Running ALL filter-based feature selection methods...
+2026-02-14 13:19:50 | INFO     | co2_forecast | Running Mutual Information feature selection...
+2026-02-14 13:19:50 | INFO     | co2_forecast | Mutual Information: Selected 5 features (max MI: 1.9503)
+2026-02-14 13:19:50 | INFO     | co2_forecast | Running F-test feature selection...
+2026-02-14 13:19:50 | INFO     | co2_forecast | F-test: Selected 20 features (significant at p<0.05)
+2026-02-14 13:19:50 | INFO     | co2_forecast | Running pearson correlation-based feature selection...
+2026-02-14 13:19:50 | INFO     | co2_forecast | Correlation-based: Selected 5 features (threshold=0.3)
+2026-02-14 13:19:50 | INFO     | co2_forecast | Running variance threshold feature selection...
+2026-02-14 13:19:50 | INFO     | co2_forecast | Variance threshold: Selected 21 features (threshold=0.01)
+2026-02-14 13:19:51 | INFO     | co2_forecast | Filter methods complete: 4 methods run
+2026-02-14 13:19:51 | INFO     | co2_forecast | ==================================================
+2026-02-14 13:19:51 | INFO     | co2_forecast | Running wrapper methods...
+2026-02-14 13:19:51 | INFO     | co2_forecast | ==================================================
+2026-02-14 13:19:51 | INFO     | co2_forecast | Running ALL wrapper-based feature selection methods...
+2026-02-14 13:19:51 | INFO     | co2_forecast | Running RFE feature selection (target: 5 features)...
+2026-02-14 13:19:51 | INFO     | co2_forecast | RFE: Selected 5 features using ridge
+2026-02-14 13:19:51 | INFO     | co2_forecast | Running RFE feature selection (target: 5 features)...
+2026-02-14 13:19:55 | INFO     | co2_forecast | RFE: Selected 5 features using random_forest
+2026-02-14 13:19:55 | INFO     | co2_forecast | Running Sequential Forward Selection (target: 5 features)...
+2026-02-14 13:20:06 | INFO     | co2_forecast | SFS: Selected 5 features using ridge
+2026-02-14 13:20:06 | INFO     | co2_forecast | Running Sequential Backward Selection (target: 5 features)...
+2026-02-14 13:20:17 | INFO     | co2_forecast | SBS: Selected 5 features using ridge
+2026-02-14 13:20:17 | INFO     | co2_forecast | Wrapper methods complete: 4 methods run
+2026-02-14 13:20:17 | INFO     | co2_forecast | ==================================================
+2026-02-14 13:20:17 | INFO     | co2_forecast | Running embedded methods...
+2026-02-14 13:20:17 | INFO     | co2_forecast | ==================================================
+2026-02-14 13:20:17 | INFO     | co2_forecast | Running ALL embedded feature selection methods...
+2026-02-14 13:20:17 | INFO     | co2_forecast | Running LASSO feature selection...
+2026-02-14 13:20:18 | INFO     | co2_forecast | LASSO optimal alpha via CV: 0.000183
+2026-02-14 13:20:18 | INFO     | co2_forecast | LASSO: Selected 18 features (alpha=0.000183)
+2026-02-14 13:20:18 | INFO     | co2_forecast | Running ElasticNet feature selection (l1_ratio=0.5)...
+2026-02-14 13:20:18 | INFO     | co2_forecast | ElasticNet optimal alpha: 0.000367
+2026-02-14 13:20:18 | INFO     | co2_forecast | ElasticNet: Selected 18 features
+2026-02-14 13:20:18 | INFO     | co2_forecast | Running Gradient Boosting feature selection...
+2026-02-14 13:20:18 | INFO     | co2_forecast | Using sklearn GradientBoosting for feature importance
+2026-02-14 13:20:18 | INFO     | co2_forecast | Gradient Boosting: Selected 5 features
+2026-02-14 13:20:18 | INFO     | co2_forecast | Running Random Forest feature selection...
+2026-02-14 13:20:18 | INFO     | co2_forecast | Random Forest: Selected 5 features
+2026-02-14 13:20:18 | INFO     | co2_forecast | Running CatBoost feature selection...
+2026-02-14 13:20:18 | WARNING  | co2_forecast | CatBoost not available. Using Gradient Boosting fallback.
+2026-02-14 13:20:18 | INFO     | co2_forecast | Running Gradient Boosting feature selection...
+2026-02-14 13:20:19 | INFO     | co2_forecast | Using sklearn GradientBoosting for feature importance
+2026-02-14 13:20:19 | INFO     | co2_forecast | Gradient Boosting: Selected 5 features
+2026-02-14 13:20:19 | INFO     | co2_forecast | Embedded methods complete: 5 methods run
+2026-02-14 13:20:19 | INFO     | co2_forecast | ==================================================
+2026-02-14 13:20:19 | INFO     | co2_forecast | Running hybrid feature selection (filter+wrapper+embedded)...
+2026-02-14 13:20:19 | INFO     | co2_forecast | Features selected by all three categories: 12
+2026-02-14 13:20:19 | INFO     | co2_forecast | Features with >= 2 votes: 22
+2026-02-14 13:20:19 | INFO     | co2_forecast | FS_hybrid final: 22 features selected
+2026-02-14 13:20:19 | INFO     | co2_forecast | ==================================================
+2026-02-14 13:20:19 | INFO     | co2_forecast | Total FS options: 7
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_linear: 9 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_nonlinear: 3 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_consensus: 3 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_filter: 21 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_wrapper: 13 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_embedded: 21 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_hybrid: 22 features
+2026-02-14 13:20:19 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:20:19 | INFO     | co2_forecast | Feature Selection Complete!
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_linear: 9 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_nonlinear: 3 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_consensus: 3 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_filter: 21 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_wrapper: 13 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_embedded: 21 features
+2026-02-14 13:20:19 | INFO     | co2_forecast |   fs_hybrid: 22 features
+2026-02-14 13:20:19 | INFO     | co2_forecast | Results saved to: outputs\runs\run_20260214_1319\tables
+2026-02-14 13:20:19 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:21:00 | INFO     | co2_forecast | Logging to: outputs\runs\run_20260214_1319\logs\run_20260214_1319.log
+2026-02-14 13:21:00 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:21:00 | INFO     | co2_forecast | Script 02: Evaluate FS with SHAP + MCDA
+2026-02-14 13:21:00 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:21:00 | INFO     | co2_forecast | Loading data and FS results...
+2026-02-14 13:21:00 | INFO     | co2_forecast | ----------------------------------------
+2026-02-14 13:21:00 | INFO     | co2_forecast | Evaluating FS options with SHAP...
+2026-02-14 13:21:00 | INFO     | co2_forecast | Creating FS evaluation matrix...
+2026-02-14 13:21:00 | INFO     | co2_forecast | Evaluating FS option: fs_linear (9 features)
+2026-02-14 13:21:00 | WARNING  | co2_forecast | LightGBM not available, using CatBoost
+2026-02-14 13:21:33 | INFO     | co2_forecast | Logging to: outputs\runs\run_20260214_1319\logs\run_20260214_1319.log
+2026-02-14 13:21:33 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:21:33 | INFO     | co2_forecast | Script 03: Optimize Models (Multi-FS Support)
+2026-02-14 13:21:33 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:21:33 | INFO     | co2_forecast | Models to optimize: ['ridge', 'random_forest', 'catboost', 'lightgbm', 'lstm']
+2026-02-14 13:21:33 | INFO     | co2_forecast | Optimizer: pso
+2026-02-14 13:21:33 | INFO     | co2_forecast | Loading data...
+2026-02-14 13:21:33 | ERROR    | co2_forecast | Selected feature set not found. Run 02_eval_fs_shap_mcda.py first.
+2026-02-14 13:21:53 | INFO     | co2_forecast | Logging to: outputs\runs\run_20260214_1319\logs\run_20260214_1319.log
+2026-02-14 13:21:53 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:21:53 | INFO     | co2_forecast | Script 04: Evaluate Models and Apply Safeguards (Multi-FS)
+2026-02-14 13:21:53 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:21:53 | INFO     | co2_forecast | Loading data...
+2026-02-14 13:21:53 | ERROR    | co2_forecast | No FS results found. Run previous scripts first.
+2026-02-14 13:22:10 | INFO     | co2_forecast | Logging to: outputs\runs\run_20260214_1319\logs\run_20260214_1319.log
+2026-02-14 13:22:10 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:22:10 | INFO     | co2_forecast | Script 05: Select Best Model with Pareto + MCDA (Multi-FS)
+2026-02-14 13:22:10 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:22:10 | INFO     | co2_forecast | Loading evaluation results...
+2026-02-14 13:22:10 | ERROR    | co2_forecast | Quarterly metrics not found. Run 04_evaluate_and_safeguards.py first.
+2026-02-14 13:22:48 | INFO     | co2_forecast | Logging to: outputs\runs\run_20260214_1319\logs\run_20260214_1319.log
+2026-02-14 13:22:48 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:22:48 | INFO     | co2_forecast | Script 06: Interpret Champion Model
+2026-02-14 13:22:48 | INFO     | co2_forecast | ============================================================
+2026-02-14 13:22:48 | ERROR    | co2_forecast | Champion pipeline not found. Run 05_select_best_model.py first.
+2026-03-26 10:11:49 | INFO     | co2_forecast | Logging to: outputs\runs\run_20260214_1319\logs\run_20260214_1319.log
+2026-03-26 10:11:49 | INFO     | co2_forecast | ============================================================
+2026-03-26 10:11:49 | INFO     | co2_forecast | Script 06: Interpret Champion Model
+2026-03-26 10:11:49 | INFO     | co2_forecast | ============================================================
+2026-03-26 10:11:49 | ERROR    | co2_forecast | Champion pipeline not found. Run 05_select_best_model.py first.
+2026-03-26 10:14:42 | INFO     | co2_forecast | Logging to: outputs\runs\run_20260214_1319\logs\run_20260214_1319.log
+2026-03-26 10:14:42 | INFO     | co2_forecast | ============================================================
+2026-03-26 10:14:42 | INFO     | co2_forecast | Script 06: Interpret Champion Model
+2026-03-26 10:14:42 | INFO     | co2_forecast | ============================================================
+2026-03-26 10:14:42 | ERROR    | co2_forecast | Champion pipeline not found. Run 05_select_best_model.py first.
+2026-03-26 10:19:51 | INFO     | co2_forecast | Logging to: outputs\runs\run_20260214_1319\logs\run_20260214_1319.log
+2026-03-26 10:19:51 | INFO     | co2_forecast | ============================================================
+2026-03-26 10:19:51 | INFO     | co2_forecast | Script 05: Select Best Model with Pareto + MCDA (Multi-FS)
+2026-03-26 10:19:51 | INFO     | co2_forecast | ============================================================
+2026-03-26 10:19:51 | INFO     | co2_forecast | Loading evaluation results...
+2026-03-26 10:19:51 | ERROR    | co2_forecast | Quarterly metrics not found. Run 04_evaluate_and_safeguards.py first.
