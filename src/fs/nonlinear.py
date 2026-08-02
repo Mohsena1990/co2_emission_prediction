@@ -227,7 +227,8 @@ def catboost_importance(
             'learning_rate': 0.1,
             'depth': 6,
             'verbose': False,
-            'random_seed': seed
+            'random_seed': seed,
+            'allow_writing_files': False
         }
 
     importance_scores = {col: [] for col in X.columns}
@@ -284,66 +285,164 @@ def catboost_importance(
     return selected, scores_df
 
 
-def boruta_selection(
+def xgboost_shap_stability_selection(
     X: pd.DataFrame,
     y: pd.Series,
-    max_iter: int = 100,
+    cv_plan: CVPlan,
+    top_k: int = 10,
+    stability_threshold: float = 0.5,
+    min_features: int = 3,
+    params: Optional[Dict] = None,
     seed: int = 42
 ) -> Tuple[List[str], pd.DataFrame]:
     """
-    Select features using Boruta algorithm.
+    FS3: select features based on XGBoost + SHAP importance stability
+    across CV folds (mean |SHAP value| per feature, top-K per fold, then
+    the fraction of folds where a feature makes the top-K).
 
     Args:
         X: Feature DataFrame
         y: Target Series
-        max_iter: Maximum iterations
+        cv_plan: CV plan
+        top_k: Number of top-SHAP features considered "important" per fold
+        stability_threshold: Minimum fraction of folds a feature must be
+            in the top-K to be selected
+        min_features: Minimum number of features to select (fallback)
+        params: XGBoost parameters (defaults used if None)
         seed: Random seed
 
     Returns:
-        Tuple of (selected features, Boruta results)
+        Tuple of (selected features, stability scores)
     """
     logger = get_logger()
 
-    try:
-        from boruta import BorutaPy
-    except ImportError:
-        logger.warning("Boruta not installed, using RF importance as fallback")
-        # Fallback to simple RF importance
-        rf = RandomForestRegressor(n_estimators=100, max_depth=10, random_state=seed)
-        rf.fit(X, y)
-        importances = pd.DataFrame({
-            'feature': X.columns,
-            'importance': rf.feature_importances_
-        }).sort_values('importance', ascending=False)
-        selected = importances.head(len(X.columns) // 2)['feature'].tolist()
-        return selected, importances
+    import xgboost as xgb
 
-    # Fit Boruta
-    rf = RandomForestRegressor(n_estimators=100, max_depth=10, random_state=seed, n_jobs=-1)
-    boruta = BorutaPy(rf, n_estimators='auto', max_iter=max_iter, random_state=seed)
+    if params is None:
+        params = {
+            'n_estimators': 100,
+            'max_depth': 5,
+            'learning_rate': 0.1,
+            'random_state': seed,
+            'verbosity': 0
+        }
 
-    # Handle NaN values
-    X_clean = X.fillna(X.mean())
-    boruta.fit(X_clean.values, y.values)
+    top_k_counts = {col: 0 for col in X.columns}
+    shap_importance_sums = {col: 0.0 for col in X.columns}
 
-    # Get results
-    results = pd.DataFrame({
-        'feature': X.columns,
-        'ranking': boruta.ranking_,
-        'selected': boruta.support_,
-        'weak': boruta.support_weak_
-    }).sort_values('ranking')
+    # Get unique folds
+    seen_folds = set()
+    unique_folds = []
+    for fold in cv_plan.folds:
+        fold_key = (tuple(fold.train_indices), tuple(fold.test_indices))
+        if fold_key not in seen_folds:
+            seen_folds.add(fold_key)
+            unique_folds.append(fold)
 
-    selected = results[results['selected']]['feature'].tolist()
+    n_folds = 0
+    for fold in unique_folds:
+        X_train = X.iloc[fold.train_indices]
+        y_train = y.iloc[fold.train_indices]
 
-    # Also include weak features if few selected
-    if len(selected) < 3:
-        weak = results[results['weak']]['feature'].tolist()
-        selected = list(set(selected + weak))
+        model = xgb.XGBRegressor(**params)
+        model.fit(X_train, y_train)
 
-    logger.info(f"Boruta: Selected {len(selected)} features")
+        # Native TreeSHAP contributions straight from the booster (exact
+        # SHAP values, same algorithm shap.TreeExplainer uses) - avoids a
+        # shap 0.49.1 / xgboost 3.x incompatibility where shap can't parse
+        # this xgboost version's serialized base_score
+        # (e.g. '[9.987916E2]') when loading the booster itself. The last
+        # column is the expected-value/bias term, dropped here since only
+        # per-feature contributions are needed.
+        contribs = model.get_booster().predict(
+            xgb.DMatrix(X_train), pred_contribs=True
+        )
+        shap_values = contribs[:, :-1]
+        mean_abs_shap = np.mean(np.abs(shap_values), axis=0)
 
-    return selected, results
+        importance_order = np.argsort(mean_abs_shap)[::-1]
+        top_k_features = [X.columns[i] for i in importance_order[:top_k]]
+
+        for col, imp in zip(X.columns, mean_abs_shap):
+            shap_importance_sums[col] += imp
+        for col in top_k_features:
+            top_k_counts[col] += 1
+
+        n_folds += 1
+
+    stability_df = pd.DataFrame([
+        {
+            'feature': col,
+            'top_k_count': top_k_counts[col],
+            'stability': top_k_counts[col] / n_folds if n_folds > 0 else 0,
+            'mean_abs_shap': shap_importance_sums[col] / n_folds if n_folds > 0 else 0
+        }
+        for col in X.columns
+    ]).sort_values('stability', ascending=False)
+
+    selected = stability_df[stability_df['stability'] >= stability_threshold]['feature'].tolist()
+
+    if len(selected) < min_features:
+        logger.info(f"XGBoost-SHAP: Only {len(selected)} features passed threshold, adding top features to reach {min_features}")
+        remaining = stability_df[~stability_df['feature'].isin(selected)].head(min_features - len(selected))
+        selected.extend(remaining['feature'].tolist())
+
+    logger.info(f"XGBoost-SHAP stability: Selected {len(selected)} features (stability >= {stability_threshold})")
+
+    return selected, stability_df
+
+
+def fs_xgboost_shap(
+    X: pd.DataFrame,
+    y: pd.Series,
+    cv_plan: CVPlan,
+    config: Config
+) -> Dict[str, Any]:
+    """
+    FS3: XGBoost-SHAP stability selection pipeline.
+
+    Args:
+        X: Feature DataFrame
+        y: Target Series
+        cv_plan: CV plan
+        config: Configuration
+
+    Returns:
+        Dictionary with selected features and scores, same shape as fs_linear.
+    """
+    logger = get_logger()
+    logger.info("Running XGBoost-SHAP stability feature selection (FS_xgboost_shap)...")
+
+    top_k = getattr(config.fs, 'top_k_features', 10)
+    min_features = getattr(config.fs, 'min_features', 3)
+
+    results = {
+        'method': 'xgboost_shap',
+        'steps': []
+    }
+
+    selected, stability_df = xgboost_shap_stability_selection(
+        X, y, cv_plan,
+        top_k=top_k,
+        stability_threshold=config.fs.stability_threshold,
+        min_features=min_features,
+        seed=config.seed
+    )
+    results['steps'].append({
+        'name': 'xgboost_shap_stability',
+        'selected': selected,
+        'n_selected': len(selected),
+        'scores': stability_df.to_dict(orient='records')
+    })
+
+    final_selected = [f for f in X.columns if f in selected]
+
+    results['selected_features'] = final_selected
+    results['n_selected'] = len(final_selected)
+
+    logger.info(f"FS_xgboost_shap final: {len(final_selected)} features selected")
+
+    return results
 
 
 def fs_nonlinear(

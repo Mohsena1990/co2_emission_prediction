@@ -97,26 +97,9 @@ def prepare_data(
     # Handle date column
     date_col = mappings.get('date')
     if date_col and date_col in df.columns:
-        # Convert to datetime
-        try:
-
-            def parse_year_quarter(x):
-                # Handles 1999.1, 1999.2, ..., 2025.1
-                year = int(np.floor(x))
-                quarter = int(round((x - year) * 10))
-                month = {1: 1, 2: 4, 3: 7, 4: 10}[quarter]
-                return pd.Timestamp(year=year, month=month, day=1)
-
-            df['date'] = df[date_col].apply(parse_year_quarter)
-
-
-
-            # df['date'] = df[date_col].apply(quarter_to_date)
-        except Exception as e:
-            logger.warning(f"Could not parse date column: {e}")
-            # Try pandas parsing
-            df['date'] = pd.to_datetime(df[date_col])
-
+        # Convert to datetime using the single canonical quarter parser
+        # (handles 'YYYYQn', 'YYYY-Qn', decimal 'YYYY.n', and datetime inputs).
+        df['date'] = df[date_col].apply(quarter_to_date)
         df = df.set_index('date')
         df = df.drop(columns=[date_col], errors='ignore')
 

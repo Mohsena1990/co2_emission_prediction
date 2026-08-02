@@ -35,6 +35,60 @@ def normalize_matrix(
     return norm_matrix
 
 
+def assign_deterministic_rank(
+    df: pd.DataFrame,
+    score_col: str,
+    ascending: bool,
+    tie_break_col: Optional[str] = None,
+    tie_break_ascending: bool = True
+) -> pd.Series:
+    """
+    Assign unique, deterministic 1..n ranks from a score column.
+
+    BUG FIX (spec 3.6): `Series.rank()` produces fractional ranks under
+    ties (e.g. two tied alternatives both get rank 2.5), and the previous
+    code truncated that with `.astype(int)`, silently collapsing distinct
+    alternatives onto the same integer rank or producing non-contiguous
+    rank sequences. This function instead performs a stable sort on
+    (score, tie_break_col, row label) and assigns ordinal ranks 1..n, so
+    ties are always broken deterministically and every alternative gets a
+    unique rank.
+
+    Args:
+        df: DataFrame of alternatives (index used as the final, always-
+            unique tie-break so the result is fully deterministic).
+        score_col: Column to rank by (e.g. 'vikor_Q', 'topsis_score').
+        ascending: True if lower score is better (e.g. VIKOR Q), False if
+            higher score is better (e.g. TOPSIS closeness).
+        tie_break_col: Optional secondary criterion for ties (e.g. a
+            parsimony/feature-count column) - documented, not implicit.
+        tie_break_ascending: Direction for tie_break_col (default: lower is
+            better, e.g. fewer features).
+
+    Returns:
+        Series of unique integer ranks (1 = best), aligned to df.index.
+    """
+    sort_cols = [score_col]
+    sort_ascending = [ascending]
+
+    if tie_break_col is not None and tie_break_col in df.columns:
+        sort_cols.append(tie_break_col)
+        sort_ascending.append(tie_break_ascending)
+
+    # Final, always-available tie-break: the row label itself, so the
+    # ordering (and therefore the ranks) is fully deterministic even if the
+    # score and tie_break_col are identical across alternatives.
+    label_col = '__label_tiebreak__'
+    working = df.copy()
+    working[label_col] = working.index.astype(str)
+    sort_cols.append(label_col)
+    sort_ascending.append(True)
+
+    ordered = working.sort_values(by=sort_cols, ascending=sort_ascending, kind='mergesort')
+    ranks = pd.Series(np.arange(1, len(ordered) + 1), index=ordered.index, name='rank')
+    return ranks.reindex(df.index)
+
+
 def pareto_filter(
     df: pd.DataFrame,
     criteria: List[str],
@@ -98,7 +152,9 @@ def topsis(
     df: pd.DataFrame,
     criteria: List[str],
     weights: Dict[str, float],
-    criteria_types: Dict[str, str]
+    criteria_types: Dict[str, str],
+    tie_break_col: Optional[str] = None,
+    tie_break_ascending: bool = True
 ) -> pd.DataFrame:
     """
     TOPSIS (Technique for Order Preference by Similarity to Ideal Solution).
@@ -153,7 +209,12 @@ def topsis(
     result_df['topsis_d_plus'] = d_plus
     result_df['topsis_d_minus'] = d_minus
     result_df['topsis_score'] = closeness
-    result_df['topsis_rank'] = result_df['topsis_score'].rank(ascending=False).astype(int)
+    # Higher topsis_score is better -> ascending=False; deterministic
+    # tie-break (bug 3.6, see assign_deterministic_rank)
+    result_df['topsis_rank'] = assign_deterministic_rank(
+        result_df, 'topsis_score', ascending=False,
+        tie_break_col=tie_break_col, tie_break_ascending=tie_break_ascending
+    )
 
     result_df = result_df.sort_values('topsis_rank')
 
@@ -167,7 +228,9 @@ def vikor(
     criteria: List[str],
     weights: Dict[str, float],
     criteria_types: Dict[str, str],
-    v: float = 0.5
+    v: float = 0.5,
+    tie_break_col: Optional[str] = None,
+    tie_break_ascending: bool = True
 ) -> pd.DataFrame:
     """
     VIKOR (VlseKriterijumska Optimizacija I Kompromisno Resenje).
@@ -211,7 +274,23 @@ def vikor(
 
     for i in range(n_alternatives):
         for j, c in enumerate(criteria):
-            denom = f_star[j] - f_minus[j]
+            # BUG FIX: f_star/f_minus are defined per-criterion-type (for
+            # 'cost' criteria f_star=min and f_minus=max, i.e. NUMERICALLY
+            # REVERSED relative to 'benefit' criteria, where f_star=max and
+            # f_minus=min). Using the raw signed `f_star[j] - f_minus[j]` as
+            # the denominator is therefore NEGATIVE for every cost
+            # criterion, flipping the sign of every normalized distance for
+            # that criterion. That silently corrupted S (which could go
+            # negative - a genuine group-utility score must be >= 0) and R
+            # (initialized to 0 and only ever updated via
+            # `max(R[i], w[j]*normalized)`; with normalized <= 0 for cost
+            # criteria, R stayed stuck at exactly 0 for every alternative -
+            # i.e. VIKOR silently degenerated to ranking by S alone whenever
+            # ANY cost criterion was used, which is the common case, not an
+            # edge case). abs() gives the correct always-positive range
+            # regardless of criterion type - a no-op for benefit criteria
+            # (already positive) and the fix for cost criteria.
+            denom = abs(f_star[j] - f_minus[j])
             if denom == 0:
                 denom = 1e-10
 
@@ -239,7 +318,11 @@ def vikor(
     result_df['vikor_S'] = S
     result_df['vikor_R'] = R
     result_df['vikor_Q'] = Q
-    result_df['vikor_rank'] = result_df['vikor_Q'].rank().astype(int)  # Lower Q is better
+    # Lower Q is better -> ascending=True; deterministic tie-break (bug 3.6)
+    result_df['vikor_rank'] = assign_deterministic_rank(
+        result_df, 'vikor_Q', ascending=True,
+        tie_break_col=tie_break_col, tie_break_ascending=tie_break_ascending
+    )
 
     result_df = result_df.sort_values('vikor_rank')
 
@@ -328,16 +411,21 @@ def select_best_fs_option(
         pareto_df = pareto_filter(working_df, criteria, criteria_types)
         working_df = pareto_df
 
-    # Apply MCDA method
+    # Apply MCDA method - ties broken deterministically by parsimony
+    # (C5_parsimony, higher is better) then by fs_option label (bug 3.6)
     if config.mcda.method == 'vikor':
         ranking_df = vikor(
             working_df, criteria, weights, criteria_types,
-            v=config.mcda.vikor_v
+            v=config.mcda.vikor_v,
+            tie_break_col='C5_parsimony', tie_break_ascending=False
         )
         score_col = 'vikor_Q'
         rank_col = 'vikor_rank'
     else:  # topsis
-        ranking_df = topsis(working_df, criteria, weights, criteria_types)
+        ranking_df = topsis(
+            working_df, criteria, weights, criteria_types,
+            tie_break_col='C5_parsimony', tie_break_ascending=False
+        )
         score_col = 'topsis_score'
         rank_col = 'topsis_rank'
 
@@ -462,16 +550,22 @@ def select_best_model(
         pareto_df = pareto_filter(working_df, criteria, criteria_types)
         working_df = pareto_df
 
-    # Apply MCDA method
+    # Apply MCDA method - break ties by parsimony if available, else by
+    # model label (bug 3.6)
+    parsimony_col = 'parsimony' if 'parsimony' in working_df.columns else None
     if config.mcda.method == 'vikor':
         ranking_df = vikor(
             working_df, criteria, weights, criteria_types,
-            v=config.mcda.vikor_v
+            v=config.mcda.vikor_v,
+            tie_break_col=parsimony_col, tie_break_ascending=False
         )
         score_col = 'vikor_Q'
         rank_col = 'vikor_rank'
     else:
-        ranking_df = topsis(working_df, criteria, weights, criteria_types)
+        ranking_df = topsis(
+            working_df, criteria, weights, criteria_types,
+            tie_break_col=parsimony_col, tie_break_ascending=False
+        )
         score_col = 'topsis_score'
         rank_col = 'topsis_rank'
 

@@ -3,7 +3,7 @@
 
 # Data Configuration
 data:
-  input_path: "data 1999-2025Q1.xlsx"
+  input_path: "data/raw/data 1999-2025Q1.xlsx"
   date_column: "Quarter"
   target_column: "CO2e"
   target_transform: "log"  # "log" or "delta_log"
@@ -91,6 +91,44 @@ output:
   figure_format: "png"
   save_models: true
   save_predictions: true
+
+# Data configurations A1-A4 (spec section 8)
+configurations:
+  names:
+    - "A1_raw"
+    - "A2_engineered"
+    - "A3_grid_fusion"
+    - "A4_full_fusion"
+  tags:
+    A1_raw: "A1"
+    A2_engineered: "A2"
+    A3_grid_fusion: "A3"
+    A4_full_fusion: "A4"
+  panels:
+    - "panel1_full_period"
+    - "panel2_common_period"
+
+# Electricity-grid data fusion (spec section 6)
+grid:
+  enabled: true
+  cache_dir: "data/raw/grid_cache"
+  minimum_quarter_completeness: 0.95
+  include_generation_mix: true
+  use_demand_weighted_intensity: false  # best-effort only, see final report
+  high_intensity_threshold_gco2_per_kwh: 300.0
+  extreme_intensity_percentile: 90.0
+
+mobility:
+  enabled: true
+  cache_dir: "data/raw/mobility"
+  minimum_quarter_completeness: 0.80
+  primary_cutoff_quarter: "2022Q3"
+  include_partial_2022q4: false  # sensitivity-only (spec section 29)
+  exclude_mobility_block: false  # mandatory sensitivity run (spec section 29)
+
+owid:
+  enabled: true
+  cache_dir: "data/raw/owid"
 
 # Global Settings
 seed: 42

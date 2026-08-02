@@ -1,0 +1,85 @@
+{
+  "fs_linear": {
+    "selected_features": [
+      "Rainfall",
+      "COVID_Deaths",
+      "CO2e_lag2",
+      "CO2e_lag4",
+      "GDP_dlog",
+      "HDD_proxy",
+      "Q2",
+      "Q4",
+      "COVID",
+      "Mobility_Grocery_Pharmacy",
+      "Mobility_Parks"
+    ],
+    "n_selected": 11
+  },
+  "fs_wrapper": {
+    "selected_features": [
+      "GDP",
+      "Population",
+      "Air_Temp",
+      "Rainfall",
+      "COVID_Deaths",
+      "CO2e_lag1",
+      "CO2e_lag2",
+      "CO2e_lag4",
+      "CO2e_dlog",
+      "GDP_dlog",
+      "HDD_proxy",
+      "Q2",
+      "Q3",
+      "Q4",
+      "COVID",
+      "Mobility_Retail_Recreation",
+      "Mobility_Parks",
+      "Mobility_Transit_Stations",
+      "Mobility_Workplaces",
+      "Mobility_Residential"
+    ],
+    "n_selected": 20
+  },
+  "fs_xgboost_shap": {
+    "selected_features": [
+      "GDP",
+      "Population",
+      "Air_Temp",
+      "CO2e_lag2",
+      "CO2e_lag4"
+    ],
+    "n_selected": 5
+  },
+  "fs_permutation_stability": {
+    "selected_features": [
+      "Mobility_Grocery_Pharmacy",
+      "Mobility_Parks",
+      "Mobility_Transit_Stations",
+      "Mobility_Workplaces",
+      "Mobility_Residential"
+    ],
+    "n_selected": 5
+  },
+  "fs_consensus": {
+    "selected_features": [
+      "GDP",
+      "Population",
+      "Air_Temp",
+      "Rainfall",
+      "COVID_Deaths",
+      "CO2e_lag2",
+      "CO2e_lag4",
+      "GDP_dlog",
+      "HDD_proxy",
+      "Q2",
+      "Q4",
+      "COVID",
+      "Mobility_Grocery_Pharmacy",
+      "Mobility_Parks",
+      "Mobility_Transit_Stations",
+      "Mobility_Workplaces",
+      "Mobility_Residential"
+    ],
+    "n_selected": 17
+  }
+}

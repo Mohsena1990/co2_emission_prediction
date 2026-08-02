@@ -1,0 +1,12 @@
+feature,fs_linear,fs_wrapper,fs_xgboost_shap,fs_permutation_stability,fs_consensus
+GDP,1,1,1,0,1
+Population,1,1,1,0,1
+Air_Temp,1,1,1,0,1
+Rainfall,1,1,1,0,1
+Mobility_Parks,1,1,0,1,1
+Mobility_Transit_Stations,0,1,1,1,1
+COVID_Deaths,1,1,0,0,1
+Mobility_Workplaces,0,1,0,1,1
+Mobility_Grocery_Pharmacy,0,1,0,1,1
+Mobility_Residential,0,1,0,1,1
+Mobility_Retail_Recreation,0,1,0,0,0

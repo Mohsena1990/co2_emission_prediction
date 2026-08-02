@@ -1,0 +1,15 @@
+variable,target_or_predictor,source,unit,frequency,start_date,end_date,missing_count,publication_timing,target_derived,safe_at_h1,safe_at_h2,safe_at_h4
+CO2e,target,raw input data file (upstream agency not recorded in repo),CO2e (as supplied),quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,0.0,n/a (target),False,False,False,False
+GDP,predictor,raw input data file (upstream agency not recorded in repo),£bn,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,0.0,release_delay_quarters=1,False,True,True,True
+Population,predictor,raw input data file (upstream agency not recorded in repo),not recorded,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,0.0,release_delay_quarters=0,False,True,True,True
+Air_Temp,predictor,raw input data file (upstream agency not recorded in repo),deg C,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,0.0,release_delay_quarters=0,False,True,True,True
+Rainfall,predictor,raw input data file (upstream agency not recorded in repo),mm,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,0.0,release_delay_quarters=0,False,True,True,True
+COVID_Deaths,predictor,raw input data file (upstream agency not recorded in repo),not recorded,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,0.0,release_delay_quarters=0,False,True,True,True
+Mobility_Retail_Recreation,predictor,raw input data file (upstream agency not recorded in repo),not recorded,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,,release_delay_quarters=0,False,True,True,True
+Mobility_Grocery_Pharmacy,predictor,raw input data file (upstream agency not recorded in repo),not recorded,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,,release_delay_quarters=0,False,True,True,True
+Mobility_Parks,predictor,raw input data file (upstream agency not recorded in repo),not recorded,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,,release_delay_quarters=0,False,True,True,True
+Mobility_Transit_Stations,predictor,raw input data file (upstream agency not recorded in repo),not recorded,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,,release_delay_quarters=0,False,True,True,True
+Mobility_Workplaces,predictor,raw input data file (upstream agency not recorded in repo),not recorded,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,,release_delay_quarters=0,False,True,True,True
+Mobility_Residential,predictor,raw input data file (upstream agency not recorded in repo),not recorded,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,,release_delay_quarters=0,False,True,True,True
+OWID_RenewableShare_L1Y,predictor,raw input data file (upstream agency not recorded in repo),not recorded,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,,release_delay_quarters=4,False,True,True,True
+OWID_LowCarbonShare_L1Y,predictor,raw input data file (upstream agency not recorded in repo),not recorded,quarterly,1999-01-01 00:00:00,2025-01-01 00:00:00,,release_delay_quarters=4,False,True,True,True

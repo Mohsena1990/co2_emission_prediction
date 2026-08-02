@@ -1,8 +1,0 @@
-{
-  "features": [
-    "Air_Temp",
-    "CO2e_lag1",
-    "Q2",
-    "Q4"
-  ]
-}

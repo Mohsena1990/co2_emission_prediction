@@ -1,0 +1,5 @@
+source,retrieval_date,checksum,first_observation,last_observation,n_records,coverage_note
+Google COVID-19 mobility,2026-08-01T14:16:36.114474+00:00,0e13c211333b9689200ddde1c13d65c1700ddd9226be7365c5e5b9d204da07d1,2020-02-15,2022-10-15,974.0,"daily national UK, 2020-02-15 through Google archive end (~2022-10-15)"
+NESO GB Carbon Intensity API,,,2018-01-01,2026-04-01,34.0,2 quarters excluded for incompleteness
+OWID renewable electricity share,2026-08-01,,,,,"annual UK series, one-year-lagged before use (spec 8.2)"
+OWID low-carbon electricity share,2026-08-01,,,,,"annual UK series, one-year-lagged before use (spec 8.2)"

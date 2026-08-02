@@ -1,0 +1,52 @@
+2026-08-01 16:20:53 | INFO     | co2_forecast | Logging to: outputs/logs/generate_tables.log
+2026-08-01 16:20:53 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:20:53 | INFO     | co2_forecast | Script 13: Generate Tables 1-10 (source run_id=smoke_p10)
+2026-08-01 16:20:53 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:20:53 | INFO     | co2_forecast | Loaded feature registry: 37 candidate predictors from config/feature_registry.yaml
+2026-08-01 16:20:53 | INFO     | co2_forecast |   table1_revised_raw_data: 14 rows -> /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/tables_smoke/table1_revised_raw_data.csv
+2026-08-01 16:20:53 | INFO     | co2_forecast |   table2_feature_registry: 37 rows -> /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/tables_smoke/table2_feature_registry.csv
+2026-08-01 16:20:53 | INFO     | co2_forecast |   table3_ab_configuration_definitions: 8 rows -> /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/tables_smoke/table3_ab_configuration_definitions.csv
+2026-08-01 16:20:53 | INFO     | co2_forecast | Pareto filter: 4 -> 4 alternatives
+2026-08-01 16:20:53 | INFO     | co2_forecast | VIKOR ranking complete. Best: A4/all_features/ridge
+2026-08-01 16:20:53 | INFO     | co2_forecast |   Acceptable advantage: False
+2026-08-01 16:20:53 | INFO     | co2_forecast |   Acceptable stability: True
+2026-08-01 16:20:53 | INFO     | co2_forecast | Pareto filter: 20 -> 14 alternatives
+2026-08-01 16:20:53 | INFO     | co2_forecast | VIKOR ranking complete. Best: A2/fs_xgboost_shap/ridge
+2026-08-01 16:20:53 | INFO     | co2_forecast |   Acceptable advantage: False
+2026-08-01 16:20:53 | INFO     | co2_forecast |   Acceptable stability: True
+2026-08-01 16:20:53 | INFO     | co2_forecast |   table4_stream_A_comparison: 4 rows -> /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/tables_smoke/table4_stream_A_comparison.csv
+2026-08-01 16:20:53 | INFO     | co2_forecast |   table5_stream_B_comparison: 20 rows -> /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/tables_smoke/table5_stream_B_comparison.csv
+2026-08-01 16:20:53 | INFO     | co2_forecast |   table6_global_factor_summary: 18 rows -> /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/tables_smoke/table6_global_factor_summary.csv
+2026-08-01 16:20:53 | INFO     | co2_forecast |   table7_stream_winners_and_final: 2 rows -> /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/tables_smoke/table7_stream_winners_and_final.csv
+2026-08-01 16:20:53 | INFO     | co2_forecast |   table8_fs_outputs: 96 rows -> /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/tables_smoke/table8_fs_outputs.csv
+2026-08-01 16:20:53 | INFO     | co2_forecast |   table9_covid_regime_interpretation: 9 rows -> /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/tables_smoke/table9_covid_regime_interpretation.csv
+2026-08-01 16:20:53 | INFO     | co2_forecast |   table10_source_data_quality: 4 rows -> /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/tables_smoke/table10_source_data_quality.csv
+2026-08-01 16:20:53 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:20:53 | INFO     | co2_forecast | Script 13 complete! 10/10 tables written to /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/tables_smoke
+2026-08-01 16:20:53 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:39:53 | INFO     | co2_forecast | Logging to: outputs/logs/generate_tables.log
+2026-08-02 01:39:53 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:39:53 | INFO     | co2_forecast | Script 13: Generate Tables 1-10 (source run_id=my_run)
+2026-08-02 01:39:53 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:39:53 | INFO     | co2_forecast | Loaded feature registry: 37 candidate predictors from config/feature_registry.yaml
+2026-08-02 01:39:53 | INFO     | co2_forecast |   table1_revised_raw_data: 14 rows -> outputs/tables/table1_revised_raw_data.csv
+2026-08-02 01:39:53 | INFO     | co2_forecast |   table2_feature_registry: 37 rows -> outputs/tables/table2_feature_registry.csv
+2026-08-02 01:39:53 | INFO     | co2_forecast |   table3_ab_configuration_definitions: 8 rows -> outputs/tables/table3_ab_configuration_definitions.csv
+2026-08-02 01:39:53 | INFO     | co2_forecast | Pareto filter: 20 -> 16 alternatives
+2026-08-02 01:39:53 | INFO     | co2_forecast | VIKOR ranking complete. Best: A3/all_features/lightgbm
+2026-08-02 01:39:53 | INFO     | co2_forecast |   Acceptable advantage: True
+2026-08-02 01:39:53 | INFO     | co2_forecast |   Acceptable stability: True
+2026-08-02 01:39:54 | INFO     | co2_forecast | Pareto filter: 100 -> 48 alternatives
+2026-08-02 01:39:54 | INFO     | co2_forecast | VIKOR ranking complete. Best: A1/fs_linear/catboost
+2026-08-02 01:39:54 | INFO     | co2_forecast |   Acceptable advantage: True
+2026-08-02 01:39:54 | INFO     | co2_forecast |   Acceptable stability: True
+2026-08-02 01:39:54 | INFO     | co2_forecast |   table4_stream_A_comparison: 20 rows -> outputs/tables/table4_stream_A_comparison.csv
+2026-08-02 01:39:54 | INFO     | co2_forecast |   table5_stream_B_comparison: 100 rows -> outputs/tables/table5_stream_B_comparison.csv
+2026-08-02 01:39:54 | INFO     | co2_forecast |   table6_global_factor_summary: 18 rows -> outputs/tables/table6_global_factor_summary.csv
+2026-08-02 01:39:54 | INFO     | co2_forecast |   table7_stream_winners_and_final: 2 rows -> outputs/tables/table7_stream_winners_and_final.csv
+2026-08-02 01:39:54 | INFO     | co2_forecast |   table8_fs_outputs: 96 rows -> outputs/tables/table8_fs_outputs.csv
+2026-08-02 01:39:54 | INFO     | co2_forecast |   table9_covid_regime_interpretation: 9 rows -> outputs/tables/table9_covid_regime_interpretation.csv
+2026-08-02 01:39:54 | INFO     | co2_forecast |   table10_source_data_quality: 4 rows -> outputs/tables/table10_source_data_quality.csv
+2026-08-02 01:39:54 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:39:54 | INFO     | co2_forecast | Script 13 complete! 10/10 tables written to outputs/tables
+2026-08-02 01:39:54 | INFO     | co2_forecast | ============================================================

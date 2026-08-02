@@ -1,0 +1,9 @@
+run_id,configuration,panel,fs_option,model,horizon,fold_id,target_date,actual,predicted,residual
+my_run,A4,panel2_common_period,all_features,catboost,2,3,2022-10-01,109987.89999999998,110169.87492012908,181.97492012909788
+my_run,A4,panel2_common_period,all_features,catboost,2,3,2023-01-01,109706.89999999992,114831.91279013111,5125.012790131208
+my_run,A4,panel2_common_period,all_features,catboost,2,3,2023-04-01,95012.50000000006,93635.98300234278,-1376.5169976572795
+my_run,A4,panel2_common_period,all_features,catboost,2,3,2023-07-01,92715.5,100020.8554469008,7305.355446900794
+my_run,A4,panel2_common_period,all_features,catboost,2,4,2023-10-01,106259.39999999992,106481.977708995,222.5777089950861
+my_run,A4,panel2_common_period,all_features,catboost,2,4,2024-01-01,114491.90000000008,104980.13297756448,-9511.767022435612
+my_run,A4,panel2_common_period,all_features,catboost,2,4,2024-04-01,98590.0,96940.26292463703,-1649.7370753629511
+my_run,A4,panel2_common_period,all_features,catboost,2,4,2024-07-01,95843.10000000003,101039.28425838122,5196.184258381181

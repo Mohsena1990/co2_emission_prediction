@@ -1,0 +1,9 @@
+run_id,configuration,panel,fs_option,model,horizon,fold_id,target_date,actual,predicted,residual
+my_run,A3,panel2_common_period,all_features,lightgbm,4,5,2023-04-01,95012.50000000006,90971.22768801168,-4041.272311988389
+my_run,A3,panel2_common_period,all_features,lightgbm,4,5,2023-07-01,92715.5,87882.5678143525,-4832.932185647514
+my_run,A3,panel2_common_period,all_features,lightgbm,4,5,2023-10-01,106259.39999999992,100699.78574556828,-5559.6142544316535
+my_run,A3,panel2_common_period,all_features,lightgbm,4,5,2024-01-01,114491.90000000008,112744.4255388976,-1747.4744611024944
+my_run,A3,panel2_common_period,all_features,lightgbm,4,6,2024-04-01,98590.0,98885.76118511683,295.7611851168476
+my_run,A3,panel2_common_period,all_features,lightgbm,4,6,2024-07-01,95843.10000000003,97744.36565147965,1901.2656514795965
+my_run,A3,panel2_common_period,all_features,lightgbm,4,6,2024-10-01,111622.30000000002,118640.7305490804,7018.430549080382
+my_run,A3,panel2_common_period,all_features,lightgbm,4,6,2025-01-01,115136.6999999999,112072.78013258376,-3063.9198674161453

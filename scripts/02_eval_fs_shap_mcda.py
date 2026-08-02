@@ -28,7 +28,7 @@ from src.core import (
     set_seed, save_json_numpy, load_json, get_latest_run_id
 )
 from src.data_io import load_processed_data
-from src.splits import load_cv_plan
+from src.splits import load_cv_plan, build_tuning_cv_plan
 from src.fs import create_fs_evaluation_matrix
 from src.decision import select_best_fs_option, pareto_filter
 from src.reporting import (
@@ -92,8 +92,22 @@ def main():
     logger.info("-" * 40)
     logger.info("Evaluating FS options with SHAP...")
 
+    # BUG FIX (spec 3.4 / audit finding A-7): evaluate_fs_option_with_shap
+    # fits an evaluator model per fold and scores it (MAE + SHAP) on that
+    # fold's TEST rows - if `cv_plan` (the same flat plan script 04 later
+    # uses for "final" held-out evaluation) were passed here, the FS-ranking
+    # signal (fs_mcda_ranking.csv, selected_feature_set.json, SHAP
+    # concentration/stability) would be computed on the outer test period,
+    # which spec 3.4 explicitly forbids ("Do not calculate selection SHAP
+    # values on the outer test period"). Use the same isolated tuning plan
+    # script 03 already uses for PSO (build_tuning_cv_plan): every fold it
+    # generates ends strictly before the earliest date any `cv_plan` fold
+    # uses as a held-out test target, so this evaluation can never see a row
+    # that will later be graded as "final" performance.
+    tuning_cv_plan = build_tuning_cv_plan(X, y, cv_plan, config.splits)
+
     eval_matrix, detailed_results = create_fs_evaluation_matrix(
-        fs_results, X, y, cv_plan, config
+        fs_results, X, y, tuning_cv_plan, config
     )
 
     # Save evaluation matrix

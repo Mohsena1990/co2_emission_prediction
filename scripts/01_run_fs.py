@@ -26,7 +26,7 @@ from src.core import (
     set_seed, save_json_numpy, load_pickle
 )
 from src.data_io import load_processed_data
-from src.splits import load_cv_plan
+from src.splits import load_cv_plan, build_tuning_cv_plan
 from src.fs import run_all_fs_options
 
 
@@ -66,9 +66,21 @@ def main():
 
     X = load_processed_data(processed_dir / 'X_full')
     y = load_processed_data(processed_dir / 'y')['target']
-    cv_plan = load_cv_plan(processed_dir / 'cv_plan.pkl')
+    eval_cv_plan = load_cv_plan(processed_dir / 'cv_plan.pkl')
 
     logger.info(f"Loaded: {len(X)} samples, {len(X.columns)} features")
+
+    # Bug 3.4/audit A-7 fix: feature selection must never be fit or scored
+    # on folds that overlap the outer evaluation windows in `eval_cv_plan`
+    # (the same plan scripts 03/04 use to report "final" performance).
+    # Build an isolated tuning-only CV plan - identical mechanism already
+    # used correctly by scripts/02 and scripts/03 - and run FS on that
+    # instead of the flat outer plan.
+    tuning_cv_plan = build_tuning_cv_plan(X, y, eval_cv_plan, config.splits)
+    logger.info(
+        f"Built isolated FS tuning CV plan: {tuning_cv_plan.n_folds} folds, "
+        f"strictly before the earliest outer evaluation fold's test start."
+    )
 
     # =========================================
     # Run All Feature Selection Options
@@ -76,7 +88,7 @@ def main():
     logger.info("-" * 40)
     logger.info("Running all feature selection methods...")
 
-    fs_results = run_all_fs_options(X, y, cv_plan, config)
+    fs_results = run_all_fs_options(X, y, tuning_cv_plan, config)
 
     # Save results
     save_json_numpy(fs_results, dirs['models'] / 'fs_results.json')

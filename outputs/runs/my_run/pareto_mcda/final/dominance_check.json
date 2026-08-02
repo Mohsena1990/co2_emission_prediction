@@ -1,0 +1,8 @@
+{
+  "one_dominates_other": false,
+  "dominant": null,
+  "non_dominated": [
+    "Best_A",
+    "Best_B"
+  ]
+}

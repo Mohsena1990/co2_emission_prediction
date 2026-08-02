@@ -1,0 +1,13 @@
+family,sum,mean,count,share_of_total,regime
+grid_exogenous,0.0,0.0,10,,pre_covid
+mobility_exogenous,0.0,0.0,6,,pre_covid
+owid_exogenous,0.0,0.0,2,,pre_covid
+raw_exogenous,0.0,0.0,5,,pre_covid
+grid_exogenous,0.0,0.0,10,,covid
+mobility_exogenous,0.0,0.0,6,,covid
+owid_exogenous,0.0,0.0,2,,covid
+raw_exogenous,0.0,0.0,5,,covid
+grid_exogenous,0.0,0.0,10,,post_covid
+mobility_exogenous,0.0,0.0,6,,post_covid
+owid_exogenous,0.0,0.0,2,,post_covid
+raw_exogenous,0.0,0.0,5,,post_covid

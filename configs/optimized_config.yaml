@@ -4,7 +4,7 @@
 
 # Data Configuration
 data:
-  input_path: "data 1999-2025Q1.xlsx"
+  input_path: "data/raw/data 1999-2025Q1.xlsx"
   date_column: "Quarter"
   target_column: "CO2e"
   target_transform: "log"  # Appropriate for near-normal, slight right-skew

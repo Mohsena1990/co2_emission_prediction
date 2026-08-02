@@ -10,10 +10,22 @@ from ..core.logging_utils import get_logger
 from ..core.config import Config
 from ..splits.walk_forward import CVPlan
 from .linear import fs_linear
-from .nonlinear import fs_nonlinear
+from .nonlinear import fs_xgboost_shap
 from .filter_methods import run_all_filter_methods
-from .wrapper_methods import run_all_wrapper_methods
-from .embedded_methods import run_all_embedded_methods
+from .wrapper_methods import run_all_wrapper_methods, fs_wrapper
+from .embedded_methods import run_all_embedded_methods, fs_permutation_stability
+
+# The five primary feature-selection strategies (spec section 7): each maps
+# a config.fs.methods entry to the (result dict key, callable) that
+# produces it. FS5 (consensus) is handled separately in run_all_fs_options
+# since it's built from the other four's results rather than computed
+# independently.
+FS_METHOD_REGISTRY = {
+    'linear_stability': ('fs_linear', fs_linear),
+    'wrapper': ('fs_wrapper', fs_wrapper),
+    'xgboost_shap': ('fs_xgboost_shap', fs_xgboost_shap),
+    'permutation_stability': ('fs_permutation_stability', fs_permutation_stability),
+}
 
 
 def vote_based_selection(
@@ -157,18 +169,25 @@ def fs_consensus(
     cv_plan: CVPlan,
     config: Config,
     linear_results: Dict[str, Any] = None,
-    nonlinear_results: Dict[str, Any] = None
+    wrapper_results: Dict[str, Any] = None,
+    xgboost_shap_results: Dict[str, Any] = None,
+    permutation_results: Dict[str, Any] = None
 ) -> Dict[str, Any]:
     """
-    Consensus feature selection combining linear and nonlinear methods.
+    FS5: consensus feature selection - votes across the four other primary
+    strategies (FS1 linear_stability, FS2 wrapper, FS3 xgboost_shap, FS4
+    permutation_stability) using `config.fs.vote_threshold` as the minimum
+    number of strategies that must agree on a feature.
 
     Args:
         X: Feature DataFrame
         y: Target Series
         cv_plan: CV plan
         config: Configuration
-        linear_results: Pre-computed linear FS results (optional)
-        nonlinear_results: Pre-computed nonlinear FS results (optional)
+        linear_results: Pre-computed FS1 results (optional, computed if None)
+        wrapper_results: Pre-computed FS2 results (optional, computed if None)
+        xgboost_shap_results: Pre-computed FS3 results (optional, computed if None)
+        permutation_results: Pre-computed FS4 results (optional, computed if None)
 
     Returns:
         Dictionary with selected features and scores
@@ -181,28 +200,22 @@ def fs_consensus(
         'steps': []
     }
 
-    # Run or use provided linear FS
     if linear_results is None:
         linear_results = fs_linear(X, y, cv_plan, config)
+    if wrapper_results is None:
+        wrapper_results = fs_wrapper(X, y, cv_plan, config)
+    if xgboost_shap_results is None:
+        xgboost_shap_results = fs_xgboost_shap(X, y, cv_plan, config)
+    if permutation_results is None:
+        permutation_results = fs_permutation_stability(X, y, cv_plan, config)
 
-    # Run or use provided nonlinear FS
-    if nonlinear_results is None:
-        nonlinear_results = fs_nonlinear(X, y, cv_plan, config)
+    method_selections = {
+        'linear_stability': linear_results.get('selected_features', []),
+        'wrapper': wrapper_results.get('selected_features', []),
+        'xgboost_shap': xgboost_shap_results.get('selected_features', []),
+        'permutation_stability': permutation_results.get('selected_features', []),
+    }
 
-    # Collect all method selections
-    method_selections = {}
-
-    # From linear methods
-    for step in linear_results.get('steps', []):
-        method_name = f"linear_{step['name']}"
-        method_selections[method_name] = step.get('selected', [])
-
-    # From nonlinear methods
-    for step in nonlinear_results.get('steps', []):
-        method_name = f"nonlinear_{step['name']}"
-        method_selections[method_name] = step.get('selected', [])
-
-    # Step 1: Vote-based selection
     vote_selected, vote_df = vote_based_selection(
         method_selections,
         list(X.columns),
@@ -215,37 +228,24 @@ def fs_consensus(
         'votes': vote_df.to_dict(orient='records')
     })
 
-    # Step 2: Stability-based selection
-    stability_selected, stability_df = stability_based_selection(
-        X, y, cv_plan,
-        method=config.fs.evaluator_model,
-        stability_threshold=config.fs.stability_threshold,
-        seed=config.seed
-    )
-    results['steps'].append({
-        'name': 'stability_selection',
-        'selected': stability_selected,
-        'n_selected': len(stability_selected),
-        'stability': stability_df.to_dict(orient='records')
-    })
+    min_features = getattr(config.fs, 'min_features', 3)
+    final_selected = vote_selected
 
-    # Final consensus: intersection of vote and stability
-    final_selected = list(set(vote_selected) & set(stability_selected))
-
-    # If intersection is too small, use union with higher vote threshold
-    if len(final_selected) < 3:
-        logger.warning("Intersection too small, using features with >=3 votes or high stability")
-        high_vote = vote_df[vote_df['vote_count'] >= 3]['feature'].tolist()
-        high_stability = stability_df[stability_df['stability'] >= 0.7]['feature'].tolist()
-        final_selected = list(set(high_vote) | set(high_stability))
+    # If too few features agree at the configured vote threshold, fall back
+    # to a lower bar (>=1 vote, i.e. union) rather than over-filtering.
+    if len(final_selected) < min_features:
+        logger.info(
+            f"FS_consensus: Only {len(final_selected)} features at "
+            f">= {config.fs.vote_threshold} votes, falling back to >=1 vote"
+        )
+        final_selected = vote_df[vote_df['vote_count'] >= 1]['feature'].tolist()
 
     # Preserve original order
     final_selected = [f for f in X.columns if f in final_selected]
 
     results['selected_features'] = final_selected
     results['n_selected'] = len(final_selected)
-    results['linear_results'] = linear_results
-    results['nonlinear_results'] = nonlinear_results
+    results['method_selections'] = method_selections
 
     logger.info(f"FS_consensus final: {len(final_selected)} features selected")
 
@@ -302,7 +302,12 @@ def fs_hybrid(
     # Run wrapper methods if not provided
     if wrapper_results is None:
         logger.info("Running wrapper methods...")
-        wrapper_results = run_all_wrapper_methods(X, y, n_features=top_k, cv=5, seed=config.seed)
+        wrapper_results = run_all_wrapper_methods(
+            X, y, cv_plan, n_features=top_k,
+            stability_threshold=getattr(config.fs, 'stability_threshold', 0.5),
+            min_features=getattr(config.fs, 'min_features', 3),
+            seed=config.seed
+        )
 
     # Run embedded methods if not provided
     if embedded_results is None:
@@ -408,7 +413,13 @@ def run_all_fs_options(
     config: Config
 ) -> Dict[str, Dict[str, Any]]:
     """
-    Run all feature selection options including hybrid approach.
+    Run the five primary feature-selection strategies (spec section 7):
+    FS1 linear_stability, FS2 wrapper, FS3 xgboost_shap, FS4
+    permutation_stability, and FS5 consensus (built from the first four).
+
+    The exact set is driven by `config.fs.methods` (default: all five) so a
+    caller can narrow it down for a faster experimental run without editing
+    code; unknown entries are skipped with a warning.
 
     Args:
         X: Feature DataFrame
@@ -417,7 +428,8 @@ def run_all_fs_options(
         config: Configuration
 
     Returns:
-        Dictionary with results for each FS option
+        Dictionary with results for each FS option (`fs_linear`, `fs_wrapper`,
+        `fs_xgboost_shap`, `fs_permutation_stability`, `fs_consensus`).
     """
     logger = get_logger()
     logger.info("Running all feature selection options...")
@@ -429,85 +441,30 @@ def run_all_fs_options(
     X_clean = X_clean.loc[common_idx]
     y_clean = y_clean.loc[common_idx]
 
-    top_k = getattr(config.fs, 'top_k_features', 10)
-    run_hybrid = getattr(config.fs, 'run_hybrid_fs', True)
+    methods = getattr(config.fs, 'methods', None) or [
+        'linear_stability', 'wrapper', 'xgboost_shap', 'permutation_stability', 'consensus'
+    ]
 
     results = {}
 
-    # FS_linear
-    logger.info("=" * 50)
-    results['fs_linear'] = fs_linear(X_clean, y_clean, cv_plan, config)
-
-    # FS_nonlinear
-    logger.info("=" * 50)
-    results['fs_nonlinear'] = fs_nonlinear(X_clean, y_clean, cv_plan, config)
-
-    # FS_consensus (uses results from linear and nonlinear)
-    logger.info("=" * 50)
-    results['fs_consensus'] = fs_consensus(
-        X_clean, y_clean, cv_plan, config,
-        linear_results=results['fs_linear'],
-        nonlinear_results=results['fs_nonlinear']
-    )
-
-    # Run filter, wrapper, embedded methods for additional options and hybrid
-    if run_hybrid:
+    for method in methods:
+        if method == 'consensus':
+            continue
+        if method not in FS_METHOD_REGISTRY:
+            logger.warning(f"Unknown FS method '{method}' in config.fs.methods, skipping")
+            continue
+        key, fn = FS_METHOD_REGISTRY[method]
         logger.info("=" * 50)
-        logger.info("Running filter methods...")
-        filter_results = run_all_filter_methods(X_clean, y_clean, top_k=top_k, seed=config.seed)
+        results[key] = fn(X_clean, y_clean, cv_plan, config)
 
+    if 'consensus' in methods:
         logger.info("=" * 50)
-        logger.info("Running wrapper methods...")
-        wrapper_results = run_all_wrapper_methods(X_clean, y_clean, n_features=top_k, cv=5, seed=config.seed)
-
-        logger.info("=" * 50)
-        logger.info("Running embedded methods...")
-        embedded_results = run_all_embedded_methods(X_clean, y_clean, top_k=top_k, cv=5, seed=config.seed)
-
-        # Add individual method results as FS options
-        results['fs_filter'] = {
-            'method': 'filter',
-            'steps': list(filter_results.values()),
-            'selected_features': list(set().union(*[
-                set(r.get('selected_features', [])) for r in filter_results.values()
-            ])),
-            'n_selected': len(set().union(*[
-                set(r.get('selected_features', [])) for r in filter_results.values()
-            ])),
-            'sub_methods': filter_results
-        }
-
-        results['fs_wrapper'] = {
-            'method': 'wrapper',
-            'steps': list(wrapper_results.values()),
-            'selected_features': list(set().union(*[
-                set(r.get('selected_features', [])) for r in wrapper_results.values()
-            ])),
-            'n_selected': len(set().union(*[
-                set(r.get('selected_features', [])) for r in wrapper_results.values()
-            ])),
-            'sub_methods': wrapper_results
-        }
-
-        results['fs_embedded'] = {
-            'method': 'embedded',
-            'steps': list(embedded_results.values()),
-            'selected_features': list(set().union(*[
-                set(r.get('selected_features', [])) for r in embedded_results.values()
-            ])),
-            'n_selected': len(set().union(*[
-                set(r.get('selected_features', [])) for r in embedded_results.values()
-            ])),
-            'sub_methods': embedded_results
-        }
-
-        # FS_hybrid (filter + wrapper + embedded)
-        logger.info("=" * 50)
-        results['fs_hybrid'] = fs_hybrid(
+        results['fs_consensus'] = fs_consensus(
             X_clean, y_clean, cv_plan, config,
-            filter_results=filter_results,
-            wrapper_results=wrapper_results,
-            embedded_results=embedded_results
+            linear_results=results.get('fs_linear'),
+            wrapper_results=results.get('fs_wrapper'),
+            xgboost_shap_results=results.get('fs_xgboost_shap'),
+            permutation_results=results.get('fs_permutation_stability')
         )
 
     logger.info("=" * 50)

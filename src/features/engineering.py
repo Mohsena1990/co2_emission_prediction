@@ -62,6 +62,51 @@ def create_target_variable(
     return y, metadata
 
 
+def create_direct_horizon_targets(
+    y: pd.Series,
+    horizons: List[int]
+) -> Dict[int, pd.Series]:
+    """
+    Build direct (non-recursive) horizon-specific targets from a single
+    origin-aligned target series.
+
+    STRUCTURAL FIX (spec 3.1 / section 12): the feature matrix X is built so
+    that row t contains only information available at forecast origin t
+    (e.g. CO2e_lag1 at row t = CO2e_{t-1}). For a *direct* h-step-ahead
+    forecast, the correct supervised pair is (X_t, y_{t+h}) - NOT (X_{t+h},
+    y_{t+h}), which is what a naive "shift the train/test split boundary by
+    h rows and reuse row-aligned X" walk-forward scheme implicitly does. The
+    latter lets features like CO2e_lag1 at row t+h reference CO2e_{t+h-1},
+    which is not observable at the true origin t for h > 1 - a leakage bug.
+
+    This function returns, for each horizon h, the series y_h where
+    y_h.loc[t] == y.loc[t + h] (aligned back onto the origin index t), so
+    that direct per-horizon models are trained as (X_t, y_h.loc[t]) pairs.
+    Rows near the end of the series where t+h falls outside the index become
+    NaN and must be dropped by the caller together with the corresponding
+    X rows.
+
+    Args:
+        y: Target series (original or transformed scale) with a
+            DatetimeIndex at quarterly frequency, in temporal order.
+        horizons: Horizons to build (e.g. [1, 2, 4]).
+
+    Returns:
+        Dict mapping horizon -> shifted target series aligned to the origin
+        index (same index as `y`).
+    """
+    if not isinstance(y.index, pd.DatetimeIndex):
+        raise ValueError("create_direct_horizon_targets requires y to have a DatetimeIndex")
+
+    targets = {}
+    for h in horizons:
+        if h < 1:
+            raise ValueError(f"Horizon must be >= 1, got {h}")
+        targets[h] = y.shift(-h)
+        targets[h].name = f"{y.name or 'target'}_h{h}"
+    return targets
+
+
 def create_lag_features(
     df: pd.DataFrame,
     columns: List[str],
@@ -224,15 +269,30 @@ def create_rate_of_change_features(
 def create_intensity_features(
     df: pd.DataFrame,
     target_col: str = 'CO2e',
-    denominator_cols: Optional[List[str]] = None
+    denominator_cols: Optional[List[str]] = None,
+    min_lag: int = 1
 ) -> pd.DataFrame:
     """
-    Create intensity/per-capita features.
+    Create intensity/per-capita features (e.g. CO2e_per_Population).
+
+    BUG FIX (spec 3.1): these features must never divide a contemporaneous,
+    untransformed target value by a contemporaneous denominator, since that
+    directly leaks CO2e_t into a predictor used to forecast CO2e_{t+h}. Both
+    the numerator and denominator are therefore lagged by `min_lag` quarters
+    before the ratio is formed, i.e.:
+
+        CO2e_per_Population_t = CO2e_{t-min_lag} / Population_{t-min_lag}
+
+    This is a historical, forecast-available ratio, not a same-quarter
+    intensity measure. `min_lag` must be >= 1; callers requiring extra
+    horizon-specific safety margin (e.g. H2/H4) can pass a larger value.
 
     Args:
         df: Input DataFrame
-        target_col: Target column (numerator)
-        denominator_cols: Columns to use as denominators (e.g., Population, TEC)
+        target_col: Target column (numerator, will be lagged)
+        denominator_cols: Columns to use as denominators (e.g., Population)
+        min_lag: Minimum number of quarters to lag both numerator and
+            denominator (must be >= 1; default 1).
 
     Returns:
         DataFrame with intensity features
@@ -240,25 +300,37 @@ def create_intensity_features(
     logger = get_logger()
     intensity_features = {}
 
+    if min_lag < 1:
+        raise ValueError(
+            f"create_intensity_features: min_lag must be >= 1 to avoid "
+            f"target leakage (CO2e_t must never appear in a predictor used "
+            f"to forecast CO2e_t or later), got min_lag={min_lag}"
+        )
+
     if target_col not in df.columns:
         logger.warning(f"Target column '{target_col}' not found")
         return pd.DataFrame(index=df.index)
 
     # Default denominator columns
     if denominator_cols is None:
-        denominator_cols = ['Population', 'TEC']
+        denominator_cols = ['Population']
+
+    numerator_lagged = df[target_col].shift(min_lag)
 
     for denom_col in denominator_cols:
         if denom_col not in df.columns:
             logger.warning(f"Denominator column '{denom_col}' not found, skipping")
             continue
 
-        # Avoid division by zero
-        denom = df[denom_col].replace(0, np.nan)
-        intensity_features[f'{target_col}_per_{denom_col}'] = df[target_col] / denom
+        # Lag denominator by the same amount, avoid division by zero
+        denom_lagged = df[denom_col].shift(min_lag).replace(0, np.nan)
+        intensity_features[f'{target_col}_per_{denom_col}'] = numerator_lagged / denom_lagged
 
     intensity_df = pd.DataFrame(intensity_features, index=df.index)
-    logger.info(f"Created {len(intensity_features)} intensity features")
+    logger.info(
+        f"Created {len(intensity_features)} intensity features "
+        f"(numerator and denominator both lagged by {min_lag} quarter(s))"
+    )
 
     return intensity_df
 
@@ -385,6 +457,19 @@ def engineer_features(
     # Start with original features
     X = df[feature_cols].copy()
 
+    # Hard removal (spec section 2): TEC, CEI, and anything derived from them
+    # must never enter any candidate pool, not even behind an opt-in flag.
+    # The raw source file may still contain these columns - drop them here,
+    # structurally, before any downstream feature construction (lags,
+    # rate-of-change, intensity ratios) can reference them, rather than
+    # relying on the registry enforcement below to merely reject them.
+    REMOVED_RAW_COLUMNS = ('TEC', 'CEI')
+    removed_present = [c for c in REMOVED_RAW_COLUMNS if c in X.columns]
+    if removed_present:
+        X = X.drop(columns=removed_present)
+        metadata['removed_columns'] = removed_present
+        logger.info(f"Dropped removed raw columns per spec section 2: {removed_present}")
+
     # Create lag features
     lag_cols = config.features.lag_features
     if lag_cols:
@@ -433,7 +518,12 @@ def engineer_features(
 
     # Create rate-of-change features (if enabled)
     if getattr(config.features, 'include_roc_features', False):
-        roc_cols = getattr(config.features, 'roc_columns', ['TEC', 'GDP'])
+        roc_cols = getattr(config.features, 'roc_columns', ['GDP'])
+        if 'TEC' in roc_cols:
+            raise ValueError(
+                "roc_columns includes 'TEC', which is removed per spec section 2 "
+                "(no TEC-derived feature may be created, not even opt-in)."
+            )
         # Also add target column rate-of-change
         roc_all_cols = roc_cols + [target_col]
         roc_df = create_rate_of_change_features(
@@ -449,17 +539,30 @@ def engineer_features(
         metadata['roc_features'] = roc_df.columns.tolist()
         logger.info(f"Created {len(roc_df.columns)} rate-of-change features")
 
-    # Create intensity features (if enabled)
+    # Create intensity features (if enabled) - opt-in, default off (spec 3.1)
     if getattr(config.features, 'include_intensity_features', False):
-        intensity_denominators = getattr(config.features, 'intensity_denominators', ['Population', 'TEC'])
+        intensity_denominators = getattr(config.features, 'intensity_denominators', ['Population'])
+        if 'TEC' in intensity_denominators:
+            raise ValueError(
+                "intensity_denominators includes 'TEC', which is removed per spec "
+                "section 2 (no TEC-derived feature may be created, not even opt-in)."
+            )
+        intensity_min_lag = getattr(config.features, 'intensity_min_lag', 1)
         intensity_df = create_intensity_features(
             df,
             target_col=target_col,
-            denominator_cols=intensity_denominators
+            denominator_cols=intensity_denominators,
+            min_lag=intensity_min_lag
         )
         X = pd.concat([X, intensity_df], axis=1)
         metadata['intensity_features'] = intensity_df.columns.tolist()
         logger.info(f"Created {len(intensity_df.columns)} intensity features")
+
+    # NOTE: CEI is removed per spec section 2 (no CEI-derived feature may be
+    # created, not even opt-in) - the raw column is already dropped above, and
+    # no lagged-CEI feature is constructed here anymore (previously
+    # create_lagged_cei_feature / CEI_lag1, spec 3.2's now-superseded
+    # governance approach).
 
     # Create weather features (if enabled)
     if getattr(config.features, 'include_weather_features', False):
@@ -479,6 +582,59 @@ def engineer_features(
     shock_df = create_shock_features(df, config.features)
     X = pd.concat([X, shock_df], axis=1)
     metadata['shock_features'] = shock_df.columns.tolist()
+
+    # Predictor-governance enforcement (spec section 5 / bug-audit Finding
+    # A-1): config/feature_registry.yaml is meant to be the single source of
+    # truth for which columns are allowed into any model matrix, but until
+    # now nothing actually consulted it here - FeatureRegistry.enforce()
+    # existed but was unused, so a feature that drifted out of the registry
+    # (e.g. a rename, or a new column added to `df` upstream) could silently
+    # enter X. When enabled, this raises on any X column absent from the
+    # registry, and on any column present but not `retained_after_audit`.
+    # No opt-in override set exists any more: the one prior use case
+    # (raw contemporaneous CEI) is gone now that CEI is fully removed
+    # per spec section 2, not merely excluded-by-default.
+    if getattr(config.features, 'enforce_availability_registry', True):
+        from .registry import FeatureRegistry
+
+        registry = FeatureRegistry.load(getattr(config, 'feature_registry_path', 'config/feature_registry.yaml'))
+
+        explicit_overrides = set()
+
+        unknown = [c for c in X.columns if c not in registry.entries]
+        if unknown:
+            raise ValueError(
+                f"enforce_availability_registry=True but the following X "
+                f"columns are not present in {registry.source_path}: "
+                f"{unknown}. Add them to the feature registry with an "
+                f"explicit leakage/availability classification before they "
+                f"can enter a model matrix."
+            )
+
+        not_retained = [c for c in X.columns if not registry.is_retained(c)]
+        blocked = [c for c in not_retained if c not in explicit_overrides]
+        if blocked:
+            raise ValueError(
+                f"enforce_availability_registry=True but the following X "
+                f"columns are marked retained_after_audit: false in "
+                f"{registry.source_path} and were not reached via an "
+                f"explicit sensitivity opt-in: {blocked}. Either exclude "
+                f"them upstream or add the corresponding opt-in flag."
+            )
+
+        metadata['registry_governance'] = {
+            'enforced': True,
+            'registry_path': str(registry.source_path),
+            'n_registry_entries': len(registry),
+            'explicit_overrides_used': sorted(explicit_overrides),
+        }
+        logger.info(
+            f"Feature registry governance enforced: all {len(X.columns)} X "
+            f"columns are known and retained_after_audit "
+            f"(overrides: {sorted(explicit_overrides) or 'none'})"
+        )
+    else:
+        metadata['registry_governance'] = {'enforced': False}
 
     metadata['feature_columns'] = X.columns.tolist()
     metadata['n_total_features'] = len(X.columns)

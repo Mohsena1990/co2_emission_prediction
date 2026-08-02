@@ -1,0 +1,17 @@
+{
+  "source_url": "https://www.gstatic.com/covid19/mobility/Global_Mobility_Report.csv",
+  "retrieval_date": "2026-08-01T14:16:36.114474+00:00",
+  "cache_file": "data/raw/mobility/google_uk_national_mobility.csv",
+  "file_checksum_sha256": "0e13c211333b9689200ddde1c13d65c1700ddd9226be7365c5e5b9d204da07d1",
+  "first_observation": "2020-02-15",
+  "last_observation": "2022-10-15",
+  "n_daily_records": 974,
+  "missing_values_by_category": {
+    "retail_and_recreation_percent_change_from_baseline": 0,
+    "grocery_and_pharmacy_percent_change_from_baseline": 0,
+    "parks_percent_change_from_baseline": 0,
+    "transit_stations_percent_change_from_baseline": 0,
+    "workplaces_percent_change_from_baseline": 0,
+    "residential_percent_change_from_baseline": 0
+  }
+}

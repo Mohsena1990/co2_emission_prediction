@@ -28,7 +28,7 @@ from src.core import (
     set_seed, save_json_numpy, load_json, get_latest_run_id
 )
 from src.data_io import load_processed_data
-from src.splits import load_cv_plan
+from src.splits import load_cv_plan, build_tuning_cv_plan
 from src.optimization import optimize_all_models, train_optimized_model
 from src.models import ModelRegistry
 from src.reporting import plot_optimization_history, set_plot_style
@@ -48,14 +48,23 @@ def parse_args():
 def optimize_for_fs_option(
     X_full: pd.DataFrame,
     y: pd.Series,
-    cv_plan,
+    tuning_cv_plan,
     config: Config,
     fs_option: str,
     selected_features: list,
     output_dir: Path,
     logger
 ) -> dict:
-    """Optimize all models for a specific FS option."""
+    """
+    Optimize all models for a specific FS option.
+
+    `tuning_cv_plan` (not the flat evaluation CVPlan) is what PSO/GWO
+    validates against here - see `build_tuning_cv_plan` (bug 3.5 / spec
+    section 11): it is built strictly from data before the earliest date
+    any evaluation fold (scripts/04) will use as a held-out test target, so
+    hyperparameter selection can never see a row it will later be "graded"
+    on.
+    """
     logger.info(f"Optimizing models for FS option: {fs_option}")
     logger.info(f"  Features ({len(selected_features)}): {selected_features[:5]}...")
 
@@ -79,9 +88,9 @@ def optimize_for_fs_option(
 
     logger.info(f"  Training data: {len(X)} samples, {len(available_features)} features")
 
-    # Optimize all models
+    # Optimize all models (tuning-only CV plan - see docstring above)
     optimization_results = optimize_all_models(
-        X, y_aligned, cv_plan, config,
+        X, y_aligned, tuning_cv_plan, config,
         output_dir=fs_output_dir
     )
 
@@ -157,48 +166,33 @@ def main():
     y = load_processed_data(processed_dir / 'y')['target']
     cv_plan = load_cv_plan(processed_dir / 'cv_plan.pkl')
 
-    # Load selected features info (with top-N options)
-    selected_fs_path = dirs['tables'] / 'selected_feature_set.json'
-    if not selected_fs_path.exists():
-        logger.error("Selected feature set not found. Run 02_eval_fs_shap_mcda.py first.")
+    # Hyperparameter tuning must never validate against a row that
+    # cv_plan (used for final evaluation in script 04) will later use as a
+    # held-out test target (bug 3.5 / spec section 11) - see
+    # build_tuning_cv_plan for how the single isolated split is built.
+    tuning_cv_plan = build_tuning_cv_plan(X_full, y, cv_plan, config.splits)
+
+    # Train on every FS option produced by script 01, not just the MCDA
+    # top-N subset from script 02 - script 02's ranking (fs_mcda_ranking.csv)
+    # stays purely informational; the actual champion is decided later by
+    # script 05's MCDA over the full FS x model grid, which can only be
+    # trustworthy if every FS option actually gets modeled.
+    fs_results_path = dirs['models'] / 'fs_results.json'
+    if not fs_results_path.exists():
+        logger.error("FS results not found. Run 01_run_fs.py first.")
         return 1
 
-    selected_fs = load_json(selected_fs_path)
+    fs_results = load_json(fs_results_path)
 
-    # Get top-N FS options to train on
-    top_options = selected_fs.get('top_options', [selected_fs['selected_fs_option']])
-    top_options_info = selected_fs.get('top_options_info', [])
-
-    # If specific FS option requested, use only that one
     if args.fs_option:
-        if args.fs_option in top_options:
-            top_options = [args.fs_option]
-            top_options_info = [info for info in top_options_info if info['fs_option'] == args.fs_option]
-        else:
-            logger.warning(f"Requested FS option '{args.fs_option}' not in top options.")
-            fs_results_path = dirs['models'] / 'fs_results.json'
-            if fs_results_path.exists():
-                fs_results = load_json(fs_results_path)
-                if args.fs_option in fs_results:
-                    top_options = [args.fs_option]
-                    top_options_info = [{
-                        'fs_option': args.fs_option,
-                        'selected_features': fs_results[args.fs_option]['selected_features'],
-                        'n_features': len(fs_results[args.fs_option]['selected_features'])
-                    }]
+        if args.fs_option not in fs_results:
+            logger.error(f"Requested FS option '{args.fs_option}' not found in fs_results.json.")
+            return 1
+        top_options = [args.fs_option]
+    else:
+        top_options = list(fs_results.keys())
 
-    # Build features dict for each FS option
-    fs_features = {}
-    for info in top_options_info:
-        fs_features[info['fs_option']] = info['selected_features']
-
-    # If we don't have features for some options, load from fs_results
-    fs_results_path = dirs['models'] / 'fs_results.json'
-    if fs_results_path.exists():
-        fs_results = load_json(fs_results_path)
-        for opt in top_options:
-            if opt not in fs_features and opt in fs_results:
-                fs_features[opt] = fs_results[opt]['selected_features']
+    fs_features = {opt: fs_results[opt]['selected_features'] for opt in top_options}
 
     logger.info(f"Training models on {len(top_options)} FS options: {top_options}")
 
@@ -214,7 +208,7 @@ def main():
 
         logger.info("=" * 50)
         fs_result = optimize_for_fs_option(
-            X_full, y, cv_plan, config,
+            X_full, y, tuning_cv_plan, config,
             fs_option=fs_option,
             selected_features=fs_features[fs_option],
             output_dir=dirs['models'],

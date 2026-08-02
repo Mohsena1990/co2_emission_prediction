@@ -6,11 +6,14 @@ model training process (e.g., L1 regularization, tree importance).
 """
 import numpy as np
 import pandas as pd
-from typing import List, Tuple, Dict, Optional
+from typing import List, Tuple, Dict, Any, Optional
 from sklearn.linear_model import Lasso, LassoCV, ElasticNet, ElasticNetCV
 from sklearn.preprocessing import StandardScaler
+from sklearn.inspection import permutation_importance
 
 from ..core.logging_utils import get_logger
+from ..core.config import Config
+from ..splits.walk_forward import CVPlan
 
 
 def lasso_selection(
@@ -318,6 +321,172 @@ def catboost_selection(
 
     logger.info(f"CatBoost: Selected {len(selected)} features")
     return selected, scores_df
+
+
+def permutation_stability_selection(
+    X: pd.DataFrame,
+    y: pd.Series,
+    cv_plan: CVPlan,
+    evaluator_model: str = 'lightgbm',
+    top_k: int = 10,
+    stability_threshold: float = 0.5,
+    min_features: int = 3,
+    n_repeats: int = 10,
+    seed: int = 42
+) -> Tuple[List[str], pd.DataFrame]:
+    """
+    FS4: model-agnostic permutation-importance stability selection across CV
+    folds. Permutation importance only requires a fitted estimator's
+    `.predict`, not model-internal attributes (coefficients/gain/etc.), so
+    the same procedure works regardless of which estimator is used to
+    probe importance.
+
+    Args:
+        X: Feature DataFrame
+        y: Target Series
+        cv_plan: CV plan
+        evaluator_model: Estimator used to probe importance ('lightgbm' or
+            'rf' - falls back to 'rf' if LightGBM is unavailable)
+        top_k: Number of top-permutation-importance features per fold
+        stability_threshold: Minimum fraction of folds a feature must be in
+            the top-K to be selected
+        min_features: Minimum number of features to select (fallback)
+        n_repeats: Number of permutation repeats per fold
+        seed: Random seed
+
+    Returns:
+        Tuple of (selected features, stability scores)
+    """
+    logger = get_logger()
+
+    top_k_counts = {col: 0 for col in X.columns}
+    importance_sums = {col: 0.0 for col in X.columns}
+
+    # Get unique folds
+    seen_folds = set()
+    unique_folds = []
+    for fold in cv_plan.folds:
+        fold_key = (tuple(fold.train_indices), tuple(fold.test_indices))
+        if fold_key not in seen_folds:
+            seen_folds.add(fold_key)
+            unique_folds.append(fold)
+
+    n_folds = 0
+    for fold in unique_folds:
+        X_train = X.iloc[fold.train_indices]
+        y_train = y.iloc[fold.train_indices]
+
+        model_used = evaluator_model
+        if model_used == 'lightgbm':
+            try:
+                import lightgbm as lgb
+                model = lgb.LGBMRegressor(
+                    n_estimators=100, learning_rate=0.1,
+                    verbosity=-1, random_state=seed
+                )
+                model.fit(X_train, y_train)
+            except ImportError:
+                model_used = 'rf'
+
+        if model_used == 'rf':
+            from sklearn.ensemble import RandomForestRegressor
+            model = RandomForestRegressor(
+                n_estimators=100, max_depth=10,
+                random_state=seed, n_jobs=-1
+            )
+            model.fit(X_train, y_train)
+
+        result = permutation_importance(
+            model, X_train, y_train,
+            n_repeats=n_repeats, random_state=seed,
+            scoring='neg_mean_absolute_error'
+        )
+        importances = result.importances_mean
+
+        importance_order = np.argsort(importances)[::-1]
+        top_k_features = [X.columns[i] for i in importance_order[:top_k]]
+
+        for col, imp in zip(X.columns, importances):
+            importance_sums[col] += imp
+        for col in top_k_features:
+            top_k_counts[col] += 1
+
+        n_folds += 1
+
+    stability_df = pd.DataFrame([
+        {
+            'feature': col,
+            'top_k_count': top_k_counts[col],
+            'stability': top_k_counts[col] / n_folds if n_folds > 0 else 0,
+            'mean_permutation_importance': importance_sums[col] / n_folds if n_folds > 0 else 0
+        }
+        for col in X.columns
+    ]).sort_values('stability', ascending=False)
+
+    selected = stability_df[stability_df['stability'] >= stability_threshold]['feature'].tolist()
+
+    if len(selected) < min_features:
+        logger.info(f"Permutation stability: Only {len(selected)} features passed threshold, adding top features to reach {min_features}")
+        remaining = stability_df[~stability_df['feature'].isin(selected)].head(min_features - len(selected))
+        selected.extend(remaining['feature'].tolist())
+
+    logger.info(f"Permutation stability: Selected {len(selected)} features (stability >= {stability_threshold})")
+
+    return selected, stability_df
+
+
+def fs_permutation_stability(
+    X: pd.DataFrame,
+    y: pd.Series,
+    cv_plan: CVPlan,
+    config: Config
+) -> Dict[str, Any]:
+    """
+    FS4: model-agnostic permutation stability selection pipeline.
+
+    Args:
+        X: Feature DataFrame
+        y: Target Series
+        cv_plan: CV plan
+        config: Configuration
+
+    Returns:
+        Dictionary with selected features and scores, same shape as fs_linear.
+    """
+    logger = get_logger()
+    logger.info("Running permutation stability feature selection (FS_permutation_stability)...")
+
+    top_k = getattr(config.fs, 'top_k_features', 10)
+    min_features = getattr(config.fs, 'min_features', 3)
+
+    results = {
+        'method': 'permutation_stability',
+        'steps': []
+    }
+
+    selected, stability_df = permutation_stability_selection(
+        X, y, cv_plan,
+        evaluator_model=config.fs.evaluator_model,
+        top_k=top_k,
+        stability_threshold=config.fs.stability_threshold,
+        min_features=min_features,
+        seed=config.seed
+    )
+    results['steps'].append({
+        'name': 'permutation_stability',
+        'selected': selected,
+        'n_selected': len(selected),
+        'scores': stability_df.to_dict(orient='records')
+    })
+
+    final_selected = [f for f in X.columns if f in selected]
+
+    results['selected_features'] = final_selected
+    results['n_selected'] = len(final_selected)
+
+    logger.info(f"FS_permutation_stability final: {len(final_selected)} features selected")
+
+    return results
 
 
 def run_all_embedded_methods(

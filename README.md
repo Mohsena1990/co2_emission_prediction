@@ -1,255 +1,267 @@
-# CO2 Forecasting Framework
+# Q-DECEM: Quarterly UK CO2e Forecasting Framework
 
-A modular Python framework for quarterly CO2 emissions forecasting with accounting-consistent validation, SHAP-based feature selection evaluation, and MCDA decision-making.
+A modular Python framework for quarterly UK CO2e emissions forecasting across four
+leakage-controlled data configurations (raw / +engineered / +grid-fusion /
++engineered+grid-fusion), with nested walk-forward validation, five feature-selection
+strategies, PSO hyperparameter tuning, and Pareto/MCDA decision support.
 
 ## Overview
 
-This framework implements a comprehensive pipeline for CO2 forecasting that includes:
+**Research question:** within a leakage-controlled quarterly UK CO2e forecasting
+framework, how much predictive value is contributed by feature engineering,
+electricity-grid data fusion, feature-selection strategy, and forecasting-model
+architecture?
 
-- **Three Feature Selection Strategies**: Linear (VIF + Ridge/ElasticNet), Nonlinear (RF/LightGBM/CatBoost), Consensus
-- **SHAP-based FS Evaluation**: Evaluate feature selection options using SHAP values across walk-forward CV
-- **MCDA Decision Making**: VIKOR and TOPSIS methods for selecting best FS option and final model
-- **Walk-forward Cross-Validation**: No data leakage, proper temporal validation
-- **Swarm Optimization**: PSO and GWO for hyperparameter tuning
-- **Annual Consistency Safeguards**: Verify quarterly predictions aggregate correctly to annual totals
-- **High-Resolution Visualization**: Publication-quality plots at 300 DPI
+**Four data configurations** (spec section 8), built purely from
+`config/feature_registry.yaml`'s `configuration_membership` tags - no hardcoded
+feature lists:
+
+| Config | Contents | Nominal max features |
+|---|---|---|
+| A1 | 5 audited raw quarterly predictors + 6 Google COVID mobility-shock predictors (TEC/CEI fully removed) | 11 |
+| A2 | A1 + 14 engineered predictors (lags, growth rates, a historical population-scaled intensity ratio, weather, seasonal, disruption dummies) | 25 |
+| A3 | A1 + 12 audited GB electricity-grid quarterly features | 11+K |
+| A4 | A2 + the same 12 grid features | 25+K |
+
+**Two experimental panels** (spec section 9), since grid data is only available from
+2018 onward while the raw macro data spans 1999-2025:
+- **Panel 1** (full period): A1 vs. A2 over the longest valid window - isolates the
+  value of feature engineering alone.
+- **Panel 2** (common period): all four configurations over the grid-covered common
+  window, with identical outer folds - isolates the value of grid fusion, and grid
+  fusion's interaction with feature engineering.
+
+**Other core capabilities:**
+
+- **Five Feature Selection Strategies**: FS1 linear stability (VIF + Ridge/ElasticNet),
+  FS2 wrapper (RFE/SFS/SBS), FS3 XGBoost-SHAP stability, FS4 permutation stability, FS5
+  consensus (vote-based across FS1-FS4) - all fit strictly inside inner expanding-window
+  folds of the outer training data, never the outer test fold.
+- **Predictor Governance**: every feature (raw, engineered, and grid) is declared in
+  `config/feature_registry.yaml` (family, target-derived status, minimum lag, per-horizon
+  safety, configuration membership) and enforced at feature-matrix build time.
+- **Nested Walk-Forward Validation**: outer expanding-window folds for reported
+  performance; inner expanding-window folds (or single-cutoff isolated tuning plans, in
+  reduced-budget "sweep" mode) for feature selection and PSO tuning - never the same data.
+- **PSO Hyperparameter Tuning**: reduced budget for the full config x FS x model sweep,
+  full budget + multiple seeds reserved for re-running the Pareto-shortlisted configurations.
+- **Pareto + MCDA Decision Support**: VIKOR/TOPSIS with deterministic tie-breaking, 5
+  weight-sensitivity schemes, rank-correlation comparison across schemes.
+- **Statistical Comparison**: paired fold-level bootstrap CIs, Diebold-Mariano test,
+  Wilcoxon signed-rank, Bonferroni/Benjamini-Hochberg multiple-comparison correction.
+- **Cross-Model Interpretability**: Ridge coefficients, TreeSHAP (RF/LightGBM/CatBoost),
+  permutation importance (LSTM), normalized and ranked for cross-model comparison.
+- **Regime & Target-Derived Sensitivity**: pre/COVID/post-COVID importance stability;
+  re-runs with CEI/intensity-ratio/CO2e_dlog (and, optionally, all historical
+  target-derived) features excluded.
+- **Annual Consistency Safeguards**: verify quarterly predictions aggregate correctly to
+  annual totals.
+- **PDF Figures**: vector output, embedded TrueType fonts, journal-ready dimensions, a
+  companion plot-data CSV for every figure.
 
 ## Models
 
 - Ridge Regression
 - Random Forest
-- CatBoost
 - LightGBM
+- CatBoost
 - LSTM (PyTorch)
+
+Baselines: previous-quarter naive, seasonal naive (y_t = y_{t-4}).
 
 ## Installation
 
+Clean-environment setup (Linux/Mac):
+
 ```bash
-# Clone or navigate to the repository
-cd "c:\Users\Ilani\OneDrive\Desktop\Shahla\New folder"
+git clone <repo-url> co2_emission_prediction
+cd co2_emission_prediction
 
-# Create virtual environment (recommended)
 python -m venv venv
-venv\Scripts\activate  # Windows
-# source venv/bin/activate  # Linux/Mac
+source venv/bin/activate
 
-# Install dependencies
 pip install -r requirements.txt
+```
+
+Windows (PowerShell):
+
+```powershell
+git clone <repo-url> co2_emission_prediction
+cd co2_emission_prediction
+
+python -m venv venv
+venv\Scripts\activate
+
+pip install -r requirements.txt
+```
+
+Verify the install:
+
+```bash
+pytest tests/ -q
 ```
 
 ## Project Structure
 
 ```
 .
-├── configs/                    # Configuration files
-│   └── default_config.yaml
-├── data/                       # Data directory
-│   └── processed/             # Processed data (generated)
-├── outputs/                    # Output directory
-│   └── runs/                  # Run outputs
-│       └── run_YYYYMMDD_HHMM/
-│           ├── configs_snapshot/
-│           ├── figures/
-│           ├── logs/
-│           ├── metrics/
-│           ├── models/
-│           ├── predictions/
-│           └── tables/
-├── scripts/                    # Entry-point scripts
-│   ├── 00_make_dataset.py
-│   ├── 01_run_fs.py
-│   ├── 02_eval_fs_shap_mcda.py
-│   ├── 03_optimize_models.py
-│   ├── 04_evaluate_and_safeguards.py
-│   ├── 05_select_best_model.py
-│   └── 06_interpret_champion.py
-├── src/                        # Source modules
+├── config/
+│   └── feature_registry.yaml   # Single source of truth for every raw/engineered/grid feature
+├── configs/                    # Run configurations
+│   ├── default_config.yaml
+│   ├── fast_validation_config.yaml   # Reduced PSO budget, for fast end-to-end validation
+│   └── sweep_config.yaml             # Reduced budget for the FULL config x FS x model sweep
+├── data/
+│   ├── raw/
+│   │   └── grid_cache/         # Cached raw GB Carbon Intensity API responses
+│   └── processed/              # X_A1..X_A4.parquet, y, cv_plan, panel2_cv_plan (generated)
+├── outputs/
+│   ├── audit/                  # Repository audit (pipeline_audit.md/json)
+│   ├── runs/run_<id>/          # Per-run intermediate outputs (see below)
+│   ├── tables/                 # Final Tables 1-12 (spec section 20)
+│   └── figures/pdf/main/       # Final PDF figures + plot_data/ (spec section 21/22)
+├── scripts/
+│   ├── 00_make_dataset.py                  # Load, clean, engineer features, build A1-A4 matrices, Panel 1/2 CV plans
+│   ├── fetch_grid_data.py                  # Backfill the GB Carbon Intensity API cache (idempotent)
+│   ├── fetch_mobility_data.py              # Cache Google's UK-national COVID mobility CSV (idempotent)
+│   ├── fetch_owid_data.py                  # Cache OWID UK renewable/low-carbon electricity share CSVs (idempotent)
+│   ├── 01_run_fs.py .. 06_interpret_champion.py   # Legacy single-configuration pipeline (still functional)
+│   ├── 10_run_experiment_grid.py           # Stage 1 (config x model) + Stage 2 (FS x model) grid, spec section 12
+│   ├── 11_pareto_mcda_and_incremental.py   # Table 6 (incremental value) + Table 10 (Pareto/MCDA)
+│   ├── 12_interpretability_and_sensitivity.py  # Table 11 (cross-model importance) + regime + target-derived sensitivity
+│   ├── 13_generate_tables.py               # All 12 tables -> outputs/tables/
+│   └── 14_generate_figures.py              # PDF figures -> outputs/figures/pdf/main/
+├── src/
 │   ├── core/                  # Config, logging, utilities
-│   ├── data_io/               # Data loading, schema
-│   ├── quality/               # Data quality checks
-│   ├── features/              # Feature engineering
-│   ├── splits/                # Walk-forward CV
-│   ├── fs/                    # Feature selection
-│   ├── models/                # Forecasting models
-│   ├── optimization/          # PSO/GWO optimization
-│   ├── evaluation/            # Metrics
-│   ├── safeguards/            # Annual consistency
-│   ├── decision/              # MCDA (VIKOR/TOPSIS)
-│   ├── interpretability/      # SHAP analysis
-│   └── reporting/             # Plotting
-├── tests/                      # Test files
+│   ├── data_io/                # Data loading, schema
+│   ├── quality/                # Data quality checks
+│   ├── features/                # Feature engineering, registry, A1-A4 matrix builder
+│   ├── grid/                    # GB Carbon Intensity API fetch + quarterly aggregation
+│   ├── mobility/                 # Google COVID mobility fetch + quarterly aggregation (neutral-zero convention)
+│   ├── owid/                     # OWID renewable/low-carbon annual share fetch + one-year-lag alignment
+│   ├── splits/                  # Walk-forward CV, nested CV, Panel 2 common-period CV
+│   ├── fs/                      # Feature selection (FS1-FS5)
+│   ├── models/                  # Forecasting models
+│   ├── optimization/            # PSO/GWO, nested per-outer-fold retuning
+│   ├── pipeline/                # Single-cell experiment orchestrator (run_configuration_model)
+│   ├── evaluation/               # Metrics, statistical tests, incremental value
+│   ├── safeguards/               # Annual consistency
+│   ├── decision/                 # MCDA (VIKOR/TOPSIS), Pareto filter, experiment ranking
+│   ├── interpretability/          # SHAP analysis, cross-model importance, regime stability
+│   └── reporting/                  # Tables, PDF figures
+├── tests/
 ├── requirements.txt
 └── README.md
 ```
 
 ## Usage
 
-### Quick Start (Run Full Pipeline)
+### One-command run (Full A1-A4 Pipeline)
 
 ```bash
-# Step 0: Load and prepare data
-python scripts/00_make_dataset.py --input "data 1999-2025Q1.xlsx"
+scripts/run_full_pipeline.sh [run_id] [data_config] [sweep_config]
 
-# Step 1: Run all feature selection methods
-python scripts/01_run_fs.py
-
-# Step 2: Evaluate FS options with SHAP and select best using MCDA
-python scripts/02_eval_fs_shap_mcda.py
-
-# Step 3: Optimize all models using selected features
-python scripts/03_optimize_models.py
-
-# Step 4: Evaluate models and apply annual consistency safeguards
-python scripts/04_evaluate_and_safeguards.py
-
-# Step 5: Select best model using Pareto + MCDA
-python scripts/05_select_best_model.py
-
-# Step 6: Generate interpretability report for champion model
-python scripts/06_interpret_champion.py
+# e.g.
+scripts/run_full_pipeline.sh my_run
 ```
 
-### Step-by-Step Guide
+Runs grid-cache refresh -> dataset/matrix build -> Stage 1+2 experimental grid ->
+Pareto/MCDA + incremental-value tables -> interpretability/regime/sensitivity ->
+tables -> PDF figures, all under one `run_id`, and stops on the first failing step
+(`set -euo pipefail`). Defaults: `run_id=run_<timestamp>`,
+`data_config=configs/default_config.yaml`, `sweep_config=configs/sweep_config.yaml`.
+Expect a multi-hour runtime for the full config x FS x model grid - run it with
+`nohup`/`tmux`/`screen` for anything beyond a quick smoke test.
 
-#### 1. Data Preparation (Script 00)
+GPU is used automatically wherever the installed backend supports it (CatBoost,
+LSTM/PyTorch - LightGBM's pip wheel is CPU-only, see **GPU support** below); set
+`model.use_gpu: false` in the config file to force CPU everywhere.
 
-Load raw Excel data, perform quality checks, and create feature-engineered dataset.
+### Step-by-step equivalent
 
 ```bash
-python scripts/00_make_dataset.py --input "data 1999-2025Q1.xlsx"
+# Step 0: backfill/refresh the mobility + grid + OWID data caches, then build A1-A4 matrices + Panel 1/2 CV plans
+python scripts/fetch_mobility_data.py --config configs/default_config.yaml
+python scripts/fetch_grid_data.py --config configs/default_config.yaml
+python scripts/fetch_owid_data.py --config configs/default_config.yaml
+python scripts/00_make_dataset.py --config configs/default_config.yaml --run-id my_run
+
+# Step 1: Run the full config x model (Stage 1) + FS x model (Stage 2) experimental grid
+python scripts/10_run_experiment_grid.py --config configs/sweep_config.yaml --run-id my_run --stage both
+
+# Step 2: Incremental-value comparisons (Table 6) + Pareto/MCDA ranking (Table 10)
+python scripts/11_pareto_mcda_and_incremental.py --config configs/sweep_config.yaml --run-id my_run
+
+# Step 3: Cross-model interpretability (Table 11), regime + target-derived sensitivity
+python scripts/12_interpretability_and_sensitivity.py --config configs/sweep_config.yaml --run-id my_run
+
+# Step 4: Generate all 12 tables and the PDF figures
+python scripts/13_generate_tables.py --config configs/sweep_config.yaml --run-id my_run
+python scripts/14_generate_figures.py --config configs/sweep_config.yaml --run-id my_run
 ```
 
-**Outputs:**
-- `data/processed/df_clean.parquet` - Cleaned data
-- `data/processed/X_full.parquet` - Feature matrix
-- `data/processed/y.parquet` - Target variable
-- `data/processed/cv_plan.pkl` - Walk-forward CV plan
-- Quality reports and feature dictionary
+`configs/sweep_config.yaml` is a reduced-PSO-budget profile intended for the full
+config x FS x model sweep (Stage 1/2); re-run a specific Pareto-shortlisted cell at
+full budget (`configs/default_config.yaml`, with `optimization.nested_retuning: true`
+for true per-outer-fold PSO retuning) for the numbers that go in a final report.
 
-#### 2. Feature Selection (Script 01)
+### GPU support
 
-Run three FS strategies: linear, nonlinear, and consensus.
+`model.use_gpu` (default `true`) is a process-wide toggle, not a per-model
+hyperparameter - each backend is probed once per process and falls back to CPU
+automatically if the installed build doesn't support it:
+
+| Model | GPU backend | Notes |
+|---|---|---|
+| CatBoost | `task_type: GPU` | Works out of the box with the standard `catboost` pip package. |
+| LSTM (PyTorch) | CUDA | Works out of the box if `torch.cuda.is_available()`. |
+| LightGBM | CPU only | The pip wheel ships without GPU support; install a CUDA/OpenCL build (source build with `-DUSE_CUDA=1`, or a conda-forge `lightgbm=*=cuda*` package) to enable it. |
+| Ridge, Random Forest | CPU only | No GPU implementation in scikit-learn; Random Forest uses all CPU cores (`n_jobs=-1`). |
+
+Set `model.use_gpu: false` in a config file (or override at the config layer) to
+force CPU everywhere, e.g. for reproducibility comparisons or to avoid contending
+with another GPU job.
+
+### Legacy Single-Configuration Pipeline (scripts 01-06)
+
+The original single-flat-matrix pipeline (`X_full.parquet`, no A1-A4 split) still runs
+end-to-end and is useful for quick iteration on FS/model code without the full grid's
+runtime cost:
 
 ```bash
-python scripts/01_run_fs.py
+python scripts/00_make_dataset.py --run-id my_run
+python scripts/01_run_fs.py --run-id my_run
+python scripts/02_eval_fs_shap_mcda.py --run-id my_run
+python scripts/03_optimize_models.py --run-id my_run
+python scripts/04_evaluate_and_safeguards.py --run-id my_run
+python scripts/05_select_best_model.py --run-id my_run
+python scripts/06_interpret_champion.py --run-id my_run
 ```
-
-**Outputs:**
-- FS scores for each method
-- Selected feature lists
-
-#### 3. FS Evaluation with SHAP + MCDA (Script 02)
-
-Evaluate FS options using SHAP-based metrics and select the best.
-
-```bash
-python scripts/02_eval_fs_shap_mcda.py
-```
-
-**Evaluation Criteria:**
-- C1: Accuracy (weighted MAE)
-- C2: Stability (std of errors)
-- C3: SHAP concentration (top-K share)
-- C4: SHAP stability (rank correlation)
-- C5: Parsimony (number of features)
-
-**Outputs:**
-- `fs_evaluation_matrix.csv`
-- `fs_mcda_ranking.csv`
-- `selected_feature_set.json`
-
-#### 4. Model Optimization (Script 03)
-
-Train and optimize all models using PSO/GWO.
-
-```bash
-python scripts/03_optimize_models.py
-```
-
-**Outputs:**
-- Best parameters for each model
-- Optimization history plots
-- Trained model files
-
-#### 5. Evaluation and Safeguards (Script 04)
-
-Evaluate models with quarterly metrics and annual consistency checks.
-
-```bash
-python scripts/04_evaluate_and_safeguards.py
-```
-
-**Safeguards:**
-- Aggregate quarterly predictions to annual totals
-- Compare with observed annual values
-- Benchmark against simple annual baselines
-
-**Outputs:**
-- `quarterly_metrics.csv`
-- `annual_consistency.csv`
-- Prediction plots
-
-#### 6. Final Model Selection (Script 05)
-
-Select champion model using Pareto front and MCDA.
-
-```bash
-python scripts/05_select_best_model.py
-```
-
-**Outputs:**
-- `pareto_front.csv`
-- `mcda_model_ranking.csv`
-- `champion_pipeline.json`
-
-#### 7. Champion Interpretation (Script 06)
-
-Generate SHAP explanations and regime analysis.
-
-```bash
-python scripts/06_interpret_champion.py
-```
-
-**Outputs:**
-- SHAP summary plot
-- Regime comparison (pre/post COVID)
-- Seasonal leverage analysis
-- Top drivers table
 
 ## Configuration
 
-Edit `configs/default_config.yaml` to customize:
+Edit `configs/default_config.yaml` (or pass `--config` with a variant) to customize:
 
 ```yaml
-# Key settings
-data:
-  target_transform: "log"  # or "delta_log"
-
 splits:
-  min_train_size: 40
+  min_train_size: 40          # Panel 1 outer-fold sizing
+  panel2_min_train_size: 16   # Panel 2 (common period) is much shorter - its own sizing
   horizons: [1, 2, 4]
-  horizon_weights:
-    1: 0.5
-    2: 0.3
-    4: 0.2
+  horizon_weights: {1: 0.5, 2: 0.3, 4: 0.2}
 
 optimization:
-  optimizer: "pso"  # or "gwo"
+  optimizer: "pso"             # or "gwo"
   n_particles: 20
   n_iterations: 30
+  nested_retuning: false       # true = real per-outer-fold PSO retuning (spec 15/16)
+
+grid:
+  enabled: true
+  cache_dir: "data/raw/grid_cache"
+  minimum_quarter_completeness: 0.95
 
 mcda:
-  method: "vikor"  # or "topsis"
-```
-
-## Custom Configuration
-
-```bash
-# Use custom config
-python scripts/00_make_dataset.py --config configs/my_config.yaml
-
-# Continue with same run
-python scripts/01_run_fs.py --run-id run_20240101_1200
+  method: "vikor"               # or "topsis"
 ```
 
 ## Testing
@@ -258,42 +270,38 @@ python scripts/01_run_fs.py --run-id run_20240101_1200
 # Run all tests
 pytest tests/ -v
 
-# Run specific test
-pytest tests/test_no_leakage.py -v
+# Run a specific area
+pytest tests/test_leakage_sentinel.py -v
+pytest tests/test_configurations.py -v
+pytest tests/test_grid.py -v
 
 # Run with coverage
 pytest tests/ --cov=src --cov-report=html
 ```
 
-## Output Figures
-
-The framework generates high-resolution (300 DPI) figures:
-
-- **Optimization History**: Convergence plots for PSO/GWO
-- **Pareto Front**: Multi-objective visualization
-- **MCDA Ranking**: VIKOR/TOPSIS ranking comparison
-- **Predictions vs Actual**: Time series comparison
-- **Annual Consistency**: Quarterly-to-annual aggregation
-- **SHAP Summary**: Feature importance visualization
-- **Regime Comparison**: Pre/post COVID feature importance
-- **Seasonal Leverage**: Quarterly sensitivity analysis
-
 ## Key Constraints
 
-1. **No Random Splits**: Only walk-forward/expanding window CV
-2. **No Leakage**: Scalers fit on training fold only; lags computed without future data
-3. **LSTM Constraints**: Small model (limited lookback, dropout, early stopping)
-4. **Annual Consistency**: Quarterly predictions must aggregate to sensible annual totals
+1. **No Random Splits**: Only walk-forward/expanding-window CV, outer and inner.
+2. **No Leakage**: Feature selection and PSO tuning never see outer-test-fold data;
+   scalers fit on the training fold only; lags/growth/intensity features are computed
+   without contemporaneous target values.
+3. **Panel Discipline**: full-period A1/A2 results are never compared directly against
+   shorter-period A3/A4 results when attributing performance to grid fusion - use Panel
+   2's common-period, identical-fold comparison for that claim.
+4. **LSTM Constraints**: small model (limited lookback, dropout, early stopping);
+   `build_predict_input` enforces exact prediction-length/date alignment.
+5. **Annual Consistency**: quarterly predictions must aggregate to sensible annual totals.
 
 ## Dependencies
 
 - Python 3.8+
 - numpy, pandas, scipy
-- scikit-learn, lightgbm, catboost
+- scikit-learn, lightgbm, catboost, xgboost
 - torch (for LSTM)
 - shap, matplotlib
-- See `requirements.txt` for full list
+- requests (grid-data ingestion)
+- See `requirements.txt` for the full pinned list.
 
 ## License
 
-MIT License
+See LICENSE file (if present) or contact repository maintainers.

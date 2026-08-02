@@ -10,6 +10,8 @@ from ..core.logging_utils import get_logger
 from ..core.config import Config
 from ..core.utils import calculate_weighted_mae, save_json_numpy
 from ..splits.walk_forward import CVPlan, generate_cv_folds
+from ..splits.nested_walk_forward import NestedFold
+from ..evaluation.metrics import calculate_mase_scale, calculate_mae as eval_calculate_mae
 from ..models.base import ModelRegistry
 from ..models.traditional import get_model_param_space
 from ..models.lstm import get_lstm_param_space
@@ -28,7 +30,19 @@ def create_objective_function(
     param_space: Dict[str, Any] = None
 ) -> callable:
     """
-    Create objective function for optimization.
+    LEGACY (pre-nested-CV): builds a PSO objective evaluated over whatever
+    `cv_plan` is passed in.
+
+    BUG 3.5 CONTEXT: if `cv_plan` is the same flat plan later used for final
+    model evaluation (as in the original scripts/03 + scripts/04 pipeline),
+    hyperparameters get selected by validating on the same folds used to
+    report "final" out-of-sample performance - the outer test data is not
+    actually held out from tuning. Kept for backward compatibility with the
+    original single-level walk-forward scripts; new code should use
+    `optimize_model_nested`, which is constructed so `cv_plan` here is
+    always an INNER plan built strictly from one outer fold's training data
+    (see splits.nested_walk_forward.NestedFold) and can therefore never see
+    the outer test fold.
 
     Args:
         X: Feature DataFrame
@@ -74,7 +88,11 @@ def create_objective_function(
             else:
                 params[name] = float(value)
 
-        # Evaluate with walk-forward CV
+        # Evaluate with walk-forward CV. Primary metric is configurable
+        # (spec section 13); MASE requires the training-fold history to
+        # compute its seasonal-naive scale, so it is always available here
+        # since X_train/y_train are exactly the in-sample data for this fold.
+        primary_metric = getattr(config.optimization, 'metric', 'mae')
         horizon_errors = {h: [] for h in config.splits.horizons}
 
         try:
@@ -83,18 +101,34 @@ def create_objective_function(
                 model = ModelRegistry.create(model_name, params)
                 model.fit(X_train, y_train)
 
-                # Predict
-                y_pred = model.predict(X_test)
+                # Predict. LSTM requires lookback history immediately before
+                # the test rows (bug 3.4) - it cannot predict from X_test
+                # alone when X_test is shorter than lookback (see the
+                # identical handling in scripts/04_evaluate_and_safeguards.py).
+                if model_name == 'lstm' and hasattr(model, 'build_predict_input'):
+                    predict_input = model.build_predict_input(X_train, X_test)
+                    y_pred = model.predict(predict_input, n_targets=len(X_test))
+                else:
+                    y_pred = model.predict(X_test)
 
-                # Calculate MAE
-                mae = np.mean(np.abs(y_test.values - y_pred))
-                horizon_errors[fold.horizon].append(mae)
+                if primary_metric == 'mase':
+                    try:
+                        scale = calculate_mase_scale(
+                            y_train.values, seasonal_period=config.evaluation.seasonal_period
+                        )
+                        error = eval_calculate_mae(y_test.values, y_pred) / scale
+                    except (ValueError, ZeroDivisionError):
+                        error = np.mean(np.abs(y_test.values - y_pred))
+                else:
+                    error = np.mean(np.abs(y_test.values - y_pred))
+
+                horizon_errors[fold.horizon].append(error)
 
         except Exception as e:
             logger.warning(f"Model training failed with params {params}: {e}")
             return float('inf')
 
-        # Calculate weighted MAE
+        # Calculate weighted error across horizons
         mean_errors = {}
         for h in config.splits.horizons:
             if horizon_errors[h]:
@@ -102,7 +136,7 @@ def create_objective_function(
             else:
                 mean_errors[h] = float('inf')
 
-        weighted_mae = calculate_weighted_mae(mean_errors, horizon_weights)
+        weighted_error = calculate_weighted_mae(mean_errors, horizon_weights)
 
         # Optional: add annual consistency penalty
         # (simplified - full implementation in evaluation module)
@@ -111,9 +145,9 @@ def create_objective_function(
             if penalty_weight > 0:
                 # Add small penalty for unstable models
                 stability_penalty = np.std(list(mean_errors.values()))
-                weighted_mae += penalty_weight * stability_penalty
+                weighted_error += penalty_weight * stability_penalty
 
-        return weighted_mae
+        return weighted_error
 
     return objective
 
@@ -127,6 +161,10 @@ def optimize_model(
     output_dir: Optional[Path] = None
 ) -> Dict[str, Any]:
     """
+    LEGACY (pre-nested-CV) - see create_objective_function docstring for why
+    this must not be used with a cv_plan that overlaps the folds used for
+    final evaluation. Prefer `optimize_model_nested`.
+
     Optimize hyperparameters for a single model.
 
     Args:
@@ -314,3 +352,67 @@ def train_optimized_model(
     model = ModelRegistry.create(model_name, best_params)
     model.fit(X_train, y_train)
     return model
+
+
+def optimize_model_nested(
+    X: pd.DataFrame,
+    y: pd.Series,
+    nested_fold: NestedFold,
+    model_name: str,
+    config: Config,
+    output_dir: Optional[Path] = None
+) -> Dict[str, Any]:
+    """
+    Optimize hyperparameters for a single model, for a single OUTER fold,
+    using ONLY that outer fold's inner CV plan (bug 3.5 / spec section 11).
+
+    This is the nested-CV-correct replacement for `optimize_model`: PSO's
+    objective is evaluated exclusively on `nested_fold.inner_cv_plan`, which
+    is built strictly from `X.iloc[nested_fold.outer.train_indices]` and can
+    structurally never include a row from the outer test fold. The caller is
+    responsible for refitting the winning hyperparameters on the *complete*
+    outer training data and forecasting the untouched outer test target
+    (this function does not do that refit itself, since the outer
+    train/test split belongs to the caller's cross-validation loop, not to
+    the optimizer).
+
+    Args:
+        X: Full feature DataFrame (only the outer-training slice is ever
+            touched via nested_fold.outer.train_indices).
+        y: Full target Series.
+        nested_fold: A NestedFold from create_nested_walk_forward_splits.
+        model_name: Model to tune.
+        config: Configuration.
+        output_dir: Optional directory to save this outer fold's
+            optimization result.
+
+    Returns:
+        Same shape as `optimize_model`'s return dict, plus 'outer_fold_id'.
+    """
+    logger = get_logger()
+    X_outer_train = X.iloc[nested_fold.outer.train_indices]
+    y_outer_train = y.iloc[nested_fold.outer.train_indices]
+
+    logger.info(
+        f"Optimizing {model_name} for outer fold {nested_fold.outer_fold_id} "
+        f"(h={nested_fold.outer.horizon}) using "
+        f"{nested_fold.inner_cv_plan.n_folds} inner folds only"
+    )
+
+    result = optimize_model(
+        X_outer_train, y_outer_train, nested_fold.inner_cv_plan,
+        model_name, config, output_dir=None
+    )
+    result['outer_fold_id'] = nested_fold.outer_fold_id
+    result['outer_horizon'] = nested_fold.outer.horizon
+    result['n_inner_folds'] = nested_fold.inner_cv_plan.n_folds
+
+    if output_dir:
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        save_json_numpy(
+            result,
+            output_dir / f"{model_name}_outer{nested_fold.outer_fold_id}_optimization.json"
+        )
+
+    return result

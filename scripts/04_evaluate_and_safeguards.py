@@ -27,7 +27,8 @@ import numpy as np
 
 from src.core import (
     Config, create_run_directories, setup_logging, get_logger,
-    set_seed, save_json_numpy, load_json, inverse_log_transform, get_latest_run_id
+    set_seed, save_json_numpy, load_json, inverse_log_transform, to_original_scale,
+    get_latest_run_id, assert_prediction_alignment
 )
 from src.data_io import load_processed_data
 from src.splits import load_cv_plan, generate_cv_folds
@@ -177,14 +178,41 @@ def main():
             logger.info(f"    Evaluating: {model_name}")
 
             predictions_list = []
+            train_history_by_fold = {}
 
             for X_train, y_train, X_test, y_test, fold in generate_cv_folds(X, y_aligned, cv_plan):
                 try:
                     model.fit(X_train, y_train)
-                    y_pred = model.predict(X_test)
+
+                    # LSTM requires lookback history immediately before the
+                    # test rows (bug 3.4) - it cannot predict from X_test
+                    # alone when X_test is shorter than lookback.
+                    if model_name == 'lstm' and hasattr(model, 'build_predict_input'):
+                        predict_input = model.build_predict_input(X_train, X_test)
+                        y_pred = model.predict(predict_input, n_targets=len(X_test))
+                    else:
+                        y_pred = model.predict(X_test)
+
+                    # Alignment check first (length/index only, scale-
+                    # agnostic), THEN invert to original-scale CO2e for
+                    # every downstream use - spec section 2/17 requires all
+                    # reported metrics to be original-scale, not whatever
+                    # config.data.target_transform left them in (bug found
+                    # 2026-08-01: this quarterly-metrics path was never
+                    # inverted, only the separate annual-consistency check
+                    # below was - see src.core.utils.to_original_scale).
+                    assert_prediction_alignment(
+                        y_test, y_pred,
+                        context=f"model={model_name}, fs_option={fs_option}, fold={fold.fold_id}, h={fold.horizon}"
+                    )
+                    target_transform = config.data.target_transform
+                    y_train_original = to_original_scale(y_train.values, target_transform)
+                    y_test_original = to_original_scale(y_test.values, target_transform)
+                    y_pred_original = to_original_scale(np.asarray(y_pred), target_transform)
+                    train_history_by_fold[fold.fold_id] = y_train_original
 
                     for i, (date, actual, predicted) in enumerate(zip(
-                        y_test.index, y_test.values, y_pred
+                        y_test.index, y_test_original, y_pred_original
                     )):
                         predictions_list.append({
                             'fold_id': fold.fold_id,
@@ -204,7 +232,11 @@ def main():
             all_predictions[model_name] = predictions_df
 
             # Compute metrics
-            horizon_metrics = evaluate_by_horizon(predictions_df, config.splits.horizons)
+            horizon_metrics = evaluate_by_horizon(
+                predictions_df, config.splits.horizons,
+                train_history_by_fold=train_history_by_fold,
+                seasonal_period=config.evaluation.seasonal_period
+            )
             stability_metrics = evaluate_stability(predictions_df)
 
             summary = create_evaluation_summary(
@@ -262,9 +294,13 @@ def main():
         all_model_results = fs_eval['model_results']
 
         for model_name, predictions_df in all_predictions.items():
+            # predictions_df's actual/predicted are ALREADY original-scale
+            # (inverted above, before being saved) - transform='none' tells
+            # aggregate_quarterly_to_annual (called inside
+            # check_annual_consistency) not to invert a second time.
             consistency = check_annual_consistency(
                 predictions_df,
-                transform=config.data.target_transform
+                transform='none'
             )
 
             # Add to model results
@@ -299,9 +335,11 @@ def main():
     for fs_option, fs_eval in all_fs_evaluations.items():
         all_predictions = fs_eval['predictions']
         for model_name, predictions_df in all_predictions.items():
+            # Same reasoning as check_annual_consistency above -
+            # predictions_df is already original-scale.
             comparison = compare_with_annual_baseline(
                 predictions_df, y_annual,
-                transform=config.data.target_transform
+                transform='none'
             )
             baseline_comparisons[f"{fs_option}_{model_name}"] = comparison
 

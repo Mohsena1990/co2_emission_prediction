@@ -1,0 +1,9 @@
+row,stream,candidate_data_blocks,nominal_count,audited_count,fs_applied,sample_period,purpose
+A1,A,A1,11.0,11,none,panel2_common_period (primary),"Raw quarterly + mobility-shock predictors only - baseline, no feature selection."
+A2,A,A2,25.0,25,none,panel2_common_period (primary),"Raw + engineered predictors, no feature selection - isolates feature-engineering value."
+A3,A,A3,,23,none,panel2_common_period (primary),"Raw + grid features, no feature selection - isolates grid-fusion value."
+A4,A,A4,,37,none,panel2_common_period (primary),"Raw + engineered + grid, no feature selection - combined/interaction effect."
+B1,B,A1 candidate pool,11.0,11,FS1-FS5,panel2_common_period (primary),"Same candidate pool as A1, with FS1-FS5 applied."
+B2,B,A2 candidate pool,25.0,25,FS1-FS5,panel2_common_period (primary),"Same candidate pool as A2, with FS1-FS5 applied."
+B3,B,A3 candidate pool,,23,FS1-FS5,panel2_common_period (primary),"Same candidate pool as A3, with FS1-FS5 applied."
+B4,B,A4 candidate pool,,37,FS1-FS5,panel2_common_period (primary),"Same candidate pool as A4, with FS1-FS5 applied."

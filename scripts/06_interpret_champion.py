@@ -2,7 +2,9 @@
 """
 Script 06: Interpret Champion Model
 ===================================
-Generate SHAP explanations and regime analysis for the champion model.
+Generate SHAP explanations and regime analysis for the champion model, with
+particular focus on the COVID period - the most volatile part of the
+series and therefore the part most worth understanding.
 
 Usage:
     python scripts/06_interpret_champion.py [--config CONFIG_PATH] [--run-id RUN_ID]
@@ -13,6 +15,7 @@ Outputs:
     - outputs/runs/<run_id>/figures/shap_summary.png
     - outputs/runs/<run_id>/figures/shap_regime_compare.png
     - outputs/runs/<run_id>/figures/seasonal_leverage.png
+    - outputs/runs/<run_id>/figures/covid_predictions.png
 """
 import argparse
 import sys
@@ -33,13 +36,29 @@ from src.models import ModelRegistry
 from src.interpretability import (
     compute_shap_values, get_feature_importance_from_shap,
     analyze_regime_shap, analyze_seasonal_shap,
+    analyze_regime_permutation_importance, manual_permutation_importance,
     compute_permutation_importance, get_ridge_coefficients,
     generate_interpretation_report
 )
+from src.evaluation import compute_all_metrics
 from src.reporting import (
     plot_feature_importance, plot_shap_summary, plot_regime_comparison,
-    set_plot_style
+    plot_predictions_vs_actual, set_plot_style
 )
+
+
+# Models with a SHAP explainer path in compute_shap_values (bug: script 06
+# used to only run regime/seasonal analysis for models with
+# `supports_shap=True`, which is False for Ridge - meaning the champion's
+# COVID-period analysis was silently empty whenever Ridge won. This maps
+# every model actually in the pipeline to the right explainer, so the
+# regime comparison always runs regardless of which model is champion.
+SHAP_MODEL_TYPES = {
+    'ridge': 'linear',
+    'random_forest': 'tree',
+    'lightgbm': 'tree',
+    'catboost': 'tree',
+}
 
 
 def parse_args():
@@ -47,6 +66,39 @@ def parse_args():
     parser.add_argument('--config', type=str, default=None)
     parser.add_argument('--run-id', type=str, default=None)
     return parser.parse_args()
+
+
+def get_regime_periods(config: Config) -> dict:
+    """Build pre/COVID/post-COVID regime windows from config.features."""
+    covid_start = pd.Period(config.features.covid_start).start_time
+    covid_end = pd.Period(config.features.covid_end).end_time
+    return {
+        'pre_covid': (None, str(covid_start.date())),
+        'covid': (str(covid_start.date()), str(covid_end.date())),
+        'post_covid': (str(covid_end.date()), None),
+    }
+
+
+def make_lstm_predict_fn_builder(model):
+    """
+    Build the `predict_fn_builder` `analyze_regime_permutation_importance`
+    needs for LSTM: `model.predict` alone can't be called on a regime slice
+    directly (bug 3.4 contract - it needs `lookback` rows of history
+    immediately before the slice), so this assembles that context from the
+    full series each time a regime's predict_fn is requested.
+    """
+    def builder(X_full: pd.DataFrame, X_regime: pd.DataFrame):
+        lookback = model.params['lookback']
+        regime_start_pos = X_full.index.get_loc(X_regime.index[0])
+        context = X_full.iloc[max(0, regime_start_pos - lookback):regime_start_pos]
+
+        def predict_fn(X_shuffled_regime):
+            predict_input = model.build_predict_input(context, X_shuffled_regime)
+            return model.predict(predict_input, n_targets=len(X_shuffled_regime))
+
+        return predict_fn
+
+    return builder
 
 
 def main():
@@ -82,6 +134,7 @@ def main():
 
     champion_info = load_json(champion_path)
     champion_model_name = champion_info['champion_model']
+    champion_fs_option = champion_info.get('champion_fs_option')
 
     logger.info(f"Champion model: {champion_model_name}")
 
@@ -109,13 +162,17 @@ def main():
     logger.info(f"Data: {len(X)} samples, {len(X.columns)} features")
 
     # Load champion model
-    model_path = dirs['models'] / f'{champion_model_name}_model.pkl'
+    models_dir = dirs['models'] / champion_fs_option if champion_fs_option else dirs['models']
+    model_path = models_dir / f'{champion_model_name}_model.pkl'
     if not model_path.exists():
         logger.error(f"Model file not found: {model_path}")
         return 1
 
     model = ModelRegistry.get(champion_model_name).load(model_path)
     logger.info(f"Loaded model: {champion_model_name}")
+
+    shap_model_type = SHAP_MODEL_TYPES.get(champion_model_name)  # None for lstm
+    regime_periods = get_regime_periods(config)
 
     # =========================================
     # Feature Importance Analysis
@@ -147,7 +204,7 @@ def main():
             output_path=dirs['figures'] / 'ridge_coefficients.png'
         )
 
-    elif hasattr(model, 'supports_shap') and model.supports_shap:
+    elif shap_model_type == 'tree':
         # Use SHAP for tree-based models
         logger.info("Computing SHAP values...")
 
@@ -194,9 +251,15 @@ def main():
             )
 
     else:
-        # Fallback to permutation importance
+        # LSTM (or any other model without a SHAP explainer path): fall
+        # back to permutation importance
         logger.info("Using permutation importance...")
-        perm_df = compute_permutation_importance(model, X, y)
+        if champion_model_name == 'lstm':
+            lstm_builder = make_lstm_predict_fn_builder(model)
+            predict_fn = lstm_builder(X, X)
+            perm_df = manual_permutation_importance(predict_fn, X, y)
+        else:
+            perm_df = compute_permutation_importance(model, X, y)
         interpretation_results['method'] = 'permutation'
         interpretation_results['permutation_importance'] = perm_df.to_dict(orient='records')
 
@@ -207,37 +270,41 @@ def main():
         )
 
     # =========================================
-    # Regime Analysis (if SHAP available)
+    # Regime Analysis (pre/COVID/post-COVID) - always runs, regardless of
+    # model type, so the COVID-period comparison the user cares about most
+    # is never silently skipped.
     # =========================================
-    if hasattr(model, 'supports_shap') and model.supports_shap:
-        logger.info("-" * 40)
-        logger.info("Analyzing feature importance by regime...")
+    logger.info("-" * 40)
+    logger.info("Analyzing feature importance by regime (pre/COVID/post-COVID)...")
 
-        try:
+    try:
+        if shap_model_type in ('linear', 'tree'):
             regime_results = analyze_regime_shap(
-                model, X,
-                regime_periods={
-                    'pre_covid': (None, '2020-01-01'),
-                    'covid': ('2020-01-01', '2022-01-01'),
-                    'post_covid': ('2022-01-01', None)
-                },
-                model_type='tree'
+                model, X, regime_periods=regime_periods, model_type=shap_model_type
+            )
+        elif champion_model_name == 'lstm':
+            regime_results = analyze_regime_permutation_importance(
+                model, X, y, regime_periods=regime_periods,
+                predict_fn_builder=make_lstm_predict_fn_builder(model)
+            )
+        else:
+            regime_results = analyze_regime_permutation_importance(
+                model, X, y, regime_periods=regime_periods
             )
 
-            interpretation_results['regime_analysis'] = {
-                k: v.to_dict(orient='records') for k, v in regime_results.items()
-            }
+        interpretation_results['regime_analysis'] = {
+            k: v.to_dict(orient='records') for k, v in regime_results.items()
+        }
 
-            # Plot regime comparison
-            if regime_results:
-                plot_regime_comparison(
-                    regime_results,
-                    title="Feature Importance by Regime",
-                    output_path=dirs['figures'] / 'shap_regime_compare.png'
-                )
+        if regime_results:
+            plot_regime_comparison(
+                regime_results,
+                title="Feature Importance by Regime",
+                output_path=dirs['figures'] / 'shap_regime_compare.png'
+            )
 
-        except Exception as e:
-            logger.warning(f"Regime analysis failed: {e}")
+    except Exception as e:
+        logger.warning(f"Regime analysis failed: {e}")
 
     # =========================================
     # Seasonal Analysis
@@ -246,7 +313,13 @@ def main():
     logger.info("Analyzing seasonal patterns...")
 
     try:
-        seasonal_df = analyze_seasonal_shap(model, X, model_type='tree')
+        if shap_model_type in ('linear', 'tree'):
+            seasonal_df = analyze_seasonal_shap(model, X, model_type=shap_model_type)
+        else:
+            # No seasonal-SHAP equivalent implemented for the permutation
+            # fallback (LSTM) - regime analysis above already covers the
+            # COVID-focused comparison for these models.
+            seasonal_df = pd.DataFrame()
 
         if len(seasonal_df) > 0:
             interpretation_results['seasonal_analysis'] = seasonal_df.to_dict(orient='records')
@@ -270,6 +343,70 @@ def main():
 
     except Exception as e:
         logger.warning(f"Seasonal analysis failed: {e}")
+
+    # =========================================
+    # COVID-Focused Prediction/Error View
+    # =========================================
+    logger.info("-" * 40)
+    logger.info("Building COVID-focused prediction view...")
+
+    try:
+        pred_path = (
+            dirs['predictions'] / champion_fs_option / f'{champion_model_name}_predictions.csv'
+            if champion_fs_option else
+            dirs['predictions'] / f'{champion_model_name}_predictions.csv'
+        )
+
+        if pred_path.exists():
+            predictions_df = pd.read_csv(pred_path).drop_duplicates(subset=['date']).sort_values('date')
+            covid_start_str, covid_end_str = regime_periods['covid']
+            energy_start = pd.Period(config.features.energy_crisis_start).start_time
+            energy_end = pd.Period(config.features.energy_crisis_end).end_time
+
+            plot_predictions_vs_actual(
+                predictions_df,
+                title=f"Champion Predictions - {champion_model_name} (COVID period highlighted)",
+                output_path=dirs['figures'] / 'covid_predictions.png',
+                highlight_periods=[
+                    (covid_start_str, covid_end_str, 'COVID', 'red'),
+                    (str(energy_start.date()), str(energy_end.date()), 'Energy crisis', 'orange'),
+                ]
+            )
+
+            dates = pd.to_datetime(predictions_df['date'])
+            covid_mask = (dates >= covid_start_str) & (dates < covid_end_str)
+            y_train_history = y[y.index < covid_start_str].values
+
+            covid_metrics = {}
+            if covid_mask.sum() >= 2:
+                covid_metrics = compute_all_metrics(
+                    predictions_df.loc[covid_mask, 'actual'].values,
+                    predictions_df.loc[covid_mask, 'predicted'].values,
+                    y_train_history=y_train_history if len(y_train_history) > 0 else None,
+                    seasonal_period=config.evaluation.seasonal_period
+                ).to_dict()
+
+            full_metrics = compute_all_metrics(
+                predictions_df['actual'].values,
+                predictions_df['predicted'].values,
+                y_train_history=y_train_history if len(y_train_history) > 0 else None,
+                seasonal_period=config.evaluation.seasonal_period
+            ).to_dict()
+
+            interpretation_results['covid_window_metrics'] = covid_metrics
+            interpretation_results['full_sample_metrics'] = full_metrics
+
+            if covid_metrics:
+                logger.info(
+                    f"  COVID-window MAE={covid_metrics['mae']:.4f} vs "
+                    f"full-sample MAE={full_metrics['mae']:.4f} "
+                    f"({covid_mask.sum()} COVID quarters)"
+                )
+        else:
+            logger.warning(f"No predictions file found at {pred_path}, skipping COVID prediction view")
+
+    except Exception as e:
+        logger.warning(f"COVID-focused prediction view failed: {e}")
 
     # =========================================
     # Save Interpretation Results

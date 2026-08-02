@@ -1,0 +1,184 @@
+configurations:
+  names:
+  - A1_raw
+  - A2_engineered
+  - A3_grid_fusion
+  - A4_full_fusion
+  panels:
+  - panel1_full_period
+  - panel2_common_period
+  tags:
+    A1_raw: A1
+    A2_engineered: A2
+    A3_grid_fusion: A3
+    A4_full_fusion: A4
+data:
+  date_column: Quarter
+  input_path: data/raw/data 1999-2025Q1.xlsx
+  sheet_name: null
+  target_column: CO2e
+  target_transform: log
+evaluation:
+  complementary_metrics:
+  - mae
+  - rmse
+  - smape
+  - r2
+  include_naive_baselines: true
+  primary_metric: mase
+  seasonal_period: 4
+feature_registry_path: config/feature_registry.yaml
+features:
+  covid_end: 2021Q4
+  covid_start: 2020Q1
+  energy_crisis_end: 2023Q4
+  energy_crisis_start: 2022Q1
+  enforce_availability_registry: true
+  hdd_base_temp: 18.0
+  include_covid_dummy: true
+  include_energy_crisis: true
+  include_intensity_features: false
+  include_roc_features: true
+  include_rolling_features: false
+  include_target_growth: true
+  include_weather_features: true
+  intensity_denominators:
+  - Population
+  intensity_min_lag: 1
+  lag_features:
+  - CO2e
+  lag_orders:
+  - 1
+  - 2
+  - 3
+  - 4
+  roc_columns:
+  - GDP
+  rolling_columns:
+  - CO2e
+  rolling_functions:
+  - mean
+  - std
+  rolling_windows:
+  - 4
+  - 8
+  seasonality_type: dummies
+  temperature_column: Air_Temp
+fs:
+  elasticnet_coef_threshold: 1.0e-08
+  evaluator_model: lightgbm
+  hybrid_min_votes: 2
+  methods:
+  - linear_stability
+  - wrapper
+  - xgboost_shap
+  - permutation_stability
+  - consensus
+  min_features: 3
+  ridge_coef_threshold: 0.005
+  run_hybrid_fs: true
+  stability_threshold: 0.6
+  top_k_features: 5
+  vif_threshold: 10.0
+  vote_threshold: 2
+grid:
+  cache_dir: data/raw/grid_cache
+  enabled: true
+  extreme_intensity_percentile: 90.0
+  high_intensity_threshold_gco2_per_kwh: 300.0
+  include_generation_mix: true
+  minimum_quarter_completeness: 0.95
+  use_demand_weighted_intensity: false
+mcda:
+  fs_weights:
+    accuracy: 0.3
+    parsimony: 0.15
+    shap_concentration: 0.15
+    shap_stability: 0.2
+    stability: 0.2
+  method: vikor
+  model_weights:
+    annual_consistency: 0.25
+    interpretability: 0.1
+    parsimony: 0.1
+    quarterly_mae: 0.35
+    stability: 0.2
+  top_n_options: 2
+  use_pareto_filter: true
+  vikor_v: 0.5
+mobility:
+  cache_dir: data/raw/mobility
+  enabled: true
+  exclude_mobility_block: false
+  include_partial_2022q4: false
+  minimum_quarter_completeness: 0.8
+  primary_cutoff_quarter: 2022Q3
+model:
+  lstm_dropout: 0.2
+  lstm_lookback_options:
+  - 4
+  - 8
+  - 12
+  lstm_max_epochs: 200
+  lstm_patience: 20
+  models:
+  - ridge
+  - random_forest
+  - catboost
+  - lightgbm
+  - lstm
+  use_gpu: true
+optimization:
+  annual_penalty_threshold: 0.05
+  annual_penalty_weight: 0.1
+  cognitive_coefficient: 1.5
+  inertia: 0.7
+  inertia_decay: 0.99
+  metric: mase
+  n_iterations: 30
+  n_particles: 20
+  nested_retuning: false
+  optimizer: pso
+  seed: 42
+  seeds_for_stability:
+  - 42
+  - 43
+  - 44
+  social_coefficient: 1.5
+output:
+  base_dir: outputs
+  figure_dpi: 300
+  figure_dpi_high_res: 600
+  figure_format: png
+  figure_vector_formats:
+  - svg
+  - pdf
+  save_models: true
+  save_predictions: true
+owid:
+  cache_dir: data/raw/owid
+  enabled: true
+run_id: my_run
+seed: 42
+splits:
+  horizon_weights:
+    1: 0.5
+    2: 0.3
+    4: 0.2
+  horizons:
+  - 1
+  - 2
+  - 4
+  inner_min_train_size: 24
+  inner_scheme: expanding
+  inner_test_size: 4
+  method: walk_forward
+  min_train_size: 40
+  outer_scheme: expanding
+  panel2_inner_min_train_size: 8
+  panel2_inner_test_size: 4
+  panel2_min_train_size: 16
+  panel2_test_size: 4
+  strategy: direct
+  strict_temporal_order: true
+  test_size: 4

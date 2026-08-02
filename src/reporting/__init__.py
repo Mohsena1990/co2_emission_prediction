@@ -28,6 +28,46 @@ from .plots import (
     plot_best_per_fs_option,
     plot_multi_fs_summary
 )
+from .tables import (
+    build_table1_raw_variable_inventory,
+    build_table2_feature_registry,
+    build_table3_configuration_definitions,
+    build_table4_grid_aggregation_summary,
+    build_table5_configuration_level_performance,
+    build_table7_fs_membership,
+    build_table_fs_performance,
+    build_table12_bug_fix_verification,
+    # Stream A/B mega-spec tables (spec section 24)
+    build_table3_ab_configuration_definitions,
+    build_table6_global_factor_summary,
+    build_table8_fs_outputs,
+    build_table9_covid_regime_interpretation,
+    build_table10_source_data_quality,
+)
+from .pdf_figures import save_figure_pdf, configure_matplotlib_for_pdf, OKABE_ITO
+from .forecast_atlas import (
+    select_family_winner, fig_forecast_single, fig_forecast_comparison,
+    COVID_PERIOD, ENERGY_CRISIS_PERIOD,
+)
+from .pdf_figure_builders import (
+    fig01_revised_framework,
+    fig02_predictor_governance_map,
+    fig03_grid_aggregation_quality,
+    fig04_configuration_model_wmase_heatmap,
+    fig05_incremental_configuration_value,
+    fig06_multi_horizon_configuration_performance,
+    fig08_fs_membership_heatmap,
+    fig10_model_fs_heatmap,
+    fig13_pareto_frontier,
+    fig14_mcda_rank_sensitivity,
+    fig15_cross_model_feature_importance,
+    fig17_regime_specific_importance,
+    fig18_target_derived_feature_sensitivity,
+    fig03a_stream_A_global_comparison,
+    fig03b_stream_B_global_overview,
+    fig03c_stream_B_shortlist_magnified,
+    fig03d_best_A_vs_best_B,
+)
 
 __all__ = [
     'set_plot_style',
@@ -53,5 +93,46 @@ __all__ = [
     'plot_fs_model_comparison_heatmap',
     'plot_fs_comparison_bars',
     'plot_best_per_fs_option',
-    'plot_multi_fs_summary'
+    'plot_multi_fs_summary',
+    # Tables (spec section 20)
+    'build_table1_raw_variable_inventory',
+    'build_table2_feature_registry',
+    'build_table3_configuration_definitions',
+    'build_table4_grid_aggregation_summary',
+    'build_table5_configuration_level_performance',
+    'build_table7_fs_membership',
+    'build_table_fs_performance',
+    'build_table12_bug_fix_verification',
+    'build_table3_ab_configuration_definitions',
+    'build_table6_global_factor_summary',
+    'build_table8_fs_outputs',
+    'build_table9_covid_regime_interpretation',
+    'build_table10_source_data_quality',
+    # PDF figure infrastructure (spec section 21/22)
+    'save_figure_pdf',
+    'configure_matplotlib_for_pdf',
+    'OKABE_ITO',
+    'fig01_revised_framework',
+    'fig02_predictor_governance_map',
+    'fig03_grid_aggregation_quality',
+    'fig04_configuration_model_wmase_heatmap',
+    'fig05_incremental_configuration_value',
+    'fig06_multi_horizon_configuration_performance',
+    'fig08_fs_membership_heatmap',
+    'fig10_model_fs_heatmap',
+    'fig13_pareto_frontier',
+    'fig14_mcda_rank_sensitivity',
+    'fig15_cross_model_feature_importance',
+    'fig17_regime_specific_importance',
+    'fig18_target_derived_feature_sensitivity',
+    'fig03a_stream_A_global_comparison',
+    'fig03b_stream_B_global_overview',
+    'fig03c_stream_B_shortlist_magnified',
+    'fig03d_best_A_vs_best_B',
+    # Forecast atlas (spec section 25)
+    'select_family_winner',
+    'fig_forecast_single',
+    'fig_forecast_comparison',
+    'COVID_PERIOD',
+    'ENERGY_CRISIS_PERIOD',
 ]

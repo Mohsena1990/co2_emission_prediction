@@ -1,0 +1,14 @@
+2026-08-01 16:07:46 | INFO     | co2_forecast | Logging to: outputs/logs/grid_fetch.log
+2026-08-01 16:07:46 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:07:46 | INFO     | co2_forecast | Fetching GB Carbon Intensity API historical data
+2026-08-01 16:07:46 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:07:46 | INFO     | co2_forecast | Range: [2018-01-01, 2026-08-01) -> cache: data/raw/grid_cache
+2026-08-01 16:07:46 | INFO     | co2_forecast | Grid data cache ready: 224 files in data/raw/grid_cache
+2026-08-01 16:07:46 | INFO     | co2_forecast | Done: 224 cache files ready in data/raw/grid_cache
+2026-08-01 16:32:36 | INFO     | co2_forecast | Logging to: outputs/logs/grid_fetch.log
+2026-08-01 16:32:36 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:32:36 | INFO     | co2_forecast | Fetching GB Carbon Intensity API historical data
+2026-08-01 16:32:36 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:32:36 | INFO     | co2_forecast | Range: [2018-01-01, 2026-08-01) -> cache: data/raw/grid_cache
+2026-08-01 16:32:36 | INFO     | co2_forecast | Grid data cache ready: 224 files in data/raw/grid_cache
+2026-08-01 16:32:36 | INFO     | co2_forecast | Done: 224 cache files ready in data/raw/grid_cache

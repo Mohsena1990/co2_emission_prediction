@@ -1,0 +1,20 @@
+2026-08-01 14:15:38 | INFO     | co2_forecast | Logging to: outputs/logs/mobility_fetch.log
+2026-08-01 14:15:38 | INFO     | co2_forecast | ============================================================
+2026-08-01 14:15:38 | INFO     | co2_forecast | Fetching Google COVID-19 mobility data (UK national)
+2026-08-01 14:15:38 | INFO     | co2_forecast | ============================================================
+2026-08-01 14:15:38 | INFO     | co2_forecast | Cache dir: data/raw/mobility
+2026-08-01 14:16:36 | INFO     | co2_forecast | Filtered 974 UK-national daily mobility records from https://www.gstatic.com/covid19/mobility/Global_Mobility_Report.csv
+2026-08-01 14:16:36 | INFO     | co2_forecast | Cached UK mobility data: data/raw/mobility/google_uk_national_mobility.csv (974 daily records)
+2026-08-01 14:16:36 | INFO     | co2_forecast | Done: cached mobility data at data/raw/mobility/google_uk_national_mobility.csv
+2026-08-01 16:07:44 | INFO     | co2_forecast | Logging to: outputs/logs/mobility_fetch.log
+2026-08-01 16:07:44 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:07:44 | INFO     | co2_forecast | Fetching Google COVID-19 mobility data (UK national)
+2026-08-01 16:07:44 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:07:44 | INFO     | co2_forecast | Cache dir: data/raw/mobility
+2026-08-01 16:07:44 | INFO     | co2_forecast | Done: cached mobility data at data/raw/mobility/google_uk_national_mobility.csv
+2026-08-01 16:32:34 | INFO     | co2_forecast | Logging to: outputs/logs/mobility_fetch.log
+2026-08-01 16:32:34 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:32:34 | INFO     | co2_forecast | Fetching Google COVID-19 mobility data (UK national)
+2026-08-01 16:32:34 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:32:34 | INFO     | co2_forecast | Cache dir: data/raw/mobility
+2026-08-01 16:32:34 | INFO     | co2_forecast | Done: cached mobility data at data/raw/mobility/google_uk_national_mobility.csv

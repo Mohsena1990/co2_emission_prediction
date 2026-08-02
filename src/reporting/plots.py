@@ -37,7 +37,8 @@ def plot_predictions_vs_actual(
     predictions_df: pd.DataFrame,
     title: str = "Predictions vs Actual",
     output_path: Optional[Path] = None,
-    figsize: Tuple[int, int] = (14, 8)
+    figsize: Tuple[int, int] = (14, 8),
+    highlight_periods: Optional[List[Tuple[str, str, str, str]]] = None
 ) -> plt.Figure:
     """
     Plot predictions vs actual values over time.
@@ -47,6 +48,11 @@ def plot_predictions_vs_actual(
         title: Plot title
         output_path: Path to save figure
         figsize: Figure size
+        highlight_periods: Optional list of (start, end, label, color)
+            tuples shaded on both panels - e.g. the COVID window, so the
+            most volatile part of the series (and how well the model
+            tracks it) is visually called out rather than left to blend
+            into the rest of the plot.
 
     Returns:
         Matplotlib figure
@@ -66,7 +72,6 @@ def plot_predictions_vs_actual(
     ax1.set_xlabel('Date')
     ax1.set_ylabel('Value')
     ax1.set_title(title, fontweight='bold', fontsize=14)
-    ax1.legend(loc='upper left')
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
     ax1.xaxis.set_major_locator(mdates.YearLocator(2))
 
@@ -80,6 +85,13 @@ def plot_predictions_vs_actual(
     ax2.set_title('Prediction Errors', fontsize=12)
     ax2.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
     ax2.xaxis.set_major_locator(mdates.YearLocator(2))
+
+    if highlight_periods:
+        for start, end, label, color in highlight_periods:
+            ax1.axvspan(pd.Timestamp(start), pd.Timestamp(end), color=color, alpha=0.15, label=label)
+            ax2.axvspan(pd.Timestamp(start), pd.Timestamp(end), color=color, alpha=0.15)
+
+    ax1.legend(loc='upper left')
 
     plt.tight_layout()
 

@@ -1,0 +1,10 @@
+winner,regime,n_samples,top_predictors
+Best_A,covid,8,"GDP, Population, Air_Temp, Rainfall, COVID_Deaths"
+Best_A,post_covid,13,"GDP, Population, Air_Temp, Rainfall, COVID_Deaths"
+Best_A,pre_covid,7,"GDP, Population, Air_Temp, Rainfall, COVID_Deaths"
+Best_B,covid,8,"Rainfall, Air_Temp, Population, COVID_Deaths, GDP"
+Best_B,post_covid,13,"Rainfall, Population, Air_Temp, COVID_Deaths, GDP"
+Best_B,pre_covid,7,"Population, Rainfall, Air_Temp, COVID_Deaths, GDP"
+Best_Overall,covid,8,"GDP, Population, Air_Temp, Rainfall, COVID_Deaths"
+Best_Overall,post_covid,13,"GDP, Population, Air_Temp, Rainfall, COVID_Deaths"
+Best_Overall,pre_covid,7,"GDP, Population, Air_Temp, Rainfall, COVID_Deaths"

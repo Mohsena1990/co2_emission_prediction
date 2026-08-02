@@ -1,0 +1,17 @@
+run_id,configuration,panel,fs_option,model,horizon,fold_id,target_date,actual,predicted,residual,winner
+my_run,A3,panel2_common_period,all_features,lightgbm,4,5,2023-04-01,95012.50000000006,90971.22768801168,-4041.272311988389,Best_A
+my_run,A3,panel2_common_period,all_features,lightgbm,4,5,2023-07-01,92715.5,87882.5678143525,-4832.932185647514,Best_A
+my_run,A3,panel2_common_period,all_features,lightgbm,4,5,2023-10-01,106259.39999999992,100699.78574556828,-5559.6142544316535,Best_A
+my_run,A3,panel2_common_period,all_features,lightgbm,4,5,2024-01-01,114491.90000000008,112744.4255388976,-1747.4744611024944,Best_A
+my_run,A3,panel2_common_period,all_features,lightgbm,4,6,2024-04-01,98590.0,98885.76118511683,295.7611851168476,Best_A
+my_run,A3,panel2_common_period,all_features,lightgbm,4,6,2024-07-01,95843.10000000003,97744.36565147965,1901.2656514795965,Best_A
+my_run,A3,panel2_common_period,all_features,lightgbm,4,6,2024-10-01,111622.30000000002,118640.7305490804,7018.430549080382,Best_A
+my_run,A3,panel2_common_period,all_features,lightgbm,4,6,2025-01-01,115136.6999999999,112072.78013258376,-3063.9198674161453,Best_A
+my_run,A1,panel2_common_period,fs_linear,catboost,4,5,2023-04-01,95012.50000000006,98007.9864778751,2995.486477875049,Best_B
+my_run,A1,panel2_common_period,fs_linear,catboost,4,5,2023-07-01,92715.5,100404.94233246298,7689.442332462961,Best_B
+my_run,A1,panel2_common_period,fs_linear,catboost,4,5,2023-10-01,106259.39999999992,110061.37983295933,3801.979832959405,Best_B
+my_run,A1,panel2_common_period,fs_linear,catboost,4,5,2024-01-01,114491.90000000008,107145.33096463767,-7346.569035362409,Best_B
+my_run,A1,panel2_common_period,fs_linear,catboost,4,6,2024-04-01,98590.0,104708.48840171105,6118.488401711031,Best_B
+my_run,A1,panel2_common_period,fs_linear,catboost,4,6,2024-07-01,95843.10000000003,99901.2422561875,4058.142256187464,Best_B
+my_run,A1,panel2_common_period,fs_linear,catboost,4,6,2024-10-01,111622.30000000002,113156.94730975224,1534.6473097522105,Best_B
+my_run,A1,panel2_common_period,fs_linear,catboost,4,6,2025-01-01,115136.6999999999,109850.15715472652,-5286.542845273376,Best_B

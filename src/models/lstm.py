@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler, RobustScaler
 
 from .base import BaseForecaster, ModelRegistry
 from ..core.logging_utils import get_logger
+from ..core.gpu import torch_device_str
 
 
 @ModelRegistry.register('lstm')
@@ -77,8 +78,8 @@ class LSTMModel(BaseForecaster):
         import torch.nn as nn
         from torch.utils.data import DataLoader, TensorDataset
 
-        # Set device
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        # Set device (config.model.use_gpu, via QDECEM_USE_GPU - see src/core/gpu.py)
+        self.device = torch.device(torch_device_str())
         logger.debug(f"LSTM using device: {self.device}")
 
         # Set seed for reproducibility
@@ -100,6 +101,17 @@ class LSTMModel(BaseForecaster):
         lookback = self.params['lookback']
         X_seq, y_seq = self._create_sequences(X_scaled, y_scaled, lookback)
 
+        if len(X_seq) < 2:
+            # At least 2 sequences are required: the train/val split below
+            # always carves out >=1 sequence for validation, so with fewer
+            # than 2 the training split would be empty and PyTorch's
+            # DataLoader would fail with an opaque "num_samples=0" error.
+            raise ValueError(
+                f"LSTM.fit: training data has {len(X_scaled)} rows, giving "
+                f"only {len(X_seq)} sequence(s) with lookback={lookback}; at "
+                f"least 2 are required (one is always reserved for "
+                f"validation). Reduce lookback or provide more training history."
+            )
         if len(X_seq) < 10:
             logger.warning(f"Very few sequences ({len(X_seq)}), LSTM may not train well")
 
@@ -188,7 +200,29 @@ class LSTMModel(BaseForecaster):
 
         return self
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: np.ndarray, n_targets: Optional[int] = None) -> np.ndarray:
+        """
+        Predict from a feature matrix.
+
+        CONTRACT (bug 3.4 fix): `X` must contain the last `lookback` rows of
+        context immediately followed by the rows to actually predict, i.e.
+        `len(X) == lookback + n_targets`. There is no zero/repeat padding
+        fallback - a test fold shorter than `lookback` must be predicted by
+        concatenating the tail of the training history first (see
+        `build_predict_input`). This function always returns exactly
+        `len(X) - lookback` predictions (or exactly `n_targets` if given,
+        which must be consistent) and raises `ValueError` on any mismatch,
+        rather than silently producing the wrong number of predictions.
+
+        Args:
+            X: Feature matrix of shape (lookback + n_targets, n_features).
+            n_targets: Optional expected number of predictions; if provided,
+                it is validated against len(X) - lookback and against the
+                actual output length before returning.
+
+        Returns:
+            Array of `len(X) - lookback` predictions, in original target units.
+        """
         if not self.is_fitted:
             raise ValueError("Model not fitted")
 
@@ -198,24 +232,31 @@ class LSTMModel(BaseForecaster):
         if isinstance(X, pd.DataFrame):
             X = X.values
 
+        lookback = self.params['lookback']
+
+        if len(X) <= lookback:
+            raise ValueError(
+                f"LSTM.predict requires len(X) > lookback ({lookback}); got "
+                f"len(X)={len(X)}. X must contain the last {lookback} rows of "
+                f"history immediately before the rows to predict - use "
+                f"build_predict_input() to assemble it correctly instead of "
+                f"passing the test fold alone."
+            )
+
+        n_expected = len(X) - lookback
+        if n_targets is not None and n_targets != n_expected:
+            raise ValueError(
+                f"LSTM.predict: n_targets={n_targets} is inconsistent with "
+                f"len(X) - lookback = {n_expected}. Check that X was built "
+                f"with build_predict_input() using the correct lookback."
+            )
+
         # Scale features
         X_scaled = self.scaler_X.transform(X)
 
-        # For prediction, we need to handle the lookback requirement
-        # If X is shorter than lookback, pad with zeros
-        lookback = self.params['lookback']
-
-        if len(X_scaled) < lookback:
-            # Pad with last available values
-            padding = np.repeat(X_scaled[:1], lookback - len(X_scaled), axis=0)
-            X_scaled = np.vstack([padding, X_scaled])
-
-        # Create sequences
-        X_seq = []
-        for i in range(lookback, len(X_scaled) + 1):
-            X_seq.append(X_scaled[i-lookback:i])
-
-        X_seq = np.array(X_seq)
+        # One sequence per target row: sequence i uses rows [i, i+lookback)
+        # of X to predict the target that would follow row i+lookback-1.
+        X_seq = np.array([X_scaled[i:i + lookback] for i in range(n_expected)])
 
         # Predict
         self.lstm_model.eval()
@@ -227,7 +268,53 @@ class LSTMModel(BaseForecaster):
         # Inverse transform
         y_pred = self.scaler_y.inverse_transform(y_scaled.reshape(-1, 1)).flatten()
 
+        if len(y_pred) != n_expected:
+            raise ValueError(
+                f"LSTM.predict produced {len(y_pred)} predictions but "
+                f"{n_expected} were expected (len(X) - lookback). This "
+                f"should be unreachable; raising rather than silently "
+                f"truncating/broadcasting."
+            )
+
         return y_pred
+
+    def build_predict_input(
+        self,
+        X_train_tail: np.ndarray,
+        X_test: np.ndarray
+    ) -> np.ndarray:
+        """
+        Assemble a valid `predict()` input: the last `lookback` rows of
+        training history immediately followed by the test rows to forecast.
+
+        Args:
+            X_train_tail: Training feature history (only the last `lookback`
+                rows are used; must contain at least `lookback` rows).
+            X_test: Test-fold feature rows to predict, in temporal order.
+
+        Returns:
+            Concatenated array/DataFrame of shape (lookback + len(X_test), n_features).
+        """
+        lookback = self.params['lookback']
+
+        if isinstance(X_train_tail, pd.DataFrame):
+            train_len = len(X_train_tail)
+        else:
+            train_len = len(X_train_tail)
+
+        if train_len < lookback:
+            raise ValueError(
+                f"build_predict_input: training history has only {train_len} "
+                f"rows but lookback={lookback} requires at least that many "
+                f"rows of context to predict the test fold."
+            )
+
+        if isinstance(X_train_tail, pd.DataFrame) and isinstance(X_test, pd.DataFrame):
+            return pd.concat([X_train_tail.tail(lookback), X_test], axis=0)
+
+        X_train_arr = X_train_tail.values if isinstance(X_train_tail, pd.DataFrame) else np.asarray(X_train_tail)
+        X_test_arr = X_test.values if isinstance(X_test, pd.DataFrame) else np.asarray(X_test)
+        return np.vstack([X_train_arr[-lookback:], X_test_arr])
 
     def get_feature_importance(self) -> Optional[Dict[str, float]]:
         # LSTM doesn't have direct feature importance

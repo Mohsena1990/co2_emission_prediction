@@ -3,7 +3,7 @@ SHAP-based interpretability for CO2 forecasting models.
 """
 import numpy as np
 import pandas as pd
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Callable, Dict, Any, List, Tuple, Optional
 from pathlib import Path
 
 from ..core.logging_utils import get_logger
@@ -205,6 +205,141 @@ def analyze_seasonal_shap(
             logger.warning(f"SHAP analysis failed for Q{quarter}: {e}")
 
     return pd.DataFrame(seasonal_results)
+
+
+def manual_permutation_importance(
+    predict_fn: Callable[[pd.DataFrame], np.ndarray],
+    X: pd.DataFrame,
+    y: pd.Series,
+    n_repeats: int = 10,
+    seed: int = 42
+) -> pd.DataFrame:
+    """
+    Permutation importance driven by an arbitrary `predict_fn(X) -> y_pred`
+    of matching length, rather than sklearn's `permutation_importance`
+    (which requires calling `estimator.predict(X)` directly and assumes the
+    output has exactly `len(X)` rows - not true for LSTM, whose `predict()`
+    returns `len(X) - lookback` rows by contract). This lets a caller supply
+    a closure that assembles whatever input shape the model actually needs
+    (e.g. `build_predict_input` for LSTM) while still measuring importance
+    by the same shuffle-and-compare-error method.
+
+    Args:
+        predict_fn: Callable taking a feature DataFrame and returning
+            predictions aligned with `y` (same length and order).
+        X: Feature DataFrame to permute columns of.
+        y: Target Series aligned with X.
+        n_repeats: Number of permutation repeats per feature.
+        seed: Random seed.
+
+    Returns:
+        DataFrame with 'feature' and 'importance_mean' (increase in MAE
+        when that feature is shuffled), sorted descending.
+    """
+    rng = np.random.RandomState(seed)
+    baseline_pred = np.asarray(predict_fn(X))
+    baseline_mae = np.mean(np.abs(y.values - baseline_pred))
+
+    importances = {}
+    for col in X.columns:
+        errors = []
+        for _ in range(n_repeats):
+            X_shuffled = X.copy()
+            X_shuffled[col] = rng.permutation(X_shuffled[col].values)
+            y_pred = np.asarray(predict_fn(X_shuffled))
+            mae = np.mean(np.abs(y.values - y_pred))
+            errors.append(mae - baseline_mae)
+        importances[col] = np.mean(errors)
+
+    return pd.DataFrame({
+        'feature': list(importances.keys()),
+        'importance_mean': list(importances.values())
+    }).sort_values('importance_mean', ascending=False)
+
+
+def analyze_regime_permutation_importance(
+    model,
+    X: pd.DataFrame,
+    y: pd.Series,
+    regime_periods: Dict[str, Tuple[str, str]] = None,
+    predict_fn_builder: Optional[Callable[[pd.DataFrame, pd.DataFrame], Callable]] = None,
+    n_repeats: int = 10,
+    seed: int = 42
+) -> Dict[str, pd.DataFrame]:
+    """
+    Compare permutation-importance rankings across regimes (e.g., pre/during
+    /post COVID), for models where SHAP isn't viable (e.g. LSTM - a
+    KernelExplainer would be prohibitively slow and doesn't respect the
+    lookback-sequence predict contract). Same shape/output as
+    `analyze_regime_shap`, so callers can treat the two interchangeably.
+
+    Args:
+        model: Trained model
+        X: Full feature DataFrame with datetime index (used both as the
+            source of each regime slice and, for models needing history
+            context, as the source of that context)
+        y: Target Series aligned with X
+        regime_periods: Dict mapping regime name to (start_date, end_date)
+        predict_fn_builder: Optional callable `(X_full, X_regime) ->
+            predict_fn(X) -> y_pred` for models whose `.predict` needs more
+            than the regime slice alone (e.g. LSTM needs lookback history
+            immediately preceding the regime). Defaults to plain
+            `model.predict` when not given.
+        n_repeats: Permutation repeats per regime
+        seed: Random seed
+
+    Returns:
+        Dictionary mapping regime to importance DataFrame
+    """
+    logger = get_logger()
+
+    results = {}
+
+    if regime_periods is None:
+        regime_periods = {
+            'pre_covid': (None, '2020-01-01'),
+            'covid': ('2020-01-01', '2022-01-01'),
+            'post_covid': ('2022-01-01', None)
+        }
+
+    for regime_name, (start, end) in regime_periods.items():
+        mask = pd.Series(True, index=X.index)
+        if start is not None:
+            mask &= (X.index >= start)
+        if end is not None:
+            mask &= (X.index < end)
+
+        X_regime = X[mask]
+        y_regime = y[mask]
+
+        if len(X_regime) < 5:
+            logger.warning(f"Regime '{regime_name}' has only {len(X_regime)} samples, skipping")
+            continue
+
+        try:
+            if predict_fn_builder is not None:
+                predict_fn = predict_fn_builder(X, X_regime)
+            else:
+                predict_fn = model.predict
+
+            importance_df = manual_permutation_importance(
+                predict_fn, X_regime, y_regime, n_repeats=n_repeats, seed=seed
+            )
+            importance_df = importance_df.rename(columns={'importance_mean': 'importance'})
+            total = importance_df['importance'].sum()
+            importance_df['importance_normalized'] = (
+                importance_df['importance'] / total if total != 0 else 0
+            )
+            importance_df['regime'] = regime_name
+            importance_df['n_samples'] = len(X_regime)
+            results[regime_name] = importance_df
+
+            logger.info(f"Regime '{regime_name}': Top feature = {importance_df.iloc[0]['feature']}")
+
+        except Exception as e:
+            logger.warning(f"Permutation importance failed for regime '{regime_name}': {e}")
+
+    return results
 
 
 def compute_permutation_importance(

@@ -10,6 +10,7 @@ from sklearn.preprocessing import StandardScaler
 
 from .base import BaseForecaster, ModelRegistry
 from ..core.logging_utils import get_logger
+from ..core.gpu import catboost_gpu_kwargs, lightgbm_gpu_kwargs
 
 
 @ModelRegistry.register('ridge')
@@ -148,6 +149,7 @@ class LightGBMModel(BaseForecaster):
             'random_state': 42,
             'verbosity': -1
         }
+        default_params.update(lightgbm_gpu_kwargs())
         params = {**default_params, **(params or {})}
         super().__init__('lightgbm', params)
 
@@ -208,6 +210,7 @@ class CatBoostModel(BaseForecaster):
             'verbose': False,
             'allow_writing_files': False
         }
+        default_params.update(catboost_gpu_kwargs())
         params = {**default_params, **(params or {})}
         super().__init__('catboost', params)
 

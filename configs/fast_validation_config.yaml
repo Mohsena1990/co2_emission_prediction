@@ -1,0 +1,9 @@
+# Reduced-budget override for validating the pipeline fixes end-to-end
+# quickly (5 FS x 5 models = 25 combinations, LSTM now actually training).
+# All other sections fall back to Config's dataclass defaults - only the
+# optimization budget is trimmed here. Not intended for a final/production
+# run - re-run with the full default budget once the fixes are validated.
+optimization:
+  optimizer: "pso"
+  n_particles: 8
+  n_iterations: 12

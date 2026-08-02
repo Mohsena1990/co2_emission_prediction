@@ -1,0 +1,26 @@
+2026-08-01 14:43:44 | INFO     | co2_forecast | Logging to: outputs/logs/owid_fetch.log
+2026-08-01 14:43:44 | INFO     | co2_forecast | ============================================================
+2026-08-01 14:43:44 | INFO     | co2_forecast | Fetching OWID UK renewable/low-carbon electricity share data
+2026-08-01 14:43:44 | INFO     | co2_forecast | ============================================================
+2026-08-01 14:43:44 | INFO     | co2_forecast | Cache dir: data/raw/owid
+2026-08-01 14:43:45 | INFO     | co2_forecast | Cached OWID renewable share data: data/raw/owid/uk_renewable_electricity_share.csv (41 annual records)
+2026-08-01 14:43:45 | INFO     | co2_forecast | Cached OWID low_carbon share data: data/raw/owid/uk_low_carbon_electricity_share.csv (41 annual records)
+2026-08-01 14:43:45 | INFO     | co2_forecast |   renewable: data/raw/owid/uk_renewable_electricity_share.csv
+2026-08-01 14:43:45 | INFO     | co2_forecast |   low_carbon: data/raw/owid/uk_low_carbon_electricity_share.csv
+2026-08-01 14:43:45 | INFO     | co2_forecast | Done.
+2026-08-01 16:07:48 | INFO     | co2_forecast | Logging to: outputs/logs/owid_fetch.log
+2026-08-01 16:07:48 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:07:48 | INFO     | co2_forecast | Fetching OWID UK renewable/low-carbon electricity share data
+2026-08-01 16:07:48 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:07:48 | INFO     | co2_forecast | Cache dir: data/raw/owid
+2026-08-01 16:07:48 | INFO     | co2_forecast |   renewable: data/raw/owid/uk_renewable_electricity_share.csv
+2026-08-01 16:07:48 | INFO     | co2_forecast |   low_carbon: data/raw/owid/uk_low_carbon_electricity_share.csv
+2026-08-01 16:07:48 | INFO     | co2_forecast | Done.
+2026-08-01 16:32:37 | INFO     | co2_forecast | Logging to: outputs/logs/owid_fetch.log
+2026-08-01 16:32:37 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:32:37 | INFO     | co2_forecast | Fetching OWID UK renewable/low-carbon electricity share data
+2026-08-01 16:32:37 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:32:37 | INFO     | co2_forecast | Cache dir: data/raw/owid
+2026-08-01 16:32:37 | INFO     | co2_forecast |   renewable: data/raw/owid/uk_renewable_electricity_share.csv
+2026-08-01 16:32:37 | INFO     | co2_forecast |   low_carbon: data/raw/owid/uk_low_carbon_electricity_share.csv
+2026-08-01 16:32:37 | INFO     | co2_forecast | Done.

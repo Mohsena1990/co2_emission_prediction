@@ -1,0 +1,45 @@
+{
+  "source_run_id": "my_run",
+  "tables": {
+    "table1_revised_raw_data": {
+      "status": "written",
+      "n_rows": 14
+    },
+    "table2_feature_registry": {
+      "status": "written",
+      "n_rows": 37
+    },
+    "table3_ab_configuration_definitions": {
+      "status": "written",
+      "n_rows": 8
+    },
+    "table4_stream_A_comparison": {
+      "status": "written",
+      "n_rows": 20
+    },
+    "table5_stream_B_comparison": {
+      "status": "written",
+      "n_rows": 100
+    },
+    "table6_global_factor_summary": {
+      "status": "written",
+      "n_rows": 18
+    },
+    "table7_stream_winners_and_final": {
+      "status": "written",
+      "n_rows": 2
+    },
+    "table8_fs_outputs": {
+      "status": "written",
+      "n_rows": 96
+    },
+    "table9_covid_regime_interpretation": {
+      "status": "written",
+      "n_rows": 9
+    },
+    "table10_source_data_quality": {
+      "status": "written",
+      "n_rows": 4
+    }
+  }
+}

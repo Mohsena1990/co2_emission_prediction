@@ -1,0 +1,28 @@
+# Reduced-budget config for the full Stage 1/2 experimental-grid sweep
+# (spec section 16 / user-confirmed compute-budget decision: reduced budget
+# for the full config x FS x model sweep, full budget + multiple seeds
+# reserved for re-running only the Pareto-shortlisted configurations).
+#
+# With ~100-140 quarterly rows and up to 105+ grid cells (Stage 1: 6 panel/
+# config combos x 5 models; Stage 2: 3 primary panel/config combos x 5 FS x
+# 5 models), LSTM is the binding cost: each PSO evaluation refits an LSTM
+# per inner tuning fold, so n_particles x n_iterations x n_inner_folds LSTM
+# fits per cell. This trims PSO budget and LSTM's epoch ceiling accordingly
+# - NOT intended for final reported numbers on shortlisted configurations,
+# which should be re-run at full budget (see optimization.nested_retuning
+# and configs/default_config.yaml).
+optimization:
+  optimizer: "pso"
+  n_particles: 5
+  n_iterations: 8
+
+model:
+  models:
+    - "ridge"
+    - "random_forest"
+    - "lightgbm"
+    - "catboost"
+    - "lstm"
+  lstm_lookback_options: [4, 8]
+  lstm_max_epochs: 40
+  lstm_patience: 8

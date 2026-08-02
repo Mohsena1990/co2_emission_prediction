@@ -159,7 +159,14 @@ class PSO(SwarmOptimizer):
 
         # Initialize
         particles = self._initialize_particles(bounds, param_types)
-        global_best_position = None
+        # Seed from the first particle rather than leaving this None: if
+        # every particle's fitness ties at exactly inf (e.g. every trial for
+        # a model raises and the objective returns inf for all of them),
+        # `fitness < global_best_fitness` never fires and this would
+        # otherwise stay None, crashing the velocity update below with an
+        # opaque "unsupported operand type(s) for -: 'NoneType' and ..."
+        # instead of surfacing that no configuration ever succeeded.
+        global_best_position = particles[0].position.copy()
         global_best_fitness = float('inf')
 
         history = {

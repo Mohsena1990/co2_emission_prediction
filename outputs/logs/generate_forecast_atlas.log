@@ -1,0 +1,176 @@
+2026-08-01 16:27:33 | INFO     | co2_forecast | Logging to: outputs/logs/generate_forecast_atlas.log
+2026-08-01 16:27:33 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:27:33 | INFO     | co2_forecast | Script 15: Generate forecast atlas (source run_id=full_run_stage1)
+2026-08-01 16:27:33 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:27:33 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A1_H1.pdf
+2026-08-01 16:27:33 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A1_H1.csv
+2026-08-01 16:27:33 | INFO     | co2_forecast | forecast atlas: fig_family_A1_H1.pdf (11 forecast points)
+2026-08-01 16:27:33 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A1_H2.pdf
+2026-08-01 16:27:33 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A1_H2.csv
+2026-08-01 16:27:33 | INFO     | co2_forecast | forecast atlas: fig_family_A1_H2.pdf (8 forecast points)
+2026-08-01 16:27:33 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A1_H4.pdf
+2026-08-01 16:27:33 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A1_H4.csv
+2026-08-01 16:27:33 | INFO     | co2_forecast | forecast atlas: fig_family_A1_H4.pdf (8 forecast points)
+2026-08-01 16:29:09 | INFO     | co2_forecast | Logging to: outputs/logs/generate_forecast_atlas.log
+2026-08-01 16:29:09 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:29:09 | INFO     | co2_forecast | Script 15: Generate forecast atlas (source run_id=full_run_stage1)
+2026-08-01 16:29:09 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:29:10 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A1_H1.pdf
+2026-08-01 16:29:10 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A1_H1.csv
+2026-08-01 16:29:10 | INFO     | co2_forecast | forecast atlas: fig_family_A1_H1.pdf (11 forecast points)
+2026-08-01 16:29:10 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A1_H2.pdf
+2026-08-01 16:29:10 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A1_H2.csv
+2026-08-01 16:29:10 | INFO     | co2_forecast | forecast atlas: fig_family_A1_H2.pdf (8 forecast points)
+2026-08-01 16:29:11 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A1_H4.pdf
+2026-08-01 16:29:11 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A1_H4.csv
+2026-08-01 16:29:11 | INFO     | co2_forecast | forecast atlas: fig_family_A1_H4.pdf (8 forecast points)
+2026-08-01 16:29:11 | WARNING  | co2_forecast | No Stream B family winner found for B1 - skipping its 3 figures
+2026-08-01 16:29:11 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A2_H1.pdf
+2026-08-01 16:29:11 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A2_H1.csv
+2026-08-01 16:29:11 | INFO     | co2_forecast | forecast atlas: fig_family_A2_H1.pdf (11 forecast points)
+2026-08-01 16:29:12 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A2_H2.pdf
+2026-08-01 16:29:12 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A2_H2.csv
+2026-08-01 16:29:12 | INFO     | co2_forecast | forecast atlas: fig_family_A2_H2.pdf (8 forecast points)
+2026-08-01 16:29:12 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A2_H4.pdf
+2026-08-01 16:29:12 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A2_H4.csv
+2026-08-01 16:29:12 | INFO     | co2_forecast | forecast atlas: fig_family_A2_H4.pdf (8 forecast points)
+2026-08-01 16:29:12 | WARNING  | co2_forecast | No Stream B family winner found for B2 - skipping its 3 figures
+2026-08-01 16:29:12 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A3_H1.pdf
+2026-08-01 16:29:12 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A3_H1.csv
+2026-08-01 16:29:12 | INFO     | co2_forecast | forecast atlas: fig_family_A3_H1.pdf (11 forecast points)
+2026-08-01 16:29:13 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A3_H2.pdf
+2026-08-01 16:29:13 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A3_H2.csv
+2026-08-01 16:29:13 | INFO     | co2_forecast | forecast atlas: fig_family_A3_H2.pdf (8 forecast points)
+2026-08-01 16:29:13 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A3_H4.pdf
+2026-08-01 16:29:13 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A3_H4.csv
+2026-08-01 16:29:13 | INFO     | co2_forecast | forecast atlas: fig_family_A3_H4.pdf (8 forecast points)
+2026-08-01 16:29:13 | WARNING  | co2_forecast | No Stream B family winner found for B3 - skipping its 3 figures
+2026-08-01 16:29:13 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A4_H1.pdf
+2026-08-01 16:29:13 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A4_H1.csv
+2026-08-01 16:29:13 | INFO     | co2_forecast | forecast atlas: fig_family_A4_H1.pdf (11 forecast points)
+2026-08-01 16:29:13 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A4_H2.pdf
+2026-08-01 16:29:13 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A4_H2.csv
+2026-08-01 16:29:13 | INFO     | co2_forecast | forecast atlas: fig_family_A4_H2.pdf (8 forecast points)
+2026-08-01 16:29:14 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test/fig_family_A4_H4.pdf
+2026-08-01 16:29:14 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig_family_A4_H4.csv
+2026-08-01 16:29:14 | INFO     | co2_forecast | forecast atlas: fig_family_A4_H4.pdf (8 forecast points)
+2026-08-01 16:29:14 | WARNING  | co2_forecast | No Stream B family winner found for B4 - skipping its 3 figures
+2026-08-01 16:29:14 | ERROR    | co2_forecast | No Table 7 found - run scripts/11_pareto_mcda_and_incremental.py first. Skipping stream/overall/comparison figures.
+2026-08-01 16:29:14 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:29:14 | INFO     | co2_forecast | Script 15 complete! 12/36 forecast figures generated -> /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/atlas_test
+2026-08-01 16:29:14 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:40:11 | INFO     | co2_forecast | Logging to: outputs/logs/generate_forecast_atlas.log
+2026-08-02 01:40:11 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:40:11 | INFO     | co2_forecast | Script 15: Generate forecast atlas (source run_id=my_run)
+2026-08-02 01:40:11 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:40:11 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A1_H1.pdf
+2026-08-02 01:40:11 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A1_H1.csv
+2026-08-02 01:40:11 | INFO     | co2_forecast | forecast atlas: fig_family_A1_H1.pdf (11 forecast points)
+2026-08-02 01:40:12 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A1_H2.pdf
+2026-08-02 01:40:12 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A1_H2.csv
+2026-08-02 01:40:12 | INFO     | co2_forecast | forecast atlas: fig_family_A1_H2.pdf (8 forecast points)
+2026-08-02 01:40:12 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A1_H4.pdf
+2026-08-02 01:40:12 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A1_H4.csv
+2026-08-02 01:40:12 | INFO     | co2_forecast | forecast atlas: fig_family_A1_H4.pdf (8 forecast points)
+2026-08-02 01:40:13 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B1_H1.pdf
+2026-08-02 01:40:13 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B1_H1.csv
+2026-08-02 01:40:13 | INFO     | co2_forecast | forecast atlas: fig_family_B1_H1.pdf (11 forecast points)
+2026-08-02 01:40:13 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B1_H2.pdf
+2026-08-02 01:40:13 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B1_H2.csv
+2026-08-02 01:40:13 | INFO     | co2_forecast | forecast atlas: fig_family_B1_H2.pdf (8 forecast points)
+2026-08-02 01:40:13 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B1_H4.pdf
+2026-08-02 01:40:13 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B1_H4.csv
+2026-08-02 01:40:13 | INFO     | co2_forecast | forecast atlas: fig_family_B1_H4.pdf (8 forecast points)
+2026-08-02 01:40:14 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A2_H1.pdf
+2026-08-02 01:40:14 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A2_H1.csv
+2026-08-02 01:40:14 | INFO     | co2_forecast | forecast atlas: fig_family_A2_H1.pdf (11 forecast points)
+2026-08-02 01:40:14 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A2_H2.pdf
+2026-08-02 01:40:14 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A2_H2.csv
+2026-08-02 01:40:14 | INFO     | co2_forecast | forecast atlas: fig_family_A2_H2.pdf (8 forecast points)
+2026-08-02 01:40:14 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A2_H4.pdf
+2026-08-02 01:40:14 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A2_H4.csv
+2026-08-02 01:40:14 | INFO     | co2_forecast | forecast atlas: fig_family_A2_H4.pdf (8 forecast points)
+2026-08-02 01:40:15 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B2_H1.pdf
+2026-08-02 01:40:15 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B2_H1.csv
+2026-08-02 01:40:15 | INFO     | co2_forecast | forecast atlas: fig_family_B2_H1.pdf (11 forecast points)
+2026-08-02 01:40:15 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B2_H2.pdf
+2026-08-02 01:40:15 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B2_H2.csv
+2026-08-02 01:40:15 | INFO     | co2_forecast | forecast atlas: fig_family_B2_H2.pdf (8 forecast points)
+2026-08-02 01:40:16 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B2_H4.pdf
+2026-08-02 01:40:16 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B2_H4.csv
+2026-08-02 01:40:16 | INFO     | co2_forecast | forecast atlas: fig_family_B2_H4.pdf (8 forecast points)
+2026-08-02 01:40:16 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A3_H1.pdf
+2026-08-02 01:40:16 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A3_H1.csv
+2026-08-02 01:40:16 | INFO     | co2_forecast | forecast atlas: fig_family_A3_H1.pdf (11 forecast points)
+2026-08-02 01:40:17 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A3_H2.pdf
+2026-08-02 01:40:17 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A3_H2.csv
+2026-08-02 01:40:17 | INFO     | co2_forecast | forecast atlas: fig_family_A3_H2.pdf (8 forecast points)
+2026-08-02 01:40:17 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A3_H4.pdf
+2026-08-02 01:40:17 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A3_H4.csv
+2026-08-02 01:40:17 | INFO     | co2_forecast | forecast atlas: fig_family_A3_H4.pdf (8 forecast points)
+2026-08-02 01:40:17 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B3_H1.pdf
+2026-08-02 01:40:17 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B3_H1.csv
+2026-08-02 01:40:17 | INFO     | co2_forecast | forecast atlas: fig_family_B3_H1.pdf (11 forecast points)
+2026-08-02 01:40:18 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B3_H2.pdf
+2026-08-02 01:40:18 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B3_H2.csv
+2026-08-02 01:40:18 | INFO     | co2_forecast | forecast atlas: fig_family_B3_H2.pdf (8 forecast points)
+2026-08-02 01:40:18 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B3_H4.pdf
+2026-08-02 01:40:18 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B3_H4.csv
+2026-08-02 01:40:18 | INFO     | co2_forecast | forecast atlas: fig_family_B3_H4.pdf (8 forecast points)
+2026-08-02 01:40:18 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A4_H1.pdf
+2026-08-02 01:40:18 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A4_H1.csv
+2026-08-02 01:40:18 | INFO     | co2_forecast | forecast atlas: fig_family_A4_H1.pdf (11 forecast points)
+2026-08-02 01:40:19 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A4_H2.pdf
+2026-08-02 01:40:19 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A4_H2.csv
+2026-08-02 01:40:19 | INFO     | co2_forecast | forecast atlas: fig_family_A4_H2.pdf (8 forecast points)
+2026-08-02 01:40:19 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_A4_H4.pdf
+2026-08-02 01:40:19 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_A4_H4.csv
+2026-08-02 01:40:19 | INFO     | co2_forecast | forecast atlas: fig_family_A4_H4.pdf (8 forecast points)
+2026-08-02 01:40:20 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B4_H1.pdf
+2026-08-02 01:40:20 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B4_H1.csv
+2026-08-02 01:40:20 | INFO     | co2_forecast | forecast atlas: fig_family_B4_H1.pdf (11 forecast points)
+2026-08-02 01:40:20 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B4_H2.pdf
+2026-08-02 01:40:20 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B4_H2.csv
+2026-08-02 01:40:20 | INFO     | co2_forecast | forecast atlas: fig_family_B4_H2.pdf (8 forecast points)
+2026-08-02 01:40:20 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_family_B4_H4.pdf
+2026-08-02 01:40:20 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_family_B4_H4.csv
+2026-08-02 01:40:20 | INFO     | co2_forecast | forecast atlas: fig_family_B4_H4.pdf (8 forecast points)
+2026-08-02 01:40:21 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_a_forecast_H1.pdf
+2026-08-02 01:40:21 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_a_forecast_H1.csv
+2026-08-02 01:40:21 | INFO     | co2_forecast | forecast atlas: fig_best_a_forecast_H1.pdf (11 forecast points)
+2026-08-02 01:40:21 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_a_forecast_H2.pdf
+2026-08-02 01:40:21 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_a_forecast_H2.csv
+2026-08-02 01:40:21 | INFO     | co2_forecast | forecast atlas: fig_best_a_forecast_H2.pdf (8 forecast points)
+2026-08-02 01:40:21 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_a_forecast_H4.pdf
+2026-08-02 01:40:21 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_a_forecast_H4.csv
+2026-08-02 01:40:21 | INFO     | co2_forecast | forecast atlas: fig_best_a_forecast_H4.pdf (8 forecast points)
+2026-08-02 01:40:22 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_b_forecast_H1.pdf
+2026-08-02 01:40:22 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_b_forecast_H1.csv
+2026-08-02 01:40:22 | INFO     | co2_forecast | forecast atlas: fig_best_b_forecast_H1.pdf (11 forecast points)
+2026-08-02 01:40:22 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_b_forecast_H2.pdf
+2026-08-02 01:40:22 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_b_forecast_H2.csv
+2026-08-02 01:40:22 | INFO     | co2_forecast | forecast atlas: fig_best_b_forecast_H2.pdf (8 forecast points)
+2026-08-02 01:40:23 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_b_forecast_H4.pdf
+2026-08-02 01:40:23 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_b_forecast_H4.csv
+2026-08-02 01:40:23 | INFO     | co2_forecast | forecast atlas: fig_best_b_forecast_H4.pdf (8 forecast points)
+2026-08-02 01:40:23 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_overall_forecast_H1.pdf
+2026-08-02 01:40:23 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_overall_forecast_H1.csv
+2026-08-02 01:40:23 | INFO     | co2_forecast | forecast atlas: fig_best_overall_forecast_H1.pdf (11 forecast points)
+2026-08-02 01:40:23 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_overall_forecast_H2.pdf
+2026-08-02 01:40:23 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_overall_forecast_H2.csv
+2026-08-02 01:40:23 | INFO     | co2_forecast | forecast atlas: fig_best_overall_forecast_H2.pdf (8 forecast points)
+2026-08-02 01:40:24 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_overall_forecast_H4.pdf
+2026-08-02 01:40:24 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_overall_forecast_H4.csv
+2026-08-02 01:40:24 | INFO     | co2_forecast | forecast atlas: fig_best_overall_forecast_H4.pdf (8 forecast points)
+2026-08-02 01:40:24 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_A_vs_B_forecast_H1.pdf
+2026-08-02 01:40:24 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_A_vs_B_forecast_H1.csv
+2026-08-02 01:40:24 | INFO     | co2_forecast | forecast atlas: fig_best_A_vs_B_forecast_H1.pdf
+2026-08-02 01:40:25 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_A_vs_B_forecast_H2.pdf
+2026-08-02 01:40:25 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_A_vs_B_forecast_H2.csv
+2026-08-02 01:40:25 | INFO     | co2_forecast | forecast atlas: fig_best_A_vs_B_forecast_H2.pdf
+2026-08-02 01:40:25 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/forecasting/fig_best_A_vs_B_forecast_H4.pdf
+2026-08-02 01:40:25 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig_best_A_vs_B_forecast_H4.csv
+2026-08-02 01:40:25 | INFO     | co2_forecast | forecast atlas: fig_best_A_vs_B_forecast_H4.pdf
+2026-08-02 01:40:25 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:40:25 | INFO     | co2_forecast | Script 15 complete! 36/36 forecast figures generated -> outputs/figures/pdf/forecasting
+2026-08-02 01:40:25 | INFO     | co2_forecast | ============================================================

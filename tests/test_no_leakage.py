@@ -171,7 +171,21 @@ class TestWalkForwardIntegrity:
                 f"Training size decreased from fold {i-1} to {i}"
 
     def test_horizon_offset(self, sample_data):
-        """Test that forecast horizons are correctly applied."""
+        """
+        Test that forecast horizons are correctly applied via direct,
+        horizon-shifted targets (y_by_horizon), NOT by shifting the test
+        window's position by the horizon.
+
+        A prior version of this test asserted `gap >= horizon` (test window
+        starting `horizon` rows after train_end) - that was actually
+        asserting the presence of the bug this fix removes: shifting the
+        test window let features at the shifted window (e.g. lag-1) leak
+        near-term information a real H-step-ahead forecast, issued at
+        train_end, would never have. The correct design keeps test origins
+        immediately following training (gap == 1) for every horizon, and
+        encodes the horizon purely in which target value each origin is
+        paired with.
+        """
         X, y = sample_data
 
         config = SplitConfig(
@@ -182,14 +196,26 @@ class TestWalkForwardIntegrity:
 
         cv_plan = create_walk_forward_splits(X, y, config)
 
+        assert set(cv_plan.y_by_horizon.keys()) == {1, 2, 4}
+
         for fold in cv_plan.folds:
             train_end_idx = fold.train_indices[-1]
             test_start_idx = fold.test_indices[0]
 
-            # Gap should be at least the horizon
+            # Test origins always immediately follow training, regardless
+            # of horizon - the horizon must not shift the test window.
             gap = test_start_idx - train_end_idx
-            assert gap >= fold.horizon, \
-                f"Fold {fold.fold_id}: Gap {gap} < horizon {fold.horizon}"
+            assert gap == 1, \
+                f"Fold {fold.fold_id}: expected origin-contiguous gap of 1, got {gap}"
+
+            # The horizon-shifted target at each test origin must equal the
+            # actual value `horizon` steps ahead of that origin.
+            y_h = cv_plan.y_by_horizon[fold.horizon]
+            for pos in fold.test_indices:
+                assert y_h.iloc[pos] == y.iloc[pos + fold.horizon], (
+                    f"Fold {fold.fold_id} (h={fold.horizon}): y_by_horizon at "
+                    f"origin {pos} does not equal y at {pos + fold.horizon}"
+                )
 
 
 if __name__ == '__main__':

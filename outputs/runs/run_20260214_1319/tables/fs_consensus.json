@@ -1,7 +1,0 @@
-{
-  "features": [
-    "CO2e_lag4",
-    "GDP_dlog",
-    "CO2e_dlog"
-  ]
-}

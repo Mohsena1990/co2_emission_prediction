@@ -1,7 +1,0 @@
-{
-  "features": [
-    "GDP",
-    "Air_Temp",
-    "CO2e_lag4"
-  ]
-}

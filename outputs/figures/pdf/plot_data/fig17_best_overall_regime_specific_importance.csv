@@ -1,0 +1,11 @@
+feature,pre_covid,covid,post_covid
+Air_Temp,0.0,0.0,0.0
+COVID_Deaths,0.0,0.0,0.0
+GDP,0.0,0.0,0.0
+Grid_CI_high_share,0.0,0.0,0.0
+Grid_CI_low_share,0.0,0.0,0.0
+Grid_CI_mean,0.0,0.0,0.0
+Grid_CI_p90,0.0,0.0,0.0
+Grid_CI_std,0.0,0.0,0.0
+Grid_fossil_share,0.0,0.0,0.0
+Grid_gas_share,0.0,0.0,0.0

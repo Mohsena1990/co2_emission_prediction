@@ -7,11 +7,12 @@ from .model_optimizer import (
     create_objective_function,
     optimize_model,
     optimize_all_models,
-    train_optimized_model
+    train_optimized_model,
+    optimize_model_nested
 )
 
 __all__ = [
     'PSO', 'GWO', 'SwarmOptimizer', 'Particle', 'get_optimizer',
     'create_objective_function', 'optimize_model', 'optimize_all_models',
-    'train_optimized_model'
+    'train_optimized_model', 'optimize_model_nested'
 ]

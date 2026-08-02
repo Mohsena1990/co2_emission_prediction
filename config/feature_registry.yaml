@@ -1,0 +1,817 @@
+# Q-DECEM predictor-governance registry (spec section 5).
+#
+# This is the single source of truth for every raw and engineered candidate
+# predictor considered by the pipeline. It is consulted by
+# src/features/registry.py BEFORE any model matrix is constructed:
+# `enforce_availability_registry: true` (see FeatureConfig) means a feature
+# absent from this file, or marked retained_after_audit: false for the
+# requested horizon, cannot enter X.
+#
+# Column semantics:
+#   name                    - feature/column name as produced by
+#                             src/features/engineering.py
+#   family                  - raw_exogenous | target_lag | target_growth |
+#                             target_intensity | weather | seasonal |
+#                             disruption | exogenous_growth
+#   kind                    - raw | engineered
+#   formula                 - mathematical definition
+#   source_variables        - upstream raw column(s) this is derived from
+#   target_derived          - true if the feature is a function of CO2e
+#                             (directly or via a target-derived input)
+#   min_lag                 - minimum number of quarters between the origin
+#                             t and the most recent input the feature uses;
+#                             0 means "as of the origin quarter itself"
+#   availability_category   - exogenous_and_observable |
+#                             exogenous_with_publication_delay |
+#                             historical_target_derived |
+#                             contemporaneous_target_derived |
+#                             deterministic_calendar |
+#                             event_or_regime_indicator |
+#                             unavailable_at_forecast_origin
+#   release_delay_quarters  - assumed publication delay for raw exogenous
+#                             series (0 if effectively immediate/backfilled)
+#   leakage_risk            - none | low | moderate | high
+#   safe_at_h1 / safe_at_h2 / safe_at_h4 - whether the feature (as
+#                             constructed, at its stated min_lag) can be used
+#                             for a direct forecast at that horizon without
+#                             using information unavailable at the origin.
+#                             A feature with min_lag m is safe at horizon h
+#                             whenever m >= 1 (the direct-target construction
+#                             in create_direct_horizon_targets already
+#                             handles the horizon offset on the TARGET side;
+#                             the FEATURE only needs to avoid using CO2e_t or
+#                             later, i.e. min_lag >= 1). Raw exogenous
+#                             features with min_lag=0 are flagged not-safe at
+#                             any horizon under a strict origin-availability
+#                             reading and are governed via
+#                             release_delay_quarters instead (documented
+#                             simplification - see final report).
+#   missing_value_rule      - how NaNs (e.g. lag warm-up rows) are handled
+#   retained_after_audit    - whether this feature is allowed into ANY
+#                             governed family / FS candidate pool by default
+#   exclusion_reason        - populated when retained_after_audit is false,
+#                             or when only a lagged/derived variant is safe
+#   role                    - forecasting | explanatory | both
+
+features:
+  # ---- 5 raw predictors (spec section 3: TEC/CEI fully removed, not just
+  # opt-in-excluded - see the removed-variable audit trail in the final
+  # report). Google mobility-shock predictors are added separately once
+  # ingested (spec section 4). ----
+  - name: GDP
+    family: raw_exogenous
+    kind: raw
+    formula: "GDP_t (raw level, £bn)"
+    source_variables: [GDP]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_with_publication_delay
+    release_delay_quarters: 1
+    leakage_risk: low
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A1, A2, A3, A4]
+
+  - name: Population
+    family: raw_exogenous
+    kind: raw
+    formula: "Population_t (raw level)"
+    source_variables: [Population]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A1, A2, A3, A4]
+
+  - name: Air_Temp
+    family: raw_exogenous
+    kind: raw
+    formula: "Air_Temp_t (quarterly mean, deg C)"
+    source_variables: [Air_Temp]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A1, A2, A3, A4]
+
+  - name: Rainfall
+    family: raw_exogenous
+    kind: raw
+    formula: "Rainfall_t (quarterly total, mm)"
+    source_variables: [Rainfall]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A1, A2, A3, A4]
+
+  - name: COVID_Deaths
+    family: raw_exogenous
+    kind: raw
+    formula: "COVID_Deaths_t (quarterly count)"
+    source_variables: [COVID_Deaths]
+    target_derived: false
+    min_lag: 0
+    availability_category: event_or_regime_indicator
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A1, A2, A3, A4]
+
+  # ---- 6 Google COVID-19 mobility-shock predictors (spec section 4) ----
+  # Daily percentage deviations from a pre-COVID baseline, aggregated to a
+  # quarterly mean (src/mobility/aggregate.py) and neutral-zeroed to 0.0
+  # outside the official Google reporting window (spec 4.4: "no observed
+  # shock represented", not "measured baseline"; never interpolated). Raw
+  # exogenous at min_lag=0 like the other raw predictors above - the
+  # quarter-t value is used to forecast CO2e_{t+h} at every horizon (spec
+  # 4.5), the origin-t value itself is always known at origin t.
+  - name: Mobility_Retail_Recreation
+    family: mobility_exogenous
+    kind: raw
+    formula: "mean_d(retail_and_recreation_percent_change_from_baseline_d) for d in quarter t; 0.0 outside the reporting window"
+    source_variables: [retail_and_recreation_percent_change_from_baseline]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: neutral_zero_outside_reporting_window
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A1, A2, A3, A4]
+
+  - name: Mobility_Grocery_Pharmacy
+    family: mobility_exogenous
+    kind: raw
+    formula: "mean_d(grocery_and_pharmacy_percent_change_from_baseline_d) for d in quarter t; 0.0 outside the reporting window"
+    source_variables: [grocery_and_pharmacy_percent_change_from_baseline]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: neutral_zero_outside_reporting_window
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A1, A2, A3, A4]
+
+  - name: Mobility_Parks
+    family: mobility_exogenous
+    kind: raw
+    formula: "mean_d(parks_percent_change_from_baseline_d) for d in quarter t; 0.0 outside the reporting window"
+    source_variables: [parks_percent_change_from_baseline]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: neutral_zero_outside_reporting_window
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A1, A2, A3, A4]
+
+  - name: Mobility_Transit_Stations
+    family: mobility_exogenous
+    kind: raw
+    formula: "mean_d(transit_stations_percent_change_from_baseline_d) for d in quarter t; 0.0 outside the reporting window"
+    source_variables: [transit_stations_percent_change_from_baseline]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: neutral_zero_outside_reporting_window
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A1, A2, A3, A4]
+
+  - name: Mobility_Workplaces
+    family: mobility_exogenous
+    kind: raw
+    formula: "mean_d(workplaces_percent_change_from_baseline_d) for d in quarter t; 0.0 outside the reporting window"
+    source_variables: [workplaces_percent_change_from_baseline]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: neutral_zero_outside_reporting_window
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A1, A2, A3, A4]
+
+  - name: Mobility_Residential
+    family: mobility_exogenous
+    kind: raw
+    formula: "mean_d(residential_percent_change_from_baseline_d) for d in quarter t; 0.0 outside the reporting window"
+    source_variables: [residential_percent_change_from_baseline]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: neutral_zero_outside_reporting_window
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A1, A2, A3, A4]
+
+  # ---- 4 target lags ----
+  - name: CO2e_lag1
+    family: target_lag
+    kind: engineered
+    formula: "CO2e_{t-1}"
+    source_variables: [CO2e]
+    target_derived: true
+    min_lag: 1
+    availability_category: historical_target_derived
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: drop_leading_nan
+    retained_after_audit: true
+    exclusion_reason: null
+    role: forecasting
+    configuration_membership: [A2, A4]
+
+  - name: CO2e_lag2
+    family: target_lag
+    kind: engineered
+    formula: "CO2e_{t-2}"
+    source_variables: [CO2e]
+    target_derived: true
+    min_lag: 2
+    availability_category: historical_target_derived
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: drop_leading_nan
+    retained_after_audit: true
+    exclusion_reason: null
+    role: forecasting
+    configuration_membership: [A2, A4]
+
+  - name: CO2e_lag3
+    family: target_lag
+    kind: engineered
+    formula: "CO2e_{t-3}"
+    source_variables: [CO2e]
+    target_derived: true
+    min_lag: 3
+    availability_category: historical_target_derived
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: drop_leading_nan
+    retained_after_audit: true
+    exclusion_reason: null
+    role: forecasting
+    configuration_membership: [A2, A4]
+
+  - name: CO2e_lag4
+    family: target_lag
+    kind: engineered
+    formula: "CO2e_{t-4}"
+    source_variables: [CO2e]
+    target_derived: true
+    min_lag: 4
+    availability_category: historical_target_derived
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: drop_leading_nan
+    retained_after_audit: true
+    exclusion_reason: null
+    role: forecasting
+    configuration_membership: [A2, A4]
+
+  # ---- 2 growth variables (spec section 5.2: "Do not create TEC_dlog") ----
+  - name: CO2e_dlog
+    family: target_growth
+    kind: engineered
+    formula: "log(CO2e_{t-1}) - log(CO2e_{t-2})  [shifted by 1 to exclude CO2e_t]"
+    source_variables: [CO2e]
+    target_derived: true
+    min_lag: 1
+    availability_category: historical_target_derived
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: drop_leading_nan
+    retained_after_audit: true
+    exclusion_reason: null
+    role: forecasting
+    configuration_membership: [A2, A4]
+
+  - name: GDP_dlog
+    family: exogenous_growth
+    kind: engineered
+    formula: "log(GDP_t) - log(GDP_{t-1})"
+    source_variables: [GDP]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_with_publication_delay
+    release_delay_quarters: 1
+    leakage_risk: low
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: drop_leading_nan
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A2, A4]
+
+  # ---- 1 intensity ratio (bug 3.1 fix: both numerator and denominator
+  # lagged; spec section 2 removed CO2e_per_TEC) ----
+  - name: CO2e_per_Population
+    family: target_intensity
+    kind: engineered
+    formula: "CO2e_{t-1} / Population_{t-1}"
+    source_variables: [CO2e, Population]
+    target_derived: true
+    min_lag: 1
+    availability_category: historical_target_derived
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: drop_leading_nan
+    retained_after_audit: true
+    exclusion_reason: null
+    role: explanatory
+    configuration_membership: [A2, A4]
+
+  # ---- 2 weather-derived variables ----
+  - name: HDD_proxy
+    family: weather
+    kind: engineered
+    formula: "max(0, 18.0 - Air_Temp_t)"
+    source_variables: [Air_Temp]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A2, A4]
+
+  - name: CDD_proxy
+    family: weather
+    kind: engineered
+    formula: "max(0, Air_Temp_t - 18.0)"
+    source_variables: [Air_Temp]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A2, A4]
+
+  # ---- 3 seasonal variables (Q1 = reference category) ----
+  - name: Q2
+    family: seasonal
+    kind: engineered
+    formula: "1{quarter(t) = 2}"
+    source_variables: [date]
+    target_derived: false
+    min_lag: 0
+    availability_category: deterministic_calendar
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: forecasting
+    configuration_membership: [A2, A4]
+
+  - name: Q3
+    family: seasonal
+    kind: engineered
+    formula: "1{quarter(t) = 3}"
+    source_variables: [date]
+    target_derived: false
+    min_lag: 0
+    availability_category: deterministic_calendar
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: forecasting
+    configuration_membership: [A2, A4]
+
+  - name: Q4
+    family: seasonal
+    kind: engineered
+    formula: "1{quarter(t) = 4}"
+    source_variables: [date]
+    target_derived: false
+    min_lag: 0
+    availability_category: deterministic_calendar
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: forecasting
+    configuration_membership: [A2, A4]
+
+  # ---- 2 disruption variables ----
+  - name: COVID
+    family: disruption
+    kind: engineered
+    formula: "1{2020Q1 <= t <= 2021Q4}"
+    source_variables: [date]
+    target_derived: false
+    min_lag: 0
+    availability_category: deterministic_calendar
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: forecasting
+    configuration_membership: [A2, A4]
+
+  - name: EnergyCrisis
+    family: disruption
+    kind: engineered
+    formula: "1{2022Q1 <= t <= 2023Q4}"
+    source_variables: [date]
+    target_derived: false
+    min_lag: 0
+    availability_category: deterministic_calendar
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: none_observed
+    retained_after_audit: true
+    exclusion_reason: null
+    role: forecasting
+    configuration_membership: [A2, A4]
+
+  # ---- 10 NESO electricity-grid quarterly features (spec section 7) - the
+  # final 12-item grid block (spec section 9) is these 10 plus the 2
+  # OWID_*_L1Y columns below. ----
+  # Source: GB National Grid ESO Carbon Intensity API
+  # (api.carbonintensity.org.uk), half-hourly, available from 2018-01-01
+  # (src/grid/fetch.py::EARLIEST_AVAILABLE_DATE). These describe the GB
+  # ELECTRICITY SYSTEM's carbon intensity and generation mix - external
+  # predictors, not a re-measurement of total UK CO2e (which covers all
+  # sectors). Aggregated to quarterly by src/grid/aggregate.py; a quarter is
+  # excluded entirely (dropped from A3/A4, not imputed) if its half-hourly
+  # completeness ratio falls below `grid.minimum_quarter_completeness`
+  # (spec 6.3) - so A3/A4 can have fewer rows than A1/A2 even within the
+  # grid-covered period. Treated as lag-0 exogenous features safe at every
+  # horizon under the same documented convention already used for the raw
+  # macro predictors above (GDP/etc.): the quarterly aggregate is only
+  # computable once the quarter completes, which coincides with the
+  # forecast origin itself, and generation-mix/intensity readings are
+  # published near-real-time (far less delayed than GDP's real publication
+  # lag) - see the header note on safe_at_h{1,2,4} semantics. Column names
+  # here use this codebase's existing snake_case convention rather than
+  # spec section 7's exact CamelCase spelling (e.g. Grid_CI_high_share vs.
+  # "Grid_HighIntensityShare") - same features, documented mapping in the
+  # final report rather than a purely cosmetic rename across the codebase.
+  # Aggregated as unweighted means of half-hourly percentages, NOT
+  # generation-weighted totals (spec 7.2's preference) - the Carbon
+  # Intensity API exposes generation-mix shares only, not absolute
+  # generation volumes, so true generation-weighting isn't computable from
+  # this source; documented simplification, same class as the "no
+  # demand-weighted CI" limitation already noted for Grid_CI_* above.
+
+  - name: Grid_CI_mean
+    family: grid_exogenous
+    kind: raw
+    formula: "mean(CI_t for t in quarter q)"
+    source_variables: [intensity_actual, intensity_forecast]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: quarter_dropped_if_incomplete
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]
+
+  - name: Grid_CI_p90
+    family: grid_exogenous
+    kind: raw
+    formula: "P90(CI_t for t in quarter q)"
+    source_variables: [intensity_actual, intensity_forecast]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: quarter_dropped_if_incomplete
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]
+
+  - name: Grid_CI_std
+    family: grid_exogenous
+    kind: raw
+    formula: "std(CI_t for t in quarter q)"
+    source_variables: [intensity_actual, intensity_forecast]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: quarter_dropped_if_incomplete
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]
+
+  - name: Grid_CI_high_share
+    family: grid_exogenous
+    kind: raw
+    formula: "mean(1{index_t in {high, very high}})"
+    source_variables: [intensity_index]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: quarter_dropped_if_incomplete
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]
+
+  - name: Grid_CI_low_share
+    family: grid_exogenous
+    kind: raw
+    formula: "mean(1{index_t in {very low, low}})"
+    source_variables: [intensity_index]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: quarter_dropped_if_incomplete
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]
+
+  - name: Grid_renewable_share
+    family: grid_exogenous
+    kind: raw
+    formula: "mean(gen_biomass_t + gen_hydro_t + gen_solar_t + gen_wind_t)"
+    source_variables: [gen_biomass, gen_hydro, gen_solar, gen_wind]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: quarter_dropped_if_incomplete
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]
+
+  # spec section 7.2: nuclear is low-carbon but NOT renewable - this column
+  # is distinct from Grid_renewable_share above, never interchangeable with
+  # it (renewables + nuclear vs. renewables only).
+  - name: Grid_low_carbon_share
+    family: grid_exogenous
+    kind: raw
+    formula: "mean(gen_biomass_t + gen_hydro_t + gen_solar_t + gen_wind_t + gen_nuclear_t)"
+    source_variables: [gen_biomass, gen_hydro, gen_solar, gen_wind, gen_nuclear]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: quarter_dropped_if_incomplete
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]
+
+  - name: Grid_fossil_share
+    family: grid_exogenous
+    kind: raw
+    formula: "mean(gen_gas_t + gen_coal_t)"
+    source_variables: [gen_gas, gen_coal]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: quarter_dropped_if_incomplete
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]
+
+  - name: Grid_gas_share
+    family: grid_exogenous
+    kind: raw
+    formula: "mean(gen_gas_t)"
+    source_variables: [gen_gas]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: quarter_dropped_if_incomplete
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]
+
+  - name: Grid_wind_share
+    family: grid_exogenous
+    kind: raw
+    formula: "mean(gen_wind_t)"
+    source_variables: [gen_wind]
+    target_derived: false
+    min_lag: 0
+    availability_category: exogenous_and_observable
+    release_delay_quarters: 0
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: quarter_dropped_if_incomplete
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]
+
+  # ---- 2 OWID annual renewable/low-carbon shares, one-year-lagged (spec
+  # section 8) ----
+  # Independently-sourced, lagged structural predictors - NOT the primary
+  # quarterly green-share signal (that's the NESO Grid_* block above); an
+  # annual external validation series / data-quality cross-check. For all
+  # quarters in year y, uses no value later than year y-1's annual share
+  # (spec 8.2 - never interpolated across its own completed year).
+  - name: OWID_RenewableShare_L1Y
+    family: owid_exogenous
+    kind: raw
+    formula: "OWID renewable-electricity-share_{y-1} for every quarter in year y"
+    source_variables: [OWID_share_electricity_renewables]
+    target_derived: false
+    min_lag: 4
+    availability_category: exogenous_with_publication_delay
+    release_delay_quarters: 4
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: nan_before_owid_series_start
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]
+
+  - name: OWID_LowCarbonShare_L1Y
+    family: owid_exogenous
+    kind: raw
+    formula: "OWID low-carbon-electricity-share_{y-1} for every quarter in year y"
+    source_variables: [OWID_share_electricity_low_carbon]
+    target_derived: false
+    min_lag: 4
+    availability_category: exogenous_with_publication_delay
+    release_delay_quarters: 4
+    leakage_risk: none
+    safe_at_h1: true
+    safe_at_h2: true
+    safe_at_h4: true
+    missing_value_rule: nan_before_owid_series_start
+    retained_after_audit: true
+    exclusion_reason: null
+    role: both
+    configuration_membership: [A3, A4]

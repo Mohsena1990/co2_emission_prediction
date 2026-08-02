@@ -1,0 +1,182 @@
+2026-08-01 16:21:18 | INFO     | co2_forecast | Logging to: outputs/logs/generate_figures.log
+2026-08-01 16:21:18 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:21:18 | INFO     | co2_forecast | Script 14: Generate PDF figures (source run_id=smoke_p10)
+2026-08-01 16:21:18 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:21:19 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig01_revised_qdecem_framework.pdf
+2026-08-01 16:21:19 | INFO     | co2_forecast | fig01: 9 stages
+2026-08-01 16:21:19 | INFO     | co2_forecast | Loaded feature registry: 37 candidate predictors from config/feature_registry.yaml
+2026-08-01 16:21:22 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig02_predictor_governance_map.pdf
+2026-08-01 16:21:22 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig02_predictor_governance_map.csv
+2026-08-01 16:21:22 | INFO     | co2_forecast | fig02: 37 features x 9 governance columns
+2026-08-01 16:21:22 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig03_grid_aggregation_quality.pdf
+2026-08-01 16:21:22 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig03_grid_aggregation_quality.csv
+2026-08-01 16:21:22 | INFO     | co2_forecast | fig03: 36 quarters, 2 excluded
+2026-08-01 16:21:22 | INFO     | co2_forecast | Pareto filter: 4 -> 4 alternatives
+2026-08-01 16:21:22 | INFO     | co2_forecast | VIKOR ranking complete. Best: A4/all_features/ridge
+2026-08-01 16:21:22 | INFO     | co2_forecast |   Acceptable advantage: False
+2026-08-01 16:21:22 | INFO     | co2_forecast |   Acceptable stability: True
+2026-08-01 16:21:22 | INFO     | co2_forecast | Pareto filter: 20 -> 14 alternatives
+2026-08-01 16:21:22 | INFO     | co2_forecast | VIKOR ranking complete. Best: A2/fs_xgboost_shap/ridge
+2026-08-01 16:21:22 | INFO     | co2_forecast |   Acceptable advantage: False
+2026-08-01 16:21:22 | INFO     | co2_forecast |   Acceptable stability: True
+2026-08-01 16:21:23 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig03a_stream_A_global_comparison.pdf
+2026-08-01 16:21:23 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig03a_stream_A_global_comparison.csv
+2026-08-01 16:21:23 | INFO     | co2_forecast | fig03a: 4 Stream A candidates
+2026-08-01 16:21:23 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig11a_stream_A_pareto_frontier.pdf
+2026-08-01 16:21:23 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig11a_stream_A_pareto_frontier.csv
+2026-08-01 16:21:23 | INFO     | co2_forecast | fig13: 4 non-dominated of 4 total
+2026-08-01 16:21:24 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig03b_stream_B_global_overview.pdf
+2026-08-01 16:21:24 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig03b_stream_B_global_overview.csv
+2026-08-01 16:21:24 | INFO     | co2_forecast | fig03b: 20 Stream B candidates across 4 panels
+2026-08-01 16:21:24 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig03c_stream_B_shortlist_magnified.pdf
+2026-08-01 16:21:24 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig03c_stream_B_shortlist_magnified.csv
+2026-08-01 16:21:24 | INFO     | co2_forecast | fig03c: 14 shortlisted candidates
+2026-08-01 16:21:24 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig11b_stream_B_pareto_frontier.pdf
+2026-08-01 16:21:24 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig11b_stream_B_pareto_frontier.csv
+2026-08-01 16:21:24 | INFO     | co2_forecast | fig13: 14 non-dominated of 20 total
+2026-08-01 16:21:25 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig03d_best_A_vs_best_B.pdf
+2026-08-01 16:21:25 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig03d_best_A_vs_best_B.csv
+2026-08-01 16:21:25 | INFO     | co2_forecast | fig03d: Best_A vs Best_B criterion profile
+2026-08-01 16:21:25 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig05_incremental_configuration_value.pdf
+2026-08-01 16:21:25 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig05_incremental_configuration_value.csv
+2026-08-01 16:21:25 | INFO     | co2_forecast | fig05: 4 comparisons
+2026-08-01 16:21:26 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig14a_mcda_rank_sensitivity_stream_A.pdf
+2026-08-01 16:21:26 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig14a_mcda_rank_sensitivity_stream_A.csv
+2026-08-01 16:21:26 | INFO     | co2_forecast | fig14: 8 schemes, top choice disagrees in 12/28 pairs
+2026-08-01 16:21:27 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig14b_mcda_rank_sensitivity_stream_B.pdf
+2026-08-01 16:21:27 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig14b_mcda_rank_sensitivity_stream_B.csv
+2026-08-01 16:21:27 | INFO     | co2_forecast | fig14: 8 schemes, top choice disagrees in 17/28 pairs
+2026-08-01 16:21:28 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig08_b1_feature_selection_membership.pdf
+2026-08-01 16:21:28 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig08_b1_feature_selection_membership.csv
+2026-08-01 16:21:28 | INFO     | co2_forecast | fig08/09 (B1): 11 features x 5 FS methods
+2026-08-01 16:21:28 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig08_b2_feature_selection_membership.pdf
+2026-08-01 16:21:28 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig08_b2_feature_selection_membership.csv
+2026-08-01 16:21:28 | INFO     | co2_forecast | fig08/09 (B2): 25 features x 5 FS methods
+2026-08-01 16:21:29 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig08_b3_feature_selection_membership.pdf
+2026-08-01 16:21:29 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig08_b3_feature_selection_membership.csv
+2026-08-01 16:21:29 | INFO     | co2_forecast | fig08/09 (B3): 23 features x 5 FS methods
+2026-08-01 16:21:29 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig08_b4_feature_selection_membership.pdf
+2026-08-01 16:21:29 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig08_b4_feature_selection_membership.csv
+2026-08-01 16:21:29 | INFO     | co2_forecast | fig08/09 (B4): 37 features x 5 FS methods
+2026-08-01 16:21:30 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig15_best_A_cross_model_feature_importance.pdf
+2026-08-01 16:21:30 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig15_best_A_cross_model_feature_importance.csv
+2026-08-01 16:21:30 | INFO     | co2_forecast | fig15: top 15 of 37 features
+2026-08-01 16:21:30 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig17_best_A_regime_specific_importance.pdf
+2026-08-01 16:21:30 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig17_best_A_regime_specific_importance.csv
+2026-08-01 16:21:30 | INFO     | co2_forecast | fig17: 10 features x 3 regimes
+2026-08-01 16:21:30 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig18_best_A_target_derived_feature_sensitivity.pdf
+2026-08-01 16:21:30 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig18_best_A_target_derived_feature_sensitivity.csv
+2026-08-01 16:21:30 | INFO     | co2_forecast | fig18: 3 variants
+2026-08-01 16:21:30 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig15_best_B_cross_model_feature_importance.pdf
+2026-08-01 16:21:30 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig15_best_B_cross_model_feature_importance.csv
+2026-08-01 16:21:30 | INFO     | co2_forecast | fig15: top 5 of 5 features
+2026-08-01 16:21:30 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig17_best_B_regime_specific_importance.pdf
+2026-08-01 16:21:30 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig17_best_B_regime_specific_importance.csv
+2026-08-01 16:21:30 | INFO     | co2_forecast | fig17: 5 features x 3 regimes
+2026-08-01 16:21:31 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig18_best_B_target_derived_feature_sensitivity.pdf
+2026-08-01 16:21:31 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig18_best_B_target_derived_feature_sensitivity.csv
+2026-08-01 16:21:31 | INFO     | co2_forecast | fig18: 2 variants
+2026-08-01 16:21:31 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig15_best_overall_cross_model_feature_importance.pdf
+2026-08-01 16:21:31 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig15_best_overall_cross_model_feature_importance.csv
+2026-08-01 16:21:31 | INFO     | co2_forecast | fig15: top 5 of 5 features
+2026-08-01 16:21:31 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig17_best_overall_regime_specific_importance.pdf
+2026-08-01 16:21:31 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig17_best_overall_regime_specific_importance.csv
+2026-08-01 16:21:31 | INFO     | co2_forecast | fig17: 5 features x 3 regimes
+2026-08-01 16:21:31 | INFO     | co2_forecast | Saved figure: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/figs_smoke/fig18_best_overall_target_derived_feature_sensitivity.pdf
+2026-08-01 16:21:31 | INFO     | co2_forecast | Saved plot data: /tmp/claude-1000/-home-mohsen-project-co2-emission-prediction/9dbce0d1-cfb5-40ed-b4d0-e8075e33c91a/scratchpad/plot_data/fig18_best_overall_target_derived_feature_sensitivity.csv
+2026-08-01 16:21:31 | INFO     | co2_forecast | fig18: 2 variants
+2026-08-01 16:21:31 | INFO     | co2_forecast | ============================================================
+2026-08-01 16:21:31 | INFO     | co2_forecast | Script 14 complete! 25 figures generated: ['fig01', 'fig02', 'fig03', 'fig03a', 'fig11a', 'fig03b', 'fig03c', 'fig11b', 'fig03d', 'fig05', 'fig14a', 'fig14b', 'fig08_b1', 'fig08_b2', 'fig08_b3', 'fig08_b4', 'fig15_best_A', 'fig17_best_A', 'fig18_best_A', 'fig15_best_B', 'fig17_best_B', 'fig18_best_B', 'fig15_best_overall', 'fig17_best_overall', 'fig18_best_overall']
+2026-08-01 16:21:31 | INFO     | co2_forecast |   Still requiring dedicated builder/CLI wiring (spec sections 25/27): the 36-PDF forecast atlas (family/stream/overall/A-vs-B out-of-sample forecasts - data already saved under fold_predictions/, builder not yet written), mobility/OWID/NESO data-quality figures, PSO convergence, forecast-error distributions, cross-model SHAP agreement.
+2026-08-01 16:21:31 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:39:56 | INFO     | co2_forecast | Logging to: outputs/logs/generate_figures.log
+2026-08-02 01:39:56 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:39:56 | INFO     | co2_forecast | Script 14: Generate PDF figures (source run_id=my_run)
+2026-08-02 01:39:56 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:39:56 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig01_revised_qdecem_framework.pdf
+2026-08-02 01:39:56 | INFO     | co2_forecast | fig01: 9 stages
+2026-08-02 01:39:56 | INFO     | co2_forecast | Loaded feature registry: 37 candidate predictors from config/feature_registry.yaml
+2026-08-02 01:39:58 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig02_predictor_governance_map.pdf
+2026-08-02 01:39:58 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig02_predictor_governance_map.csv
+2026-08-02 01:39:58 | INFO     | co2_forecast | fig02: 37 features x 9 governance columns
+2026-08-02 01:39:58 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig03_grid_aggregation_quality.pdf
+2026-08-02 01:39:58 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig03_grid_aggregation_quality.csv
+2026-08-02 01:39:58 | INFO     | co2_forecast | fig03: 36 quarters, 2 excluded
+2026-08-02 01:39:58 | INFO     | co2_forecast | Pareto filter: 20 -> 16 alternatives
+2026-08-02 01:39:58 | INFO     | co2_forecast | VIKOR ranking complete. Best: A3/all_features/lightgbm
+2026-08-02 01:39:58 | INFO     | co2_forecast |   Acceptable advantage: True
+2026-08-02 01:39:58 | INFO     | co2_forecast |   Acceptable stability: True
+2026-08-02 01:39:59 | INFO     | co2_forecast | Pareto filter: 100 -> 48 alternatives
+2026-08-02 01:39:59 | INFO     | co2_forecast | VIKOR ranking complete. Best: A1/fs_linear/catboost
+2026-08-02 01:39:59 | INFO     | co2_forecast |   Acceptable advantage: True
+2026-08-02 01:39:59 | INFO     | co2_forecast |   Acceptable stability: True
+2026-08-02 01:40:00 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig03a_stream_A_global_comparison.pdf
+2026-08-02 01:40:00 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig03a_stream_A_global_comparison.csv
+2026-08-02 01:40:00 | INFO     | co2_forecast | fig03a: 20 Stream A candidates
+2026-08-02 01:40:00 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig11a_stream_A_pareto_frontier.pdf
+2026-08-02 01:40:00 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig11a_stream_A_pareto_frontier.csv
+2026-08-02 01:40:00 | INFO     | co2_forecast | fig13: 16 non-dominated of 20 total
+2026-08-02 01:40:01 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig03b_stream_B_global_overview.pdf
+2026-08-02 01:40:01 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig03b_stream_B_global_overview.csv
+2026-08-02 01:40:01 | INFO     | co2_forecast | fig03b: 100 Stream B candidates across 4 panels
+2026-08-02 01:40:01 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig03c_stream_B_shortlist_magnified.pdf
+2026-08-02 01:40:01 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig03c_stream_B_shortlist_magnified.csv
+2026-08-02 01:40:01 | INFO     | co2_forecast | fig03c: 15 shortlisted candidates
+2026-08-02 01:40:02 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig11b_stream_B_pareto_frontier.pdf
+2026-08-02 01:40:02 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig11b_stream_B_pareto_frontier.csv
+2026-08-02 01:40:02 | INFO     | co2_forecast | fig13: 48 non-dominated of 100 total
+2026-08-02 01:40:02 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig03d_best_A_vs_best_B.pdf
+2026-08-02 01:40:02 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig03d_best_A_vs_best_B.csv
+2026-08-02 01:40:02 | INFO     | co2_forecast | fig03d: Best_A vs Best_B criterion profile
+2026-08-02 01:40:03 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig05_incremental_configuration_value.pdf
+2026-08-02 01:40:03 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig05_incremental_configuration_value.csv
+2026-08-02 01:40:03 | INFO     | co2_forecast | fig05: 4 comparisons
+2026-08-02 01:40:04 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig14a_mcda_rank_sensitivity_stream_A.pdf
+2026-08-02 01:40:04 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig14a_mcda_rank_sensitivity_stream_A.csv
+2026-08-02 01:40:04 | INFO     | co2_forecast | fig14: 8 schemes, top choice disagrees in 18/28 pairs
+2026-08-02 01:40:05 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig14b_mcda_rank_sensitivity_stream_B.pdf
+2026-08-02 01:40:05 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig14b_mcda_rank_sensitivity_stream_B.csv
+2026-08-02 01:40:05 | INFO     | co2_forecast | fig14: 8 schemes, top choice disagrees in 19/28 pairs
+2026-08-02 01:40:05 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig08_b1_feature_selection_membership.pdf
+2026-08-02 01:40:05 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig08_b1_feature_selection_membership.csv
+2026-08-02 01:40:05 | INFO     | co2_forecast | fig08/09 (B1): 11 features x 5 FS methods
+2026-08-02 01:40:06 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig08_b2_feature_selection_membership.pdf
+2026-08-02 01:40:06 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig08_b2_feature_selection_membership.csv
+2026-08-02 01:40:06 | INFO     | co2_forecast | fig08/09 (B2): 25 features x 5 FS methods
+2026-08-02 01:40:06 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig08_b3_feature_selection_membership.pdf
+2026-08-02 01:40:06 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig08_b3_feature_selection_membership.csv
+2026-08-02 01:40:06 | INFO     | co2_forecast | fig08/09 (B3): 23 features x 5 FS methods
+2026-08-02 01:40:07 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig08_b4_feature_selection_membership.pdf
+2026-08-02 01:40:07 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig08_b4_feature_selection_membership.csv
+2026-08-02 01:40:07 | INFO     | co2_forecast | fig08/09 (B4): 37 features x 5 FS methods
+2026-08-02 01:40:07 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig15_best_A_cross_model_feature_importance.pdf
+2026-08-02 01:40:07 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig15_best_A_cross_model_feature_importance.csv
+2026-08-02 01:40:07 | INFO     | co2_forecast | fig15: top 15 of 23 features
+2026-08-02 01:40:07 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig17_best_A_regime_specific_importance.pdf
+2026-08-02 01:40:07 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig17_best_A_regime_specific_importance.csv
+2026-08-02 01:40:07 | INFO     | co2_forecast | fig17: 10 features x 3 regimes
+2026-08-02 01:40:08 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig18_best_A_target_derived_feature_sensitivity.pdf
+2026-08-02 01:40:08 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig18_best_A_target_derived_feature_sensitivity.csv
+2026-08-02 01:40:08 | INFO     | co2_forecast | fig18: 1 variants
+2026-08-02 01:40:08 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig15_best_B_cross_model_feature_importance.pdf
+2026-08-02 01:40:08 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig15_best_B_cross_model_feature_importance.csv
+2026-08-02 01:40:08 | INFO     | co2_forecast | fig15: top 6 of 6 features
+2026-08-02 01:40:08 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig17_best_B_regime_specific_importance.pdf
+2026-08-02 01:40:08 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig17_best_B_regime_specific_importance.csv
+2026-08-02 01:40:08 | INFO     | co2_forecast | fig17: 6 features x 3 regimes
+2026-08-02 01:40:08 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig18_best_B_target_derived_feature_sensitivity.pdf
+2026-08-02 01:40:08 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig18_best_B_target_derived_feature_sensitivity.csv
+2026-08-02 01:40:08 | INFO     | co2_forecast | fig18: 1 variants
+2026-08-02 01:40:09 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig15_best_overall_cross_model_feature_importance.pdf
+2026-08-02 01:40:09 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig15_best_overall_cross_model_feature_importance.csv
+2026-08-02 01:40:09 | INFO     | co2_forecast | fig15: top 15 of 23 features
+2026-08-02 01:40:09 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig17_best_overall_regime_specific_importance.pdf
+2026-08-02 01:40:09 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig17_best_overall_regime_specific_importance.csv
+2026-08-02 01:40:09 | INFO     | co2_forecast | fig17: 10 features x 3 regimes
+2026-08-02 01:40:09 | INFO     | co2_forecast | Saved figure: outputs/figures/pdf/main/fig18_best_overall_target_derived_feature_sensitivity.pdf
+2026-08-02 01:40:09 | INFO     | co2_forecast | Saved plot data: outputs/figures/pdf/plot_data/fig18_best_overall_target_derived_feature_sensitivity.csv
+2026-08-02 01:40:09 | INFO     | co2_forecast | fig18: 1 variants
+2026-08-02 01:40:09 | INFO     | co2_forecast | ============================================================
+2026-08-02 01:40:09 | INFO     | co2_forecast | Script 14 complete! 25 figures generated: ['fig01', 'fig02', 'fig03', 'fig03a', 'fig11a', 'fig03b', 'fig03c', 'fig11b', 'fig03d', 'fig05', 'fig14a', 'fig14b', 'fig08_b1', 'fig08_b2', 'fig08_b3', 'fig08_b4', 'fig15_best_A', 'fig17_best_A', 'fig18_best_A', 'fig15_best_B', 'fig17_best_B', 'fig18_best_B', 'fig15_best_overall', 'fig17_best_overall', 'fig18_best_overall']
+2026-08-02 01:40:09 | INFO     | co2_forecast |   Still requiring dedicated builder/CLI wiring (spec sections 25/27): the 36-PDF forecast atlas (family/stream/overall/A-vs-B out-of-sample forecasts - data already saved under fold_predictions/, builder not yet written), mobility/OWID/NESO data-quality figures, PSO convergence, forecast-error distributions, cross-model SHAP agreement.
+2026-08-02 01:40:09 | INFO     | co2_forecast | ============================================================
