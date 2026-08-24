@@ -1,0 +1,65 @@
+{
+  "git_commit": "2b86c5e457ebfb62e4f56da4d7d102b7f29c6dec",
+  "git_dirty_at_run_time": true,
+  "generated_at_utc": "2026-08-23T20:21:53.143916Z",
+  "python_version": "3.10.12 (main, Mar  3 2026, 11:56:32) [GCC 11.4.0]",
+  "package_versions": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.7.2",
+    "lightgbm": "4.6.0",
+    "catboost": "1.2.8",
+    "xgboost": "3.1.3",
+    "shap": "0.49.1",
+    "scipy": "1.15.3",
+    "torch": "2.9.1",
+    "matplotlib": "3.10.8",
+    "pyyaml": "6.0.3"
+  },
+  "seed": 42,
+  "input_file_checksums_sha256": {
+    "data/processed/X_A1.parquet": "53f3a70b1ddc2430e3d026f7007096a090c0b814848840e59ced44083363bfb5",
+    "data/processed/X_A2.parquet": "79fa8d0fbc341e88bad22ed4a18a422b6fe89dca6d449a778510034098c776be",
+    "data/processed/X_A3.parquet": "b9fb67be1100545fa0430c04453e9c03d8a113c1de95e00f36ec161fa5588e23",
+    "data/processed/X_A4.parquet": "9b8ba0167d8f9fb95be1f9a3cd6324538f518890f4b0d873e42c8f73262836ba",
+    "data/processed/y.parquet": "c9ec4e64c3ddb5c7cd09042886c7e49c3069baaac44dbde2c3698a8554eeb507",
+    "config/feature_registry.yaml": "2e5bbe15d106e815b39568597565037dfe78f2165749e09d462da77467ca09e0"
+  },
+  "executed_scripts": [
+    "scripts/12_interpretability_and_sensitivity.py --run-id final_rerun_2026 (bugfixed: tuned-hyperparameter refit + SHAP integrity checks)",
+    "scripts/16_champion_shap_deliverables.py (new: champion global/regime SHAP CSVs)",
+    "scripts/17_champion_regime_figure.py (new: publication figure)",
+    "scripts/20_statistical_robustness.py (new: paired grid-signal tests)",
+    "scripts/21_origin_diagnostics.py (new: forecast-origin-level diagnostic)",
+    "scripts/18_mobility_sensitivity.py --run-id final_rerun_2026_mobility (new: M0-M3 mobility-treatment robustness; M3 rerun once after fixing a y_by_horizon carry-over bug in the restricted CVPlan)",
+    "scripts/19_grid_ablation.py --run-id final_rerun_2026_ablation (new: 6-variant grid-signal ablation around A3)"
+  ],
+  "configuration_ids": {
+    "champion": "A3/all_features/lightgbm",
+    "compact_finalist": "A1(B1)/fs_linear/catboost"
+  },
+  "result_paths": {
+    "diagnosis": "outputs/audit/champion_shap_diagnosis.md",
+    "champion_reproduction": "outputs/robustness/champion_reproduction.csv",
+    "global_shap": "outputs/interpretability/champion_A3_LightGBM_global_shap.csv",
+    "regime_shap": "outputs/interpretability/champion_A3_LightGBM_regime_shap.csv",
+    "regime_rank_changes": "outputs/interpretability/champion_A3_LightGBM_regime_rank_changes.csv",
+    "shap_integrity_checks": "outputs/audit/shap_integrity_checks.csv",
+    "figure_pdf": "outputs/figures/pdf/main/fig_champion_regime_importance.pdf",
+    "figure_png": "outputs/figures/png/main/fig_champion_regime_importance.png",
+    "figure_caption": "outputs/reporting/figure_champion_regime_caption.txt",
+    "run_namespace": "outputs/runs/final_rerun_2026/",
+    "grid_signal_paired_tests": "outputs/robustness/grid_signal_paired_tests.csv",
+    "champion_origin_diagnostics": "outputs/robustness/champion_origin_diagnostics.csv",
+    "origin_gain_figure": "outputs/figures/pdf/sensitivity/fig_origin_level_grid_gain.pdf",
+    "mobility_sensitivity_results": "outputs/robustness/mobility_sensitivity_results.csv",
+    "mobility_figure": "outputs/figures/pdf/sensitivity/fig_mobility_robustness.pdf",
+    "mobility_run_namespace": "outputs/runs/final_rerun_2026_mobility/",
+    "grid_ablation_results": "outputs/robustness/grid_ablation_results.csv",
+    "grid_ablation_figure": "outputs/figures/pdf/sensitivity/fig_grid_ablation.pdf",
+    "grid_ablation_run_namespace": "outputs/runs/final_rerun_2026_ablation/",
+    "final_report": "outputs/final_rerun_2026/FINAL_RERUN_REPORT.md",
+    "manuscript_update_table": "outputs/final_rerun_2026/MANUSCRIPT_UPDATE_TABLE.csv"
+  },
+  "notes": "outputs/runs/my_run left untouched (original validated Stream A/B run); final_rerun_2026 seeded from my_run upstream artifacts (fold_predictions, selected_features, pareto_mcda/final table7, metrics) then re-ran only the interpretability stage (script 12) with the hyperparameter-lookup bugfix. Mobility sensitivity (scripts/18) and grid ablation (scripts/19) run under separate run namespaces (final_rerun_2026_mobility, final_rerun_2026_ablation) with a reduced PSO budget (8 particles/10 iterations vs the primary run's 20/30) to keep total wall-clock time tractable - champion selection itself used the full budget and is untouched by this reduction."
+}

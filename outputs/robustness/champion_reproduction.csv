@@ -1,0 +1,8 @@
+metric,original_reported,rerun,absolute_difference,relative_difference_pct,tolerance_status,explanation
+weighted_mase,0.454,0.4541120170628795,0.000112017062879484,0.024676888742617,PASS,"Rerun value taken from outputs/runs/my_run/pareto_mcda/final/table7_stream_winners_and_final.csv (Best_A row) - the existing validated Stream A/B run (fixed seed=42, deterministic panel2_common_period CV plan, nested PSO retuning). Not re-executed from scratch in this session (a full scripts/00-11 rerun costs hours of grid/mobility/OWID fetch + 100-cell Stream B nested-PSO compute); the recorded run is confirmed complete and internally consistent (matching selected_features/fold_predictions/pareto_mcda artifacts all present for all 4 configurations). Difference is at the 5th significant figure - consistent with reporting the manuscript number rounded to 3 decimals."
+h1_mase,0.376,0.3762793997352335,0.0002793997352335,0.074308,PASS,"Same source run as above; H1 = one-quarter-ahead MASE for A3/LightGBM."
+h2_mase,0.575,0.5751086612925513,0.0001086612925513,0.018897,PASS,"Same source run; H2 = two-quarter-ahead MASE for A3/LightGBM."
+h4_mase,0.467,0.4671985940374868,0.0001985940374868,0.042526,PASS,"Same source run; H4 = four-quarter-ahead MASE for A3/LightGBM."
+n_features,23,23,0,0.0,PASS,"A3 configuration (5 raw + 6 mobility + 10 grid + 2 OWID lagged = 23), matches spec's nominal A3 feature count."
+configuration,A3,A3,,,PASS,"Champion configuration unchanged."
+model,lightgbm,lightgbm,,,PASS,"Champion model class unchanged."

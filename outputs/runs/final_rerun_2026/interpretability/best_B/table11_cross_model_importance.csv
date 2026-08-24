@@ -1,0 +1,7 @@
+feature,ridge_rank,random_forest_rank,lightgbm_rank,catboost_rank,lstm_rank,average_rank,rank_dispersion,n_models_scored
+Rainfall,1,1,4,1,5,2.4,1.9493588689617927,5
+Population,5,2,1,2,3,2.6,1.51657508881031,5
+Air_Temp,2,3,2,3,6,3.2,1.6431676725154984,5
+GDP,4,5,3,4,1,3.4,1.5165750888103102,5
+Mobility_Parks,3,4,5,6,2,4.0,1.5811388300841898,5
+COVID_Deaths,6,6,6,5,4,5.4,0.8944271909999159,5

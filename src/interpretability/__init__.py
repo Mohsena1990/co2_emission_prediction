@@ -19,6 +19,7 @@ from .cross_model_importance import (
     compute_regime_stability,
     compute_family_contribution,
 )
+from .integrity_checks import compute_regime_shap_with_integrity
 
 __all__ = [
     'compute_shap_values',
@@ -34,4 +35,5 @@ __all__ = [
     'build_cross_model_importance_table',
     'compute_regime_stability',
     'compute_family_contribution',
+    'compute_regime_shap_with_integrity',
 ]

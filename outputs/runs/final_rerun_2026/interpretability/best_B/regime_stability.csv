@@ -1,0 +1,7 @@
+feature,n_regimes,n_regimes_in_top_k,regime_stability
+Population,3,3,1.0
+Rainfall,3,3,1.0
+Air_Temp,3,3,1.0
+COVID_Deaths,3,3,1.0
+GDP,3,3,1.0
+Mobility_Parks,3,0,0.0

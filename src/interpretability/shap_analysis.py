@@ -49,12 +49,21 @@ def compute_shap_values(
         shap_values = explainer.shap_values(X)
 
     elif model_type == 'linear':
-        # For linear models
+        # For linear models. If the wrapper fit its inner sklearn model on
+        # scaler-transformed data (e.g. RidgeModel.fit's StandardScaler),
+        # the explainer/background data must be transformed the same way -
+        # feeding raw untransformed X to LinearExplainer(model.model, X)
+        # would explain a different function than the one actually fitted
+        # (see outputs/audit/champion_shap_diagnosis.md, "transformed vs
+        # untransformed feature mismatch").
+        scaler = getattr(model, 'scaler', None)
         if hasattr(model, 'model'):
-            explainer = shap.LinearExplainer(model.model, X)
+            X_input = scaler.transform(X.values) if scaler is not None else X
+            explainer = shap.LinearExplainer(model.model, X_input)
+            shap_values = explainer.shap_values(X_input)
         else:
             explainer = shap.LinearExplainer(model, X)
-        shap_values = explainer.shap_values(X)
+            shap_values = explainer.shap_values(X)
 
     else:
         # For other models, use Kernel SHAP (slower)

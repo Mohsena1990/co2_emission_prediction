@@ -1,0 +1,137 @@
+2026-08-23 20:05:12 | INFO     | co2_forecast | Logging to: outputs/runs/final_rerun_2026/logs/final_rerun_2026.log
+2026-08-23 20:05:12 | INFO     | co2_forecast | ============================================================
+2026-08-23 20:05:12 | INFO     | co2_forecast | Script 12: SHAP interpretation of Best_A/Best_B/Best_Overall + COVID regimes
+2026-08-23 20:05:12 | INFO     | co2_forecast | ============================================================
+2026-08-23 20:05:12 | INFO     | co2_forecast | Loaded feature registry: 37 candidate predictors from config/feature_registry.yaml
+2026-08-23 20:05:12 | INFO     | co2_forecast | ============================================================
+2026-08-23 20:05:12 | INFO     | co2_forecast | Interpreting Best_A: A3/all_features/lightgbm
+2026-08-23 20:05:12 | INFO     | co2_forecast | ============================================================
+2026-08-23 20:05:12 | INFO     | co2_forecast | Slicing all configurations to the primary common period [2018-04-01 00:00:00 - 2025-01-01 00:00:00] (reference: A3)
+2026-08-23 20:05:12 | INFO     | co2_forecast | Data: 28 rows, 23 features
+2026-08-23 20:05:12 | INFO     | co2_forecast |   ridge: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'alpha': 100.0}
+2026-08-23 20:05:12 | INFO     | co2_forecast |   random_forest: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'n_estimators': 122, 'max_depth': 3, 'min_samples_split': 2, 'min_samples_leaf': 1}
+2026-08-23 20:05:13 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:13 | INFO     | co2_forecast |   lightgbm: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'n_estimators': 164, 'learning_rate': 0.3, 'num_leaves': 127, 'max_depth': 10, 'min_child_samples': 6, 'reg_alpha': 0.001, 'reg_lambda': 0.001}
+2026-08-23 20:05:13 | WARNING  | co2_forecast | LightGBM has no GPU-enabled build installed; using CPU. The pip wheel ships CPU-only - install a CUDA/OpenCL build (e.g. build from source with -DUSE_CUDA=1, or a conda-forge lightgbm=*=cuda* package) to enable GPU training.
+2026-08-23 20:05:13 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:13 | INFO     | co2_forecast |   catboost: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'iterations': 269, 'learning_rate': 0.23138959162300096, 'depth': 3, 'l2_leaf_reg': 10.0}
+2026-08-23 20:05:20 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:20 | INFO     | co2_forecast |   lstm: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'lookback': 5, 'hidden_size': 23, 'num_layers': 2, 'dropout': 0.16079150978034004, 'learning_rate': 0.0001, 'batch_size': 8}
+2026-08-23 20:05:23 | INFO     | co2_forecast |   lstm: SHAP (GradientExplainer/DeepExplainer) not attempted - falling back to sequence-aware permutation importance (spec section 22 failure-transparency requirement)
+2026-08-23 20:05:23 | INFO     | co2_forecast | Cross-model importance: 23 features
+2026-08-23 20:05:23 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:23 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:23 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:23 | INFO     | co2_forecast | Regime stability computed for 23 features across 3 regimes
+2026-08-23 20:05:23 | INFO     | co2_forecast | Regime importance: 69 rows across 3 regimes
+2026-08-23 20:05:23 | WARNING  | co2_forecast | No fold predictions found for A3/all_features/lightgbm at COVID anomaly dates
+2026-08-23 20:05:23 | INFO     | co2_forecast | Creating walk-forward splits for 16 valid samples
+2026-08-23 20:05:23 | INFO     | co2_forecast | Created 4 CV folds across horizons [1, 2, 4]
+2026-08-23 20:05:23 | INFO     | co2_forecast | Built tuning CV plan: 4 folds from 16 rows before 2022-Q%q (evaluation cutoff) - isolation OK (max tuning date 2021-Q%q)
+2026-08-23 20:05:23 | INFO     | co2_forecast | Optimizing lightgbm...
+2026-08-23 20:05:23 | INFO     | co2_forecast | Starting PSO: 20 particles, 30 iterations
+2026-08-23 20:05:23 | INFO     | co2_forecast |   Iteration 0: Best fitness = 0.768990
+2026-08-23 20:05:25 | INFO     | co2_forecast |   Iteration 5: Best fitness = 0.610540
+2026-08-23 20:05:28 | INFO     | co2_forecast |   Iteration 10: Best fitness = 0.610168
+2026-08-23 20:05:30 | INFO     | co2_forecast |   Iteration 15: Best fitness = 0.608980
+2026-08-23 20:05:33 | INFO     | co2_forecast |   Iteration 20: Best fitness = 0.608457
+2026-08-23 20:05:36 | INFO     | co2_forecast |   Iteration 25: Best fitness = 0.605675
+2026-08-23 20:05:39 | INFO     | co2_forecast |   Iteration 29: Best fitness = 0.604821
+2026-08-23 20:05:39 | INFO     | co2_forecast | PSO complete. Best fitness: 0.604821
+2026-08-23 20:05:39 | INFO     | co2_forecast |   Best params: {'n_estimators': 300, 'learning_rate': 0.3, 'num_leaves': 127, 'max_depth': 8, 'min_child_samples': 6, 'reg_alpha': 0.001, 'reg_lambda': 0.1188402269406553}
+2026-08-23 20:05:39 | INFO     | co2_forecast |   Best fitness: 0.604821
+2026-08-23 20:05:39 | INFO     | co2_forecast | [A3/panel2_common_period/all_features/lightgbm] sweep tuning: best_params={'n_estimators': 300, 'learning_rate': 0.3, 'num_leaves': 127, 'max_depth': 8, 'min_child_samples': 6, 'reg_alpha': 0.001, 'reg_lambda': 0.1188402269406553}
+2026-08-23 20:05:39 | INFO     | co2_forecast | Target-derived sensitivity (mode=named): dropping 0 feature(s): []
+2026-08-23 20:05:39 | INFO     | co2_forecast |   named_target_derived_excluded: no applicable columns to drop, skipping
+2026-08-23 20:05:39 | INFO     | co2_forecast | Target-derived sensitivity (mode=all): dropping 0 feature(s): []
+2026-08-23 20:05:39 | INFO     | co2_forecast |   all_target_derived_excluded: no applicable columns to drop, skipping
+2026-08-23 20:05:39 | INFO     | co2_forecast | Target-derived sensitivity: 1 rows
+2026-08-23 20:05:39 | INFO     | co2_forecast | ============================================================
+2026-08-23 20:05:39 | INFO     | co2_forecast | Interpreting Best_B: A1/fs_linear/catboost
+2026-08-23 20:05:39 | INFO     | co2_forecast | ============================================================
+2026-08-23 20:05:39 | INFO     | co2_forecast | Slicing all configurations to the primary common period [2018-04-01 00:00:00 - 2025-01-01 00:00:00] (reference: A3)
+2026-08-23 20:05:39 | INFO     | co2_forecast | Data: 28 rows, 6 features
+2026-08-23 20:05:39 | INFO     | co2_forecast |   ridge: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'alpha': 100.0}
+2026-08-23 20:05:39 | INFO     | co2_forecast |   random_forest: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'n_estimators': 182, 'max_depth': 3, 'min_samples_split': 2, 'min_samples_leaf': 1}
+2026-08-23 20:05:39 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:39 | INFO     | co2_forecast |   lightgbm: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'n_estimators': 164, 'learning_rate': 0.3, 'num_leaves': 127, 'max_depth': 10, 'min_child_samples': 6, 'reg_alpha': 0.001, 'reg_lambda': 0.001}
+2026-08-23 20:05:39 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:39 | INFO     | co2_forecast |   catboost: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'iterations': 206, 'learning_rate': 0.18548569310579693, 'depth': 3, 'l2_leaf_reg': 8.731303322108246}
+2026-08-23 20:05:41 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:41 | INFO     | co2_forecast |   lstm: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'lookback': 4, 'hidden_size': 16, 'num_layers': 2, 'dropout': 0.5, 'learning_rate': 0.0001, 'batch_size': 32}
+2026-08-23 20:05:41 | INFO     | co2_forecast |   lstm: SHAP (GradientExplainer/DeepExplainer) not attempted - falling back to sequence-aware permutation importance (spec section 22 failure-transparency requirement)
+2026-08-23 20:05:41 | INFO     | co2_forecast | Cross-model importance: 6 features
+2026-08-23 20:05:41 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:41 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:42 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:05:42 | INFO     | co2_forecast | Regime stability computed for 6 features across 3 regimes
+2026-08-23 20:05:42 | INFO     | co2_forecast | Regime importance: 18 rows across 3 regimes
+2026-08-23 20:05:42 | WARNING  | co2_forecast | No fold predictions found for A1/fs_linear/catboost at COVID anomaly dates
+2026-08-23 20:05:42 | INFO     | co2_forecast | Creating walk-forward splits for 16 valid samples
+2026-08-23 20:05:42 | INFO     | co2_forecast | Created 4 CV folds across horizons [1, 2, 4]
+2026-08-23 20:05:42 | INFO     | co2_forecast | Built tuning CV plan: 4 folds from 16 rows before 2022-Q%q (evaluation cutoff) - isolation OK (max tuning date 2021-Q%q)
+2026-08-23 20:05:42 | INFO     | co2_forecast | Optimizing catboost...
+2026-08-23 20:05:42 | INFO     | co2_forecast | Starting PSO: 20 particles, 30 iterations
+2026-08-23 20:07:14 | INFO     | co2_forecast |   Iteration 0: Best fitness = 0.290389
+2026-08-23 20:12:43 | INFO     | co2_forecast |   Iteration 5: Best fitness = 0.254022
+2026-08-23 20:17:59 | INFO     | co2_forecast |   Iteration 10: Best fitness = 0.249168
+2026-08-23 20:23:12 | INFO     | co2_forecast |   Iteration 15: Best fitness = 0.249168
+2026-08-23 20:28:24 | INFO     | co2_forecast |   Iteration 20: Best fitness = 0.248147
+2026-08-23 20:33:43 | INFO     | co2_forecast |   Iteration 25: Best fitness = 0.248147
+2026-08-23 20:38:02 | INFO     | co2_forecast |   Iteration 29: Best fitness = 0.247908
+2026-08-23 20:38:02 | INFO     | co2_forecast | PSO complete. Best fitness: 0.247908
+2026-08-23 20:38:02 | INFO     | co2_forecast |   Best params: {'iterations': 64, 'learning_rate': 0.20966625912569634, 'depth': 3, 'l2_leaf_reg': 9.999802750517496}
+2026-08-23 20:38:02 | INFO     | co2_forecast |   Best fitness: 0.247908
+2026-08-23 20:38:02 | INFO     | co2_forecast | [A1/panel2_common_period/fs_linear/catboost] sweep tuning: best_params={'iterations': 64, 'learning_rate': 0.20966625912569634, 'depth': 3, 'l2_leaf_reg': 9.999802750517496}
+2026-08-23 20:38:07 | INFO     | co2_forecast | Target-derived sensitivity (mode=named): dropping 0 feature(s): []
+2026-08-23 20:38:07 | INFO     | co2_forecast |   named_target_derived_excluded: no applicable columns to drop, skipping
+2026-08-23 20:38:07 | INFO     | co2_forecast | Target-derived sensitivity (mode=all): dropping 0 feature(s): []
+2026-08-23 20:38:07 | INFO     | co2_forecast |   all_target_derived_excluded: no applicable columns to drop, skipping
+2026-08-23 20:38:07 | INFO     | co2_forecast | Target-derived sensitivity: 1 rows
+2026-08-23 20:38:07 | INFO     | co2_forecast | ============================================================
+2026-08-23 20:38:07 | INFO     | co2_forecast | Interpreting Best_Overall: A3/all_features/lightgbm
+2026-08-23 20:38:07 | INFO     | co2_forecast | ============================================================
+2026-08-23 20:38:07 | INFO     | co2_forecast | Slicing all configurations to the primary common period [2018-04-01 00:00:00 - 2025-01-01 00:00:00] (reference: A3)
+2026-08-23 20:38:07 | INFO     | co2_forecast | Data: 28 rows, 23 features
+2026-08-23 20:38:07 | INFO     | co2_forecast |   ridge: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'alpha': 100.0}
+2026-08-23 20:38:07 | INFO     | co2_forecast |   random_forest: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'n_estimators': 122, 'max_depth': 3, 'min_samples_split': 2, 'min_samples_leaf': 1}
+2026-08-23 20:38:07 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:38:07 | INFO     | co2_forecast |   lightgbm: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'n_estimators': 164, 'learning_rate': 0.3, 'num_leaves': 127, 'max_depth': 10, 'min_child_samples': 6, 'reg_alpha': 0.001, 'reg_lambda': 0.001}
+2026-08-23 20:38:07 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:38:07 | INFO     | co2_forecast |   catboost: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'iterations': 269, 'learning_rate': 0.23138959162300096, 'depth': 3, 'l2_leaf_reg': 10.0}
+2026-08-23 20:38:09 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:38:09 | INFO     | co2_forecast |   lstm: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'lookback': 5, 'hidden_size': 23, 'num_layers': 2, 'dropout': 0.16079150978034004, 'learning_rate': 0.0001, 'batch_size': 8}
+2026-08-23 20:38:10 | INFO     | co2_forecast |   lstm: SHAP (GradientExplainer/DeepExplainer) not attempted - falling back to sequence-aware permutation importance (spec section 22 failure-transparency requirement)
+2026-08-23 20:38:10 | INFO     | co2_forecast | Cross-model importance: 23 features
+2026-08-23 20:38:10 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:38:10 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:38:10 | INFO     | co2_forecast | Computing SHAP values using tree explainer
+2026-08-23 20:38:11 | INFO     | co2_forecast | Regime stability computed for 23 features across 3 regimes
+2026-08-23 20:38:11 | INFO     | co2_forecast | Regime importance: 69 rows across 3 regimes
+2026-08-23 20:38:11 | WARNING  | co2_forecast | No fold predictions found for A3/all_features/lightgbm at COVID anomaly dates
+2026-08-23 20:38:11 | INFO     | co2_forecast | Creating walk-forward splits for 16 valid samples
+2026-08-23 20:38:11 | INFO     | co2_forecast | Created 4 CV folds across horizons [1, 2, 4]
+2026-08-23 20:38:11 | INFO     | co2_forecast | Built tuning CV plan: 4 folds from 16 rows before 2022-Q%q (evaluation cutoff) - isolation OK (max tuning date 2021-Q%q)
+2026-08-23 20:38:11 | INFO     | co2_forecast | Optimizing lightgbm...
+2026-08-23 20:38:11 | INFO     | co2_forecast | Starting PSO: 20 particles, 30 iterations
+2026-08-23 20:38:11 | INFO     | co2_forecast |   Iteration 0: Best fitness = 0.768990
+2026-08-23 20:38:13 | INFO     | co2_forecast |   Iteration 5: Best fitness = 0.610540
+2026-08-23 20:38:15 | INFO     | co2_forecast |   Iteration 10: Best fitness = 0.610168
+2026-08-23 20:38:18 | INFO     | co2_forecast |   Iteration 15: Best fitness = 0.608980
+2026-08-23 20:38:20 | INFO     | co2_forecast |   Iteration 20: Best fitness = 0.608457
+2026-08-23 20:38:23 | INFO     | co2_forecast |   Iteration 25: Best fitness = 0.605675
+2026-08-23 20:38:26 | INFO     | co2_forecast |   Iteration 29: Best fitness = 0.604821
+2026-08-23 20:38:26 | INFO     | co2_forecast | PSO complete. Best fitness: 0.604821
+2026-08-23 20:38:26 | INFO     | co2_forecast |   Best params: {'n_estimators': 300, 'learning_rate': 0.3, 'num_leaves': 127, 'max_depth': 8, 'min_child_samples': 6, 'reg_alpha': 0.001, 'reg_lambda': 0.1188402269406553}
+2026-08-23 20:38:26 | INFO     | co2_forecast |   Best fitness: 0.604821
+2026-08-23 20:38:26 | INFO     | co2_forecast | [A3/panel2_common_period/all_features/lightgbm] sweep tuning: best_params={'n_estimators': 300, 'learning_rate': 0.3, 'num_leaves': 127, 'max_depth': 8, 'min_child_samples': 6, 'reg_alpha': 0.001, 'reg_lambda': 0.1188402269406553}
+2026-08-23 20:38:26 | INFO     | co2_forecast | Target-derived sensitivity (mode=named): dropping 0 feature(s): []
+2026-08-23 20:38:26 | INFO     | co2_forecast |   named_target_derived_excluded: no applicable columns to drop, skipping
+2026-08-23 20:38:26 | INFO     | co2_forecast | Target-derived sensitivity (mode=all): dropping 0 feature(s): []
+2026-08-23 20:38:26 | INFO     | co2_forecast |   all_target_derived_excluded: no applicable columns to drop, skipping
+2026-08-23 20:38:26 | INFO     | co2_forecast | Target-derived sensitivity: 1 rows
+2026-08-23 20:38:26 | INFO     | co2_forecast | SHAP integrity checks: 9 rows, 0 failed -> outputs/audit/shap_integrity_checks.csv
+2026-08-23 20:38:26 | INFO     | co2_forecast | ============================================================
+2026-08-23 20:38:26 | INFO     | co2_forecast | Script 12 complete!
+2026-08-23 20:38:26 | INFO     | co2_forecast |   Results saved under: outputs/runs/final_rerun_2026/interpretability
+2026-08-23 20:38:26 | INFO     | co2_forecast | ============================================================

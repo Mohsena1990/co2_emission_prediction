@@ -1,0 +1,43 @@
+# spearman_rank_correlation_between_regimes
+regime_a,regime_b,spearman_rho,p_value,n_features
+pre_covid,covid,0.9207920792079207,4.806006894247166e-10,23
+pre_covid,post_covid,0.9653465346534653,9.955423145803274e-14,23
+covid,post_covid,0.9148514851485149,9.99951657152929e-10,23
+
+# top5_overlap_between_regimes
+regime_a,regime_b,top5_a,top5_b,overlap_count,overlap_features
+pre_covid,covid,"COVID_Deaths,Grid_CI_mean,Grid_CI_p90,Grid_CI_std,Population","COVID_Deaths,GDP,Grid_CI_p90,Grid_CI_std,Mobility_Workplaces",3,"COVID_Deaths,Grid_CI_p90,Grid_CI_std"
+pre_covid,post_covid,"COVID_Deaths,Grid_CI_mean,Grid_CI_p90,Grid_CI_std,Population","COVID_Deaths,Grid_CI_mean,Grid_CI_p90,Grid_CI_std,Population",5,"COVID_Deaths,Grid_CI_mean,Grid_CI_p90,Grid_CI_std,Population"
+covid,post_covid,"COVID_Deaths,GDP,Grid_CI_p90,Grid_CI_std,Mobility_Workplaces","COVID_Deaths,Grid_CI_mean,Grid_CI_p90,Grid_CI_std,Population",3,"COVID_Deaths,Grid_CI_p90,Grid_CI_std"
+
+# per_feature_rank_by_regime_and_max_change
+feature,family,rank_pre_covid,rank_covid,rank_post_covid,max_rank_change
+Mobility_Workplaces,mobility,11,3,11,8
+GDP,macroeconomic,9,2,7,7
+Grid_CI_mean,grid_carbon_intensity,2,7,2,5
+Grid_CI_low_share,grid_carbon_intensity,12,12,8,4
+Grid_low_carbon_share,grid_generation_mix,8,10,12,4
+Air_Temp,weather,6,9,6,3
+Grid_wind_share,grid_generation_mix,7,8,10,3
+OWID_RenewableShare_L1Y,annual_transition,17,16,14,3
+Population,macroeconomic,4,6,5,2
+COVID_Deaths,shock_health,5,5,3,2
+Rainfall,weather,14,14,16,2
+Grid_renewable_share,grid_generation_mix,10,11,9,2
+Mobility_Retail_Recreation,mobility,15,15,17,2
+Grid_fossil_share,grid_generation_mix,16,17,15,2
+Grid_CI_p90,grid_carbon_intensity,3,4,4,1
+Mobility_Grocery_Pharmacy,mobility,21,21,21,0
+Grid_CI_high_share,grid_carbon_intensity,13,13,13,0
+Mobility_Transit_Stations,mobility,21,21,21,0
+Mobility_Residential,mobility,20,20,20,0
+Mobility_Parks,mobility,18,18,18,0
+Grid_CI_std,grid_carbon_intensity,1,1,1,0
+Grid_gas_share,grid_generation_mix,19,19,19,0
+OWID_LowCarbonShare_L1Y,annual_transition,21,21,21,0
+
+# grid_vs_non_grid_importance_share_by_regime
+regime,grid_feature_share,non_grid_feature_share
+pre_covid,0.6901268603872203,0.3098731396127797
+covid,0.6113655214843517,0.3886344785156482
+post_covid,0.6767875283337557,0.3232124716662444

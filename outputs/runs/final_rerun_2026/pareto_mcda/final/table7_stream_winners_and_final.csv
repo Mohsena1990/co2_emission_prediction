@@ -1,0 +1,3 @@
+stream_winner,configuration,panel,fs_option,model,pareto_status,weighted_mase,worst_horizon_mase,error_std,n_features,total_runtime_seconds,mase_h1,mase_h2,mase_h4,vikor_S,vikor_R,vikor_Q,vikor_rank,final_decision,is_compromise,is_best_overall
+Best_A,A3,panel2_common_period,all_features,lightgbm,non_dominated,0.4541120170628795,0.5751086612925513,1610.8713182670465,23,0.2641775608062744,0.3762793997352335,0.5751086612925513,0.4671985940374868,0.4,0.2,0.0,1,selected,False,True
+Best_B,A1,panel2_common_period,fs_linear,catboost,non_dominated,0.6548666323253567,0.6967684655693338,982.5291616911976,6,12.460653066635132,0.6967684655693338,0.5966489757731084,0.6374385340437864,0.6000000000000001,0.2,0.5,2,selected,False,False

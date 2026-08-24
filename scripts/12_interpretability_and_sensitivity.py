@@ -62,6 +62,7 @@ from src.interpretability import (
     compute_permutation_importance, manual_permutation_importance,
     analyze_regime_shap, analyze_regime_permutation_importance,
     build_cross_model_importance_table, compute_regime_stability, compute_family_contribution,
+    compute_regime_shap_with_integrity,
 )
 
 SHAP_MODEL_TYPES = {'ridge': 'linear', 'random_forest': 'tree', 'lightgbm': 'tree', 'catboost': 'tree'}
@@ -120,6 +121,57 @@ def get_importance_for_model(model_name, model, X, y, logger):
     return perm_df.rename(columns={'importance_mean': 'importance'})[['feature', 'importance']]
 
 
+def _load_cell_hyperparameters(configuration, fs_option, model_name, config, logger):
+    """
+    Load this cell's ACTUAL PSO-tuned hyperparameters from the real Stream
+    A/B walk-forward provenance (fold_predictions/stream_{A,B}/
+    provenance.json), instead of refitting with library defaults.
+
+    See outputs/audit/champion_shap_diagnosis.md: refitting with
+    `ModelRegistry.create(model_name, {})` (library defaults) was the root
+    cause of the all-zero/all-identical champion SHAP bug - for A3/LightGBM
+    on the 28-row common-period sample, the default `min_child_samples=20`
+    left no valid split satisfying the min-leaf-size constraint, so every
+    tree degenerated to a single leaf and the whole ensemble predicted one
+    constant value (verified prediction std ~1e-15) regardless of feature
+    values, making every SHAP contribution exactly zero.
+
+    Hyperparameters are tuned PER OUTER FOLD under nested_retuning (spec
+    section 11), so there is no single canonical "cell's best_params" - this
+    picks the fold with the latest `train_end` (the most historical data,
+    closest to what a deployment/interpretability fit would actually use) as
+    the representative setting for the one stable full-sample refit this
+    script needs.
+    """
+    rows = []
+    for stream in ('A', 'B'):
+        prov_path = config.run_dir / 'fold_predictions' / f'stream_{stream}' / 'provenance.json'
+        if not prov_path.exists():
+            continue
+        with open(prov_path) as f:
+            prov = json.load(f)
+        rows.extend([
+            r for r in prov
+            if r['configuration'] == configuration and r['fs_option'] == fs_option and r['model'] == model_name
+        ])
+
+    if not rows:
+        raise ValueError(
+            f"No fold provenance found for {configuration}/{fs_option}/{model_name} in "
+            f"{config.run_dir}/fold_predictions/stream_{{A,B}}/provenance.json - refusing to "
+            f"silently fall back to library-default hyperparameters (that fallback is the root "
+            f"cause of the champion all-zero SHAP bug; see outputs/audit/champion_shap_diagnosis.md)."
+        )
+
+    rows.sort(key=lambda r: r['train_end'], reverse=True)
+    chosen = rows[0]
+    logger.info(
+        f"  {model_name}: using tuned hyperparameters from outer fold {chosen['fold_id']} "
+        f"(train_end={chosen['train_end']}, h={chosen['horizon']}): {chosen['hyperparameters']}"
+    )
+    return chosen['hyperparameters']
+
+
 def _load_winner_matrix(configuration, fs_option, dirs, registry, logger):
     """Load and, if fs_option != 'all_features', FS-restrict this winner's
     configuration matrix - resliced to the primary common period (spec
@@ -174,7 +226,7 @@ def _covid_anomaly_errors(configuration, fs_option, model_name, config, logger):
     ]
 
 
-def interpret_winner(label, configuration, fs_option, model_name, config, dirs, registry, logger):
+def interpret_winner(label, configuration, fs_option, model_name, config, dirs, registry, logger, integrity_rows):
     logger.info("=" * 60)
     logger.info(f"Interpreting {label}: {configuration}/{fs_option}/{model_name}")
     logger.info("=" * 60)
@@ -184,10 +236,14 @@ def interpret_winner(label, configuration, fs_option, model_name, config, dirs, 
     logger.info(f"Data: {len(X_config)} rows, {len(X_config.columns)} features")
 
     # ---- Cross-model importance (Table 11-equivalent) ----
+    # Every model is refit with its OWN cell's actual PSO-tuned
+    # hyperparameters (not library defaults - see
+    # _load_cell_hyperparameters's docstring for why that matters).
     importance_by_model, fitted_models = {}, {}
     for m in ALL_MODELS:
         try:
-            model = ModelRegistry.create(m, {})
+            params = _load_cell_hyperparameters(configuration, fs_option, m, config, logger)
+            model = ModelRegistry.create(m, params)
             model.fit(X_config, y)
             fitted_models[m] = model
             importance_by_model[m] = get_importance_for_model(m, model, X_config, y, logger)
@@ -206,7 +262,11 @@ def interpret_winner(label, configuration, fs_option, model_name, config, dirs, 
         try:
             shap_type = SHAP_MODEL_TYPES.get(model_name)
             if shap_type in ('linear', 'tree'):
-                regime_results = analyze_regime_shap(champion_model, X_config, regime_periods=regime_periods, model_type=shap_type)
+                regime_results, checks_df = compute_regime_shap_with_integrity(
+                    champion_model, X_config, regime_periods, shap_type, label, model_name
+                )
+                if not checks_df.empty:
+                    integrity_rows.append(checks_df)
             else:
                 regime_results = analyze_regime_permutation_importance(champion_model, X_config, y, regime_periods=regime_periods)
         except Exception as e:
@@ -306,12 +366,23 @@ def main():
         logger.error(f"Table 7 missing one of Best_A/Best_B/Best_Overall - found: {list(winners.keys())}")
         return 1
 
+    integrity_rows = []
     for label in ('Best_A', 'Best_B', 'Best_Overall'):
         row = winners[label]
         interpret_winner(
             label, row['configuration'], row.get('fs_option', 'all_features'), row['model'],
-            config, dirs, registry, logger
+            config, dirs, registry, logger, integrity_rows
         )
+
+    if integrity_rows:
+        integrity_df = pd.concat(integrity_rows, ignore_index=True)
+        integrity_out = Path('outputs/audit/shap_integrity_checks.csv')
+        integrity_out.parent.mkdir(parents=True, exist_ok=True)
+        integrity_df.to_csv(integrity_out, index=False)
+        n_failed = int((~integrity_df['passed']).sum())
+        logger.info(f"SHAP integrity checks: {len(integrity_df)} rows, {n_failed} failed -> {integrity_out}")
+        if n_failed:
+            logger.error(f"SHAP INTEGRITY CHECK FAILURES DETECTED:\n{integrity_df[~integrity_df['passed']]}")
 
     logger.info("=" * 60)
     logger.info("Script 12 complete!")

@@ -1,0 +1,10 @@
+winner,model,regime,n_observations,n_features_expected,n_shap_rows,n_features_shap,additivity_max_abs_diff,issues,passed
+Best_A,lightgbm,pre_covid,7,23,7,23,1.4210854715202004e-14,,True
+Best_A,lightgbm,covid,8,23,8,23,1.5987211554602254e-14,,True
+Best_A,lightgbm,post_covid,13,23,13,23,1.5987211554602254e-14,,True
+Best_B,catboost,pre_covid,7,6,7,6,0.0,,True
+Best_B,catboost,covid,8,6,8,6,0.0,,True
+Best_B,catboost,post_covid,13,6,13,6,0.0,,True
+Best_Overall,lightgbm,pre_covid,7,23,7,23,1.4210854715202004e-14,,True
+Best_Overall,lightgbm,covid,8,23,8,23,1.5987211554602254e-14,,True
+Best_Overall,lightgbm,post_covid,13,23,13,23,1.5987211554602254e-14,,True
