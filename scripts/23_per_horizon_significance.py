@@ -50,7 +50,8 @@ def main():
     df['significant'] = df['significant_after_correction_alpha_0.05']
 
     out = df[['comparison_label', 'horizon_label', 'n_pairs', 'pct_pairs_a_better',
-              'mean_abs_error_diff', 'wilcoxon_p', 'wilcoxon_p_holm_corrected', 'significant']].copy()
+              'mean_abs_error_diff', 'wilcoxon_p', 'wilcoxon_p_holm_corrected', 'significant',
+              'dm_statistic', 'dm_p_value', 'dm_p_holm_corrected']].copy()
     out = out.rename(columns={
         'comparison_label': 'comparison', 'horizon_label': 'horizon',
         'pct_pairs_a_better': 'pct_A3_better', 'mean_abs_error_diff': 'mean_abs_error_diff_tonnes',

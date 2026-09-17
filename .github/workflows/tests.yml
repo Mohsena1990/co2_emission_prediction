@@ -35,10 +35,17 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run test suite
-        run: pytest tests/ -v --durations=20
+        run: pytest tests/ -v --durations=20 --cov=src --cov-report=term-missing --cov-report=xml
 
       - name: Leakage and nested-CV isolation checks
         run: |
           pytest tests/test_leakage_sentinel.py tests/test_no_leakage.py \
                  tests/test_nested_cv_isolation.py tests/test_pso_isolation.py \
                  tests/test_feature_leakage_fixes.py -v
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          retention-days: 30

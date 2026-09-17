@@ -6,6 +6,9 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
 
 # CatBoost training artifacts (regenerated on every run; allow_writing_files
 # is set False on the CatBoostModel wrapper, but sub-processes/notebooks may

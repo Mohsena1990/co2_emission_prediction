@@ -1,0 +1,4 @@
+origin_quarter,horizon,target_quarter,point_forecast_co2e_thousand_tonnes,n_training_pairs,all_origin_inputs_real
+2025-01-01,1,2025-04-01,97739.2982673876,27,True
+2025-01-01,2,2025-07-01,97822.70236799798,26,True
+2025-01-01,4,2026-01-01,112784.27802225202,24,True

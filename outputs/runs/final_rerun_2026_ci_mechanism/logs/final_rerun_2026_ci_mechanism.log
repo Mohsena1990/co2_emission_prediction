@@ -1,0 +1,400 @@
+2026-09-17 23:43:41 | INFO     | co2_forecast | Logging to: outputs/runs/final_rerun_2026_ci_mechanism/logs/final_rerun_2026_ci_mechanism.log
+2026-09-17 23:43:41 | INFO     | co2_forecast | ============================================================
+2026-09-17 23:43:41 | INFO     | co2_forecast | Script 25: what does Grid_CI_std proxy for?
+2026-09-17 23:43:41 | INFO     | co2_forecast | ============================================================
+2026-09-17 23:43:43 | INFO     | co2_forecast | Loaded 150257 half-hourly grid intervals from data/raw/grid_cache (2017-12-31 23:30:00+00:00 to 2026-08-01 01:00:00+00:00)
+2026-09-17 23:43:43 | INFO     | co2_forecast | Built 34 quarters of mechanism candidates:
+       Grid_forecast_error_mean_abs  ...  Grid_wind_share_std
+count                     34.000000  ...            33.000000
+mean                      11.802115  ...            13.796407
+std                        5.479365  ...             2.875150
+min                        8.358745  ...             8.038537
+25%                        9.303399  ...            12.045971
+50%                        9.780948  ...            13.979383
+75%                       10.737790  ...            16.089790
+max                       32.375694  ...            18.341279
+
+[8 rows x 4 columns]
+2026-09-17 23:43:44 | INFO     | co2_forecast | Slicing all configurations to the primary common period [2018-04-01 00:00:00 - 2025-01-01 00:00:00] (reference: A3)
+2026-09-17 23:43:44 | INFO     | co2_forecast | Merged 28 common-period quarters for correlation analysis
+2026-09-17 23:43:44 | INFO     | co2_forecast | Correlations with Grid_CI_std:
+                              pearson_vs_Grid_CI_std  spearman_vs_Grid_CI_std
+Grid_CI_mean                                0.095632                 0.003831
+Grid_CI_p90                                 0.494745                 0.335113
+Grid_CI_high_share                          0.382643                 0.510126
+Grid_CI_low_share                           0.079891                 0.182266
+Grid_forecast_error_mean_abs                0.034860                 0.119321
+Grid_forecast_error_std                     0.164880                 0.072797
+n_forecast_error_obs                       -0.315087                -0.253127
+Grid_wind_share_std                         0.374950                 0.375479
+2026-09-17 23:43:44 | INFO     | co2_forecast | Creating walk-forward splits for 16 valid samples
+2026-09-17 23:43:44 | INFO     | co2_forecast | Created 4 CV folds across horizons [1, 2, 4]
+2026-09-17 23:43:44 | INFO     | co2_forecast | Built tuning CV plan: 4 folds from 16 rows before 2022-Qq (evaluation cutoff) - isolation OK (max tuning date 2021-Qq)
+2026-09-17 23:43:44 | INFO     | co2_forecast | Optimizing ridge...
+2026-09-17 23:43:44 | INFO     | co2_forecast | Starting PSO: 8 particles, 10 iterations
+2026-09-17 23:43:44 | INFO     | co2_forecast |   Iteration 0: Best fitness = 2.476275
+2026-09-17 23:43:44 | INFO     | co2_forecast |   Iteration 5: Best fitness = 2.125504
+2026-09-17 23:43:44 | INFO     | co2_forecast |   Iteration 9: Best fitness = 2.125504
+2026-09-17 23:43:44 | INFO     | co2_forecast | PSO complete. Best fitness: 2.125504
+2026-09-17 23:43:44 | INFO     | co2_forecast |   Best params: {'alpha': 100.0}
+2026-09-17 23:43:44 | INFO     | co2_forecast |   Best fitness: 2.125504
+2026-09-17 23:43:44 | INFO     | co2_forecast | [A3_forecast_error_std_only/panel2_common_period/all_features/ridge] sweep tuning: best_params={'alpha': 100.0}
+2026-09-17 23:43:44 | INFO     | co2_forecast |   ridge -> weighted_mase=0.9000550920296699
+2026-09-17 23:43:44 | INFO     | co2_forecast | Creating walk-forward splits for 16 valid samples
+2026-09-17 23:43:44 | INFO     | co2_forecast | Created 4 CV folds across horizons [1, 2, 4]
+2026-09-17 23:43:44 | INFO     | co2_forecast | Built tuning CV plan: 4 folds from 16 rows before 2022-Qq (evaluation cutoff) - isolation OK (max tuning date 2021-Qq)
+2026-09-17 23:43:44 | INFO     | co2_forecast | Optimizing random_forest...
+2026-09-17 23:43:44 | INFO     | co2_forecast | Starting PSO: 8 particles, 10 iterations
+2026-09-17 23:43:46 | INFO     | co2_forecast |   Iteration 0: Best fitness = 0.671464
+2026-09-17 23:43:52 | INFO     | co2_forecast |   Iteration 5: Best fitness = 0.353406
+2026-09-17 23:43:56 | INFO     | co2_forecast |   Iteration 9: Best fitness = 0.353406
+2026-09-17 23:43:56 | INFO     | co2_forecast | PSO complete. Best fitness: 0.353406
+2026-09-17 23:43:56 | INFO     | co2_forecast |   Best params: {'n_estimators': 50, 'max_depth': 3, 'min_samples_split': 2, 'min_samples_leaf': 1}
+2026-09-17 23:43:56 | INFO     | co2_forecast |   Best fitness: 0.353406
+2026-09-17 23:43:56 | INFO     | co2_forecast | [A3_forecast_error_std_only/panel2_common_period/all_features/random_forest] sweep tuning: best_params={'n_estimators': 50, 'max_depth': 3, 'min_samples_split': 2, 'min_samples_leaf': 1}
+2026-09-17 23:43:57 | INFO     | co2_forecast |   random_forest -> weighted_mase=0.7407367817609363
+2026-09-17 23:43:57 | INFO     | co2_forecast | Creating walk-forward splits for 16 valid samples
+2026-09-17 23:43:57 | INFO     | co2_forecast | Created 4 CV folds across horizons [1, 2, 4]
+2026-09-17 23:43:57 | INFO     | co2_forecast | Built tuning CV plan: 4 folds from 16 rows before 2022-Qq (evaluation cutoff) - isolation OK (max tuning date 2021-Qq)
+2026-09-17 23:43:57 | INFO     | co2_forecast | Optimizing catboost...
+2026-09-17 23:43:57 | INFO     | co2_forecast | Starting PSO: 8 particles, 10 iterations
+2026-09-17 23:43:57 | WARNING  | co2_forecast | CatBoost GPU probe failed (catboost/libs/train_lib/trainer_env.cpp:9: Environment for task type [GPU] not found); using CPU.
+2026-09-17 23:43:57 | INFO     | co2_forecast |   Iteration 0: Best fitness = 0.387595
+2026-09-17 23:43:58 | INFO     | co2_forecast |   Iteration 5: Best fitness = 0.381712
+2026-09-17 23:43:58 | INFO     | co2_forecast |   Iteration 9: Best fitness = 0.379054
+2026-09-17 23:43:58 | INFO     | co2_forecast | PSO complete. Best fitness: 0.379054
+2026-09-17 23:43:58 | INFO     | co2_forecast |   Best params: {'iterations': 73, 'learning_rate': 0.0661262923369348, 'depth': 3, 'l2_leaf_reg': 2.8020111218546324}
+2026-09-17 23:43:58 | INFO     | co2_forecast |   Best fitness: 0.379054
+2026-09-17 23:43:58 | INFO     | co2_forecast | [A3_forecast_error_std_only/panel2_common_period/all_features/catboost] sweep tuning: best_params={'iterations': 73, 'learning_rate': 0.0661262923369348, 'depth': 3, 'l2_leaf_reg': 2.8020111218546324}
+2026-09-17 23:43:58 | INFO     | co2_forecast |   catboost -> weighted_mase=0.7374075490650669
+2026-09-17 23:43:58 | INFO     | co2_forecast | Creating walk-forward splits for 16 valid samples
+2026-09-17 23:43:58 | INFO     | co2_forecast | Created 4 CV folds across horizons [1, 2, 4]
+2026-09-17 23:43:58 | INFO     | co2_forecast | Built tuning CV plan: 4 folds from 16 rows before 2022-Qq (evaluation cutoff) - isolation OK (max tuning date 2021-Qq)
+2026-09-17 23:43:58 | INFO     | co2_forecast | Optimizing lightgbm...
+2026-09-17 23:43:58 | INFO     | co2_forecast | Starting PSO: 8 particles, 10 iterations
+2026-09-17 23:43:58 | WARNING  | co2_forecast | LightGBM has no GPU-enabled build installed; using CPU. The pip wheel ships CPU-only - install a CUDA/OpenCL build (e.g. build from source with -DUSE_CUDA=1, or a conda-forge lightgbm=*=cuda* package) to enable GPU training.
+2026-09-17 23:43:59 | INFO     | co2_forecast |   Iteration 0: Best fitness = 0.768990
+2026-09-17 23:44:00 | INFO     | co2_forecast |   Iteration 5: Best fitness = 0.655353
+2026-09-17 23:44:01 | INFO     | co2_forecast |   Iteration 9: Best fitness = 0.644572
+2026-09-17 23:44:01 | INFO     | co2_forecast | PSO complete. Best fitness: 0.644572
+2026-09-17 23:44:01 | INFO     | co2_forecast |   Best params: {'n_estimators': 50, 'learning_rate': 0.24875557248327107, 'num_leaves': 127, 'max_depth': 3, 'min_child_samples': 5, 'reg_alpha': 0.09419715994303053, 'reg_lambda': 1.6116769810147058}
+2026-09-17 23:44:01 | INFO     | co2_forecast |   Best fitness: 0.644572
+2026-09-17 23:44:01 | INFO     | co2_forecast | [A3_forecast_error_std_only/panel2_common_period/all_features/lightgbm] sweep tuning: best_params={'n_estimators': 50, 'learning_rate': 0.24875557248327107, 'num_leaves': 127, 'max_depth': 3, 'min_child_samples': 5, 'reg_alpha': 0.09419715994303053, 'reg_lambda': 1.6116769810147058}
+2026-09-17 23:44:01 | INFO     | co2_forecast |   lightgbm -> weighted_mase=0.6434111819930152
+2026-09-17 23:44:01 | INFO     | co2_forecast | Creating walk-forward splits for 16 valid samples
+2026-09-17 23:44:01 | INFO     | co2_forecast | Created 4 CV folds across horizons [1, 2, 4]
+2026-09-17 23:44:01 | INFO     | co2_forecast | Built tuning CV plan: 4 folds from 16 rows before 2022-Qq (evaluation cutoff) - isolation OK (max tuning date 2021-Qq)
+2026-09-17 23:44:01 | INFO     | co2_forecast | Optimizing lstm...
+2026-09-17 23:44:01 | INFO     | co2_forecast | Starting PSO: 8 particles, 10 iterations
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Model training failed with params {'lookback': 7, 'hidden_size': 62, 'num_layers': 2, 'dropout': 0.3394633936788147, 'learning_rate': 0.0016445845403801217, 'batch_size': 8}: LSTM.fit: training data has 8 rows, giving only 1 sequence(s) with lookback=7; at least 2 are required (one is always reserved for validation). Reduce lookback or provide more training history.
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Model training failed with params {'lookback': 11, 'hidden_size': 26, 'num_layers': 1, 'dropout': 0.17336180394137354, 'learning_rate': 0.0031119982052994237, 'batch_size': 16}: LSTM.fit: training data has 8 rows, giving only 0 sequence(s) with lookback=11; at least 2 are required (one is always reserved for validation). Reduce lookback or provide more training history.
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Model training failed with params {'lookback': 8, 'hidden_size': 54, 'num_layers': 1, 'dropout': 0.3056937753654447, 'learning_rate': 0.005964904231734221, 'batch_size': 8}: LSTM.fit: training data has 8 rows, giving only 0 sequence(s) with lookback=8; at least 2 are required (one is always reserved for validation). Reduce lookback or provide more training history.
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (6), LSTM may not train well
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Model training failed with params {'lookback': 8, 'hidden_size': 25, 'num_layers': 2, 'dropout': 0.4100531293444458, 'learning_rate': 0.009401039521485473, 'batch_size': 32}: LSTM.fit: training data has 8 rows, giving only 0 sequence(s) with lookback=8; at least 2 are required (one is always reserved for validation). Reduce lookback or provide more training history.
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Model training failed with params {'lookback': 7, 'hidden_size': 29, 'num_layers': 2, 'dropout': 0.2427013306774357, 'learning_rate': 0.00288125164590507, 'batch_size': 16}: LSTM.fit: training data has 8 rows, giving only 1 sequence(s) with lookback=7; at least 2 are required (one is always reserved for validation). Reduce lookback or provide more training history.
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (6), LSTM may not train well
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:01 | INFO     | co2_forecast |   Iteration 0: Best fitness = 1.081462
+2026-09-17 23:44:01 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (6), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Model training failed with params {'lookback': 8, 'hidden_size': 44, 'num_layers': 1, 'dropout': 0.32389753899663415, 'learning_rate': 0.005520634690128072, 'batch_size': 8}: LSTM.fit: training data has 8 rows, giving only 0 sequence(s) with lookback=8; at least 2 are required (one is always reserved for validation). Reduce lookback or provide more training history.
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (6), LSTM may not train well
+2026-09-17 23:44:02 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (6), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:03 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:04 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:04 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:04 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:04 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:04 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:04 | WARNING  | co2_forecast | Model training failed with params {'lookback': 7, 'hidden_size': 35, 'num_layers': 1, 'dropout': 0.31512819649180424, 'learning_rate': 0.004065945490368326, 'batch_size': 8}: LSTM.fit: training data has 8 rows, giving only 1 sequence(s) with lookback=7; at least 2 are required (one is always reserved for validation). Reduce lookback or provide more training history.
+2026-09-17 23:44:04 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:04 | WARNING  | co2_forecast | Very few sequences (6), LSTM may not train well
+2026-09-17 23:44:04 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:04 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:05 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:05 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:05 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:05 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:05 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:05 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:05 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (6), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:06 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (6), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:07 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (6), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:08 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:09 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:10 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:11 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:11 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:11 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:11 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:11 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:11 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:11 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:11 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:11 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:12 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:12 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:12 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:12 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:12 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:12 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:12 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:12 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:12 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:12 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:12 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:13 | INFO     | co2_forecast |   Iteration 5: Best fitness = 0.766704
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:13 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:14 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:14 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:14 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:14 | WARNING  | co2_forecast | Very few sequences (6), LSTM may not train well
+2026-09-17 23:44:14 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:14 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:14 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:14 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:14 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:15 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:15 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:15 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:15 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:15 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:15 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:15 | WARNING  | co2_forecast | Very few sequences (6), LSTM may not train well
+2026-09-17 23:44:15 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:15 | WARNING  | co2_forecast | Very few sequences (2), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:16 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:17 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:18 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:18 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:18 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:18 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:18 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:18 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:18 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:18 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:18 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:19 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:20 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:21 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (7), LSTM may not train well
+2026-09-17 23:44:22 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (3), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:23 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:24 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:24 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:24 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:24 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:24 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:24 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:24 | WARNING  | co2_forecast | Very few sequences (8), LSTM may not train well
+2026-09-17 23:44:24 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:24 | WARNING  | co2_forecast | Very few sequences (4), LSTM may not train well
+2026-09-17 23:44:24 | INFO     | co2_forecast |   Iteration 9: Best fitness = 0.762728
+2026-09-17 23:44:24 | INFO     | co2_forecast | PSO complete. Best fitness: 0.762728
+2026-09-17 23:44:24 | INFO     | co2_forecast |   Best params: {'lookback': 4, 'hidden_size': 16, 'num_layers': 2, 'dropout': 0.29952189754267877, 'learning_rate': 0.0001, 'batch_size': 32}
+2026-09-17 23:44:24 | INFO     | co2_forecast |   Best fitness: 0.762728
+2026-09-17 23:44:24 | INFO     | co2_forecast | [A3_forecast_error_std_only/panel2_common_period/all_features/lstm] sweep tuning: best_params={'lookback': 4, 'hidden_size': 16, 'num_layers': 2, 'dropout': 0.29952189754267877, 'learning_rate': 0.0001, 'batch_size': 32}
+2026-09-17 23:44:25 | INFO     | co2_forecast |   lstm -> weighted_mase=1.0181639684621813
+2026-09-17 23:44:25 | INFO     | co2_forecast | Wrote outputs/robustness/ci_std_mechanism_ablation.csv (5 rows)
+2026-09-17 23:44:25 | INFO     | co2_forecast | Saved outputs/figures/pdf/sensitivity/fig_ci_std_mechanism.pdf
+2026-09-17 23:44:25 | INFO     | co2_forecast | ============================================================
+2026-09-17 23:44:25 | INFO     | co2_forecast | Script 25 complete!
+2026-09-17 23:44:25 | INFO     | co2_forecast | ============================================================

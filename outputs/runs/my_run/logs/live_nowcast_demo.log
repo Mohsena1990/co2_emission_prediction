@@ -1,0 +1,22 @@
+2026-09-17 23:49:18 | INFO     | co2_forecast | Logging to: outputs/runs/my_run/logs/live_nowcast_demo.log
+2026-09-17 23:49:18 | INFO     | co2_forecast | ============================================================
+2026-09-17 23:49:18 | INFO     | co2_forecast | Script 27: live-nowcast demonstration (mechanism, not a new accuracy claim)
+2026-09-17 23:49:18 | INFO     | co2_forecast | ============================================================
+2026-09-17 23:49:18 | INFO     | co2_forecast | Champion has real target data through 2025-01-01; nowcasting [datetime.date(2025, 4, 1), datetime.date(2025, 7, 1), datetime.date(2025, 10, 1), datetime.date(2026, 1, 1), datetime.date(2026, 4, 1)]
+2026-09-17 23:49:18 | INFO     | co2_forecast |   lightgbm: using tuned hyperparameters from outer fold 2 (train_end=2024-01-01T00:00:00, h=1): {'n_estimators': 164, 'learning_rate': 0.3, 'num_leaves': 127, 'max_depth': 10, 'min_child_samples': 6, 'reg_alpha': 0.001, 'reg_lambda': 0.001}
+2026-09-17 23:49:18 | WARNING  | co2_forecast | LightGBM has no GPU-enabled build installed; using CPU. The pip wheel ships CPU-only - install a CUDA/OpenCL build (e.g. build from source with -DUSE_CUDA=1, or a conda-forge lightgbm=*=cuda* package) to enable GPU training.
+2026-09-17 23:49:18 | INFO     | co2_forecast | Refit champion (A3/LightGBM, tuned hyperparameters) on all 28 available quarters
+2026-09-17 23:51:33 | INFO     | co2_forecast | Logging to: outputs/runs/my_run/logs/live_nowcast_demo.log
+2026-09-17 23:51:33 | INFO     | co2_forecast | ============================================================
+2026-09-17 23:51:33 | INFO     | co2_forecast | Script 27: live-nowcast demonstration (mechanism, not a new accuracy claim)
+2026-09-17 23:51:33 | INFO     | co2_forecast | ============================================================
+2026-09-17 23:51:33 | INFO     | co2_forecast | Current forecast origin (last quarter with a real published target): 2025-01-01
+2026-09-17 23:51:33 | INFO     | co2_forecast | Origin row's own features are all real (GDP, grid, mobility, weather - fully observed by then)
+2026-09-17 23:51:33 | INFO     | co2_forecast | Grid data already cached BEYOND the current origin (available before the macro/target series catches up): [datetime.date(2025, 4, 1), datetime.date(2025, 7, 1), datetime.date(2025, 10, 1), datetime.date(2026, 1, 1), datetime.date(2026, 4, 1)]
+2026-09-17 23:51:33 | INFO     | co2_forecast |   h=1: tuned hyperparameters from fold 2 (train_end=2024-01-01T00:00:00): {'n_estimators': 164, 'learning_rate': 0.3, 'num_leaves': 127, 'max_depth': 10, 'min_child_samples': 6, 'reg_alpha': 0.001, 'reg_lambda': 0.001}
+2026-09-17 23:51:33 | WARNING  | co2_forecast | LightGBM has no GPU-enabled build installed; using CPU. The pip wheel ships CPU-only - install a CUDA/OpenCL build (e.g. build from source with -DUSE_CUDA=1, or a conda-forge lightgbm=*=cuda* package) to enable GPU training.
+2026-09-17 23:51:33 | INFO     | co2_forecast |   H1 forecast for 2025-04-01: 97,739 thousand tonnes CO2e (trained on 27 direct (X_t, y_t+1) pairs)
+2026-09-17 23:51:33 | INFO     | co2_forecast |   h=2: tuned hyperparameters from fold 4 (train_end=2023-01-01T00:00:00): {'n_estimators': 164, 'learning_rate': 0.3, 'num_leaves': 127, 'max_depth': 10, 'min_child_samples': 6, 'reg_alpha': 0.001, 'reg_lambda': 0.001}
+2026-09-17 23:51:33 | INFO     | co2_forecast |   H2 forecast for 2025-07-01: 97,823 thousand tonnes CO2e (trained on 26 direct (X_t, y_t+2) pairs)
+2026-09-17 23:51:33 | INFO     | co2_forecast |   h=4: tuned hyperparameters from fold 6 (train_end=2023-01-01T00:00:00): {'n_estimators': 164, 'learning_rate': 0.3, 'num_leaves': 127, 'max_depth': 10, 'min_child_samples': 6, 'reg_alpha': 0.001, 'reg_lambda': 0.001}
+2026-09-17 23:51:33 | INFO     | co2_forecast |   H4 forecast for 2026-01-01: 112,784 thousand tonnes CO2e (trained on 24 direct (X_t, y_t+4) pairs)

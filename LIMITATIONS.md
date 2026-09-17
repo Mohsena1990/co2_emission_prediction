@@ -27,9 +27,24 @@ limitation is found or an old one is resolved.
   be read as a family-level result, not as 27 independent trials.
 - Per-horizon significance (now in `outputs/tables/table13_per_horizon_significance.csv`,
   built by `scripts/23_per_horizon_significance.py`) shows that **no single
-  horizon individually survives Holm correction** for any comparison,
-  including A3 vs A2 - only the pooled test does. Report both, not just
-  the pooled number.
+  horizon individually survives Holm correction under the Wilcoxon test**
+  for any comparison, including A3 vs A2 - only the pooled test does.
+  Report both, not just the pooled number.
+- `scripts/20_statistical_robustness.py` now also runs the Diebold-Mariano
+  test (`src/evaluation/statistical_tests.py::diebold_mariano_test` -
+  already implemented and used elsewhere in the codebase, e.g.
+  `incremental_value.py`, but not previously wired into this robustness
+  check). DM is the more appropriate test here: its long-run-variance
+  estimator explicitly accounts for the h-1 order serial correlation
+  expected in h-step-ahead forecast errors, rather than treating paired
+  differences as exchangeable the way Wilcoxon does. Result: **A3
+  significantly beats A2 at H1 individually** (DM statistic -3.63,
+  Holm-corrected p=0.037) - stronger, convergent evidence alongside the
+  pooled Wilcoxon result, not just a restatement of it. DM is undefined
+  (returns NaN, not a fabricated number) at H4 for every comparison: with
+  n=8 pairs and lag truncation h-1=3, the long-run variance estimate is
+  unstable. This is the estimator correctly declining to produce an
+  unreliable result, not a bug - use Wilcoxon/paired-t for H4.
 - 120 total candidates (20 Stream A + 100 Stream B) were searched over an
   11-28 quarter panel. Nested CV prevents leakage within a candidate's own
   fit, but does not eliminate selection-multiplicity risk across 120
@@ -73,6 +88,75 @@ matters" should be qualified with this finding. See
 `outputs/figures/pdf/main/fig_policy_capacity_vs_flexibility.pdf` and
 `outputs/figures/pdf/sensitivity/fig_ci_decomposition.pdf` for the figures
 built to make this distinction explicit.
+
+## Prediction intervals are indicative, not calibrated
+
+`scripts/26_prediction_intervals.py` adds empirical, leave-one-out
+prediction intervals around the champion's point forecasts (needed for
+any of the policy use cases that require a range, not just a point
+estimate - see RESEARCH_OVERVIEW.md). Honest calibration check: nominal
+80% intervals achieve only **62-64% empirical leave-one-out coverage**
+(all three horizons); nominal 50% intervals achieve 25-50%. **The
+intervals as constructed are anti-conservative (narrower than their
+stated level) at this sample size** - report them as an indicative range,
+not a validated/calibrated interval, and do not claim "80% confidence"
+in the manuscript without repeating this caveat. This is itself expected
+at n=8-11 per horizon (a coverage estimate at this sample size has wide
+uncertainty of its own), and is reported plainly rather than tuned away
+by, e.g., artificially widening the intervals to hit the nominal level on
+this same data (which would just be overfitting the calibration check).
+See `outputs/robustness/champion_interval_calibration.csv` for the full
+numbers and `outputs/figures/pdf/main/fig_champion_prediction_intervals.pdf`
+for the fan charts.
+
+## What Grid_CI_std mechanistically represents: still open
+
+`scripts/25_ci_std_mechanism_investigation.py` tested two candidate
+mechanisms for why carbon-intensity dispersion is the champion's leading
+predictor, using data already cached locally (NESO's own half-hourly
+`forecast` field alongside `actual`, and half-hourly wind generation
+share) - no new API calls:
+
+1. **System-predictability stress** (forecast error `|actual - forecast|`):
+   Pearson correlation with `Grid_CI_std` = **0.03** (mean abs error) / **0.16**
+   (std of signed error). Essentially uncorrelated.
+2. **Wind intermittency** (std of half-hourly wind generation share):
+   Pearson correlation = **0.37**. Weak-to-moderate at best.
+
+**Neither hypothesis cleanly explains the dispersion signal.** Tested as a
+standalone predictor, forecast-error std (WMASE 0.643) performs about the
+same tier as `Grid_CI_std` alone (0.662) - both worse than the mean alone
+(0.598) - despite the two being only weakly correlated (0.16) with each
+other, which itself suggests they're not just two labels for the same
+underlying phenomenon. **What `Grid_CI_std` mechanistically represents
+remains an open question after this pass**, not a solved one - report it
+as "carbon-intensity dispersion is predictive" without further mechanistic
+claims (e.g. do not describe it as "a forecast-difficulty signal" or "a
+wind-intermittency signal" without new evidence). See
+`outputs/robustness/ci_std_mechanism_correlations.csv` and
+`outputs/figures/pdf/sensitivity/fig_ci_std_mechanism.pdf` for the full
+result. A natural, not-yet-attempted follow-up: demand-side volatility
+(half-hourly national demand is available from the same NESO data
+ecosystem but not yet fetched/cached here) or interconnector flow
+volatility, which this pass did not test.
+
+## Live-nowcast demonstration is a mechanism demo, not a scored result
+
+`scripts/27_live_nowcast_demo.py` runs the champion's actual direct H1/H2/H4
+models from the true current origin (2025Q1, the last quarter with a real
+published target) to produce real next-quarter/half-year/year-ahead
+forecasts (2025Q2, 2025Q3, 2026Q1: 97,739 / 97,823 / 112,784 thousand
+tonnes CO2e). Every input is real - because this pipeline forecasts
+directly from a known origin (X_t -> y_{t+h}), it never needs a future
+quarter's own placeholder covariates. **There is no ground truth yet for
+these target quarters - do not cite these three numbers as a validated
+accuracy result**, only as a demonstration that the deployed mechanism
+runs end-to-end. Separately, real grid data already exists for five
+quarters beyond the current origin (through 2026Q2) while the macro/target
+series is bounded by the raw source file (through 2025Q1) - concrete,
+already-on-disk evidence for the "grid data updates before the
+macro/inventory data this pipeline depends on" claim, independent of the
+three forecasts above.
 
 ## Reduced-PSO-budget sensitivity sweeps
 

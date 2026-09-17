@@ -1,6 +1,6 @@
 [project]
 name = "qdecem-co2-forecast"
-version = "0.5.0"
+version = "0.6.0"
 description = "Q-DECEM: leakage-controlled quarterly UK CO2e forecasting framework (predictor governance, feature selection, PSO-tuned models, Pareto/MCDA selection)"
 readme = "README.md"
 requires-python = ">=3.10"

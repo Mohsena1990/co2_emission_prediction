@@ -147,8 +147,11 @@ pytest tests/ -q
 │   ├── 20_statistical_robustness.py        # Paired significance tests (A3 vs A1/A2/A4/naive)
 │   ├── 21_origin_diagnostics.py            # Per-origin forecast/error diagnostics
 │   ├── 22_ci_decomposition_ablation.py     # Single-statistic decomposition within the CI family
-│   ├── 23_per_horizon_significance.py      # Per-horizon significance alongside the pooled test
-│   └── 24_policy_figures.py                # Policy/managerial-implications figures
+│   ├── 23_per_horizon_significance.py      # Per-horizon significance (incl. Diebold-Mariano) alongside the pooled test
+│   ├── 24_policy_figures.py                # Policy/managerial-implications figures
+│   ├── 25_ci_std_mechanism_investigation.py # What Grid_CI_std proxies for (open question - see LIMITATIONS.md)
+│   ├── 26_prediction_intervals.py          # Empirical prediction intervals + calibration check for the champion
+│   └── 27_live_nowcast_demo.py             # Runs the deployed mechanism from the current real origin (demo, not scored)
 ├── src/
 │   ├── core/                  # Config, logging, utilities
 │   ├── data_io/                # Data loading, schema

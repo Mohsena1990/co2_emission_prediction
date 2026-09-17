@@ -103,9 +103,14 @@ policy material sits:
 
 | Artifact | What it is |
 |---|---|
-| `scripts/19_grid_ablation.py` | Family-level ablation (CI vs. generation-mix vs. full A3), now reconciled with the headline champion numbers |
+| `scripts/19_grid_ablation.py` | Family-level ablation (CI vs. generation-mix vs. full A3), reconciled with the headline champion numbers |
+| `scripts/20_statistical_robustness.py` | Paired significance tests; now includes Diebold-Mariano alongside Wilcoxon/paired-t |
 | `scripts/22_ci_decomposition_ablation.py` | Single-statistic decomposition within the carbon-intensity family |
-| `scripts/23_per_horizon_significance.py` | Per-horizon significance surfaced alongside the pooled Table 12 result |
+| `scripts/23_per_horizon_significance.py` | Per-horizon significance (incl. DM) surfaced alongside the pooled Table 12 result |
 | `scripts/24_policy_figures.py` | The two policy/managerial figures described above |
+| `scripts/25_ci_std_mechanism_investigation.py` | Tests two candidate mechanisms behind `Grid_CI_std`'s dominance (forecast-error stress, wind intermittency) - open question, not resolved |
+| `scripts/26_prediction_intervals.py` | Empirical leave-one-out prediction intervals around the champion's forecasts, with an honest calibration check |
+| `scripts/27_live_nowcast_demo.py` | Runs the actual deployed mechanism from the true current origin to produce real (unscored) next-quarter forecasts |
 | `LIMITATIONS.md` | Canonical, consolidated list of what these results do and do not support |
 | `CHANGELOG.md` | What changed, when, and why |
+| `Makefile` | Common commands (`make test`, `make pipeline`, `make tables`, ...) |

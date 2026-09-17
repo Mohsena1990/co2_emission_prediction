@@ -36,6 +36,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import wilcoxon, ttest_rel
 
+from src.evaluation import diebold_mariano_test
+
 PRED_PATH = Path('outputs/runs/my_run/fold_predictions/stream_A/predictions.csv')
 MODEL = 'lightgbm'
 COMPARISONS = [('A3', 'A1'), ('A3', 'A2'), ('A3', 'A4')]
@@ -78,6 +80,8 @@ def main():
     rows = []
     raw_pvals = []
     raw_rows_idx = []
+    dm_pvals = []
+    dm_rows_idx = []
 
     horizons = [1, 2, 4, None]  # None = pooled across all horizons
     all_comparisons = COMPARISONS + [('A3', 'naive_lag4')]
@@ -121,6 +125,27 @@ def main():
             except ValueError:
                 w_stat, w_p = np.nan, np.nan
 
+            # Diebold-Mariano test (Diebold & Mariano, 1995; Harvey-Leybourne-
+            # Newbold small-sample correction), computed on SIGNED errors -
+            # unlike Wilcoxon/paired-t above, DM's long-run variance estimator
+            # explicitly accounts for the h-1 order serial correlation
+            # expected in h-step-ahead forecast errors, which addresses the
+            # "pooling non-independent horizons" caveat in LIMITATIONS.md.
+            # Only meaningful per-horizon (a single, well-defined h) - not
+            # computed for the pooled row, which mixes H1/H2/H4 and has no
+            # single correct lag truncation.
+            dm_stat, dm_p, dm_note = np.nan, np.nan, ''
+            if h is not None:
+                signed_err_a = (merged['actual_a'] - merged['predicted_a']).to_numpy()
+                signed_err_b = (merged['actual_b'] - merged['predicted_b']).to_numpy()
+                dm_result = diebold_mariano_test(signed_err_a, signed_err_b, h=h, loss='absolute')
+                dm_stat, dm_p = dm_result['dm_statistic'], dm_result['p_value']
+                if np.isnan(dm_p):
+                    dm_note = (f'DM long-run variance non-positive at h={h}, n={n} '
+                               f'(lag truncation h-1={h-1} too large relative to sample '
+                               f'size) - not a missing computation, the estimator is '
+                               f'genuinely unstable here; use Wilcoxon/paired-t for this cell')
+
             row = {
                 'comparison': f'{config_a}_vs_{config_b}', 'model': MODEL,
                 'horizon': h if h else 'pooled', 'n_pairs': n,
@@ -130,18 +155,31 @@ def main():
                 'pct_pairs_a_better': float((abs_diff < 0).mean() * 100),
                 'paired_ttest_stat': t_stat, 'paired_ttest_p': t_p,
                 'wilcoxon_stat': w_stat, 'wilcoxon_p': w_p,
-                'note': '',
+                'dm_statistic': dm_stat, 'dm_p_value': dm_p,
+                'note': dm_note,
             }
             rows.append(row)
             if not np.isnan(w_p):
                 raw_pvals.append(w_p)
                 raw_rows_idx.append(len(rows) - 1)
+            if not np.isnan(dm_p):
+                dm_pvals.append(dm_p)
+                dm_rows_idx.append(len(rows) - 1)
 
     if raw_pvals:
         corrected = holm_bonferroni(raw_pvals)
         for idx, p_corr in zip(raw_rows_idx, corrected):
             rows[idx]['wilcoxon_p_holm_corrected'] = p_corr
             rows[idx]['significant_after_correction_alpha_0.05'] = bool(p_corr < 0.05)
+
+    if dm_pvals:
+        # Separate Holm family from Wilcoxon's: DM is only run per-horizon
+        # (not pooled), so its family has fewer tests and should not share
+        # an ordering with the Wilcoxon family's pooled rows.
+        dm_corrected = holm_bonferroni(dm_pvals)
+        for idx, p_corr in zip(dm_rows_idx, dm_corrected):
+            rows[idx]['dm_p_holm_corrected'] = p_corr
+            rows[idx]['dm_significant_after_correction_alpha_0.05'] = bool(p_corr < 0.05)
 
     result_df = pd.DataFrame(rows)
     Path('outputs/robustness').mkdir(parents=True, exist_ok=True)

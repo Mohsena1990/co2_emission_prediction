@@ -3,6 +3,49 @@
 All notable changes to this project are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.6.0] - 2026-09-17
+
+### Added
+- `scripts/20_statistical_robustness.py`: now also runs the Diebold-Mariano
+  test (already implemented in `src/evaluation/statistical_tests.py` and
+  used elsewhere, but not previously wired into this robustness check)
+  alongside Wilcoxon/paired-t. Finding: **A3 significantly beats A2 at H1
+  individually** (DM statistic -3.63, Holm-corrected p=0.037) - stronger,
+  convergent per-horizon evidence alongside the existing pooled result. DM
+  correctly returns NaN (not a fabricated number) at H4, where n=8 and
+  lag truncation h-1=3 make the long-run-variance estimator unstable.
+  Surfaced in `outputs/tables/table13_per_horizon_significance.csv` too.
+- `scripts/25_ci_std_mechanism_investigation.py`: tests two candidate
+  mechanisms for why carbon-intensity dispersion dominates (forecast-error
+  "system stress", wind intermittency) using data already cached locally.
+  Honest result: neither correlates strongly with `Grid_CI_std` (0.03-0.16
+  and 0.37 respectively) - **what the dispersion signal mechanistically
+  represents remains an open question**, documented as such rather than
+  forced into either story.
+- `scripts/26_prediction_intervals.py`: empirical, leave-one-out prediction
+  intervals around the champion's point forecasts, with an honest
+  calibration check. Finding: nominal 80% intervals achieve only 62-64%
+  empirical coverage at this sample size - reported as an indicative range,
+  not a validated/calibrated interval.
+- `scripts/27_live_nowcast_demo.py`: runs the champion's actual direct
+  H1/H2/H4 models from the true current origin (2025Q1) to produce real
+  (unscored - no ground truth exists yet) forecasts for 2025Q2/Q3 and
+  2026Q1, using exclusively real inputs (the direct-horizon design means
+  no future-quarter placeholder values are ever needed). Also documents
+  that real grid data already exists five quarters beyond the current
+  origin (through 2026Q2), concrete evidence for the "grid data updates
+  before the macro/inventory data" claim behind the early-warning framing.
+- `Makefile` (common commands), `.github/dependabot.yml` (monthly pip +
+  GitHub Actions update PRs, checked by the existing CI before merge),
+  and a coverage report (`--cov=src`, uploaded as a CI artifact) added to
+  `.github/workflows/tests.yml`.
+- Verified the README's documented `venv` + `pip install -r requirements.txt`
+  install path against a genuinely fresh Python 3.10 environment (all 379
+  tests pass) - no bug found, but previously unverified.
+
+### Fixed
+- `.gitignore`: added `.coverage`/`coverage.xml`/`htmlcov/`.
+
 ## [0.5.0] - 2026-09-17
 
 Archived on Zenodo: [10.5281/zenodo.22820748](https://doi.org/10.5281/zenodo.22820748).
