@@ -1,0 +1,35 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run test suite
+        run: pytest tests/ -v --durations=20
+
+      - name: Leakage and nested-CV isolation checks
+        run: |
+          pytest tests/test_leakage_sentinel.py tests/test_no_leakage.py \
+                 tests/test_nested_cv_isolation.py tests/test_pso_isolation.py \
+                 tests/test_feature_leakage_fixes.py -v

@@ -1,9 +1,19 @@
 # Q-DECEM: Quarterly UK CO2e Forecasting Framework
 
+![tests](https://github.com/Mohsena1990/co2_emission_prediction/actions/workflows/tests.yml/badge.svg)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
+
 A modular Python framework for quarterly UK CO2e emissions forecasting across four
 leakage-controlled data configurations (raw / +engineered / +grid-fusion /
 +engineered+grid-fusion), with nested walk-forward validation, five feature-selection
 strategies, PSO hyperparameter tuning, and Pareto/MCDA decision support.
+
+See [`RESEARCH_OVERVIEW.md`](RESEARCH_OVERVIEW.md) for the core idea, algorithm
+design and policy-interpretability layer in one place, and
+[`LIMITATIONS.md`](LIMITATIONS.md) for what the results do and do not support
+(sample size, statistical-testing caveats, and an important nuance on the
+carbon-intensity dispersion finding). [`CHANGELOG.md`](CHANGELOG.md) tracks
+what changed and why.
 
 ## Overview
 
@@ -130,7 +140,14 @@ pytest tests/ -q
 │   ├── 11_pareto_mcda_and_incremental.py   # Table 6 (incremental value) + Table 10 (Pareto/MCDA)
 │   ├── 12_interpretability_and_sensitivity.py  # Table 11 (cross-model importance) + regime + target-derived sensitivity
 │   ├── 13_generate_tables.py               # All 12 tables -> outputs/tables/
-│   └── 14_generate_figures.py              # PDF figures -> outputs/figures/pdf/main/
+│   ├── 14_generate_figures.py              # PDF figures -> outputs/figures/pdf/main/
+│   ├── 18_mobility_sensitivity.py          # M0-M3 mobility-encoding robustness sweep
+│   ├── 19_grid_ablation.py                 # Grid-family ablation (CI vs. generation-mix vs. full A3)
+│   ├── 20_statistical_robustness.py        # Paired significance tests (A3 vs A1/A2/A4/naive)
+│   ├── 21_origin_diagnostics.py            # Per-origin forecast/error diagnostics
+│   ├── 22_ci_decomposition_ablation.py     # Single-statistic decomposition within the CI family
+│   ├── 23_per_horizon_significance.py      # Per-horizon significance alongside the pooled test
+│   └── 24_policy_figures.py                # Policy/managerial-implications figures
 ├── src/
 │   ├── core/                  # Config, logging, utilities
 │   ├── data_io/                # Data loading, schema
