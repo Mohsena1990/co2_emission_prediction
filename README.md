@@ -2,6 +2,7 @@
 
 ![tests](https://github.com/Mohsena1990/co2_emission_prediction/actions/workflows/tests.yml/badge.svg)
 ![license](https://img.shields.io/badge/license-MIT-blue.svg)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22820748.svg)](https://doi.org/10.5281/zenodo.22820748)
 
 A modular Python framework for quarterly UK CO2e emissions forecasting across four
 leakage-controlled data configurations (raw / +engineered / +grid-fusion /
@@ -319,6 +320,28 @@ pytest tests/ --cov=src --cov-report=html
 - requests (grid-data ingestion)
 - See `requirements.txt` for the full pinned list.
 
+## Citing this work
+
+This repository is archived on Zenodo with a version-specific DOI, so a
+citation always points to the exact code and results a paper used, rather
+than a `main` branch that can change underneath it:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22820748.svg)](https://doi.org/10.5281/zenodo.22820748)
+
+```bibtex
+@software{asghari_ilani_qdecem_2026,
+  author  = {Asghari Ilani, Mohsen},
+  title   = {{Q-DECEM: Quarterly UK CO2e Forecasting Framework}},
+  year    = {2026},
+  version = {0.5.0},
+  doi     = {10.5281/zenodo.22820748},
+  url     = {https://github.com/Mohsena1990/co2_emission_prediction}
+}
+```
+
+See [`CITATION.cff`](CITATION.cff) for the machine-readable version (GitHub
+surfaces this automatically via the "Cite this repository" button).
+
 ## License
 
-See LICENSE file (if present) or contact repository maintainers.
+See [`LICENSE`](LICENSE) (MIT).

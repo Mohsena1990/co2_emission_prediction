@@ -5,6 +5,10 @@ follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [0.5.0] - 2026-09-17
 
+Archived on Zenodo: [10.5281/zenodo.22820748](https://doi.org/10.5281/zenodo.22820748).
+This is the version-specific DOI to cite - see `CITATION.cff` / README's
+"Citing this work" section.
+
 ### Added
 - `scripts/22_ci_decomposition_ablation.py`: decomposes the carbon-intensity
   family into its five individual statistics (mean, p90, std, high/low

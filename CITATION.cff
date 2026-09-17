@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite it as below."
+title: "Q-DECEM: Quarterly UK CO2e Forecasting Framework"
+type: software
+version: 0.5.0
+date-released: "2026-09-17"
+doi: 10.5281/zenodo.22820748
+url: "https://github.com/Mohsena1990/co2_emission_prediction"
+repository-code: "https://github.com/Mohsena1990/co2_emission_prediction"
+license: MIT
+authors:
+  - family-names: "Asghari Ilani"
+    given-names: "Mohsen"
+    affiliation: "School of Management, Swansea University, Swansea, SA1 8EN, Wales, United Kingdom"
+    email: "2238065@swansea.ac.uk"
+    orcid: "https://orcid.org/0000-0003-0189-6956"
+keywords:
+  - electricity-grid dynamics
+  - carbon-emission forecasting
+  - grid carbon intensity
+  - national emissions monitoring
+  - multi-horizon forecasting
+  - data fusion
+  - United Kingdom
+abstract: >-
+  A leakage-controlled, nested-walk-forward pipeline for quarterly UK CO2e
+  emissions forecasting comparing macroeconomic/weather/mobility predictors
+  against electricity-grid carbon-intensity and generation-mix fusion,
+  across four data configurations and five feature-selection strategies,
+  with Pareto/VIKOR decision support and TreeSHAP interpretability.
+preferred-citation:
+  type: article
+  title: "Grid carbon-intensity dynamics as predictive signals for quarterly UK CO2 emissions: A multi-horizon forecasting study"
+  authors:
+    - family-names: "Asghari Ilani"
+      given-names: "Mohsen"
+      affiliation: "School of Management, Swansea University, Swansea, SA1 8EN, Wales, United Kingdom"
+      orcid: "https://orcid.org/0000-0003-0189-6956"
