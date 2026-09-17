@@ -9,12 +9,19 @@ leakage-controlled data configurations (raw / +engineered / +grid-fusion /
 +engineered+grid-fusion), with nested walk-forward validation, five feature-selection
 strategies, PSO hyperparameter tuning, and Pareto/MCDA decision support.
 
-See [`RESEARCH_OVERVIEW.md`](RESEARCH_OVERVIEW.md) for the core idea, algorithm
-design and policy-interpretability layer in one place, and
-[`LIMITATIONS.md`](LIMITATIONS.md) for what the results do and do not support
-(sample size, statistical-testing caveats, and an important nuance on the
-carbon-intensity dispersion finding). [`CHANGELOG.md`](CHANGELOG.md) tracks
-what changed and why.
+## Documentation map
+
+Six documents, each answering a different question - read the one that
+matches yours rather than searching all of them:
+
+| Document | Answers |
+|---|---|
+| [`RESEARCH_OVERVIEW.md`](RESEARCH_OVERVIEW.md) | "What is this, conceptually?" - core idea, algorithm design, policy layer |
+| [`LIMITATIONS.md`](LIMITATIONS.md) | "Can I trust this specific claim?" - sample size, statistical caveats, open questions |
+| [`PAPER_MAPPING.md`](PAPER_MAPPING.md) | "Which script produced Table/Figure N in the paper?" |
+| [`CHANGELOG.md`](CHANGELOG.md) | "What changed, and when?" |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | "How do I make a change safely?" |
+| This file | "How do I install and run it?" |
 
 ## Overview
 
@@ -243,21 +250,12 @@ Set `model.use_gpu: false` in a config file (or override at the config layer) to
 force CPU everywhere, e.g. for reproducibility comparisons or to avoid contending
 with another GPU job.
 
-### Legacy Single-Configuration Pipeline (scripts 01-06)
+### Legacy pipeline (archived)
 
-The original single-flat-matrix pipeline (`X_full.parquet`, no A1-A4 split) still runs
-end-to-end and is useful for quick iteration on FS/model code without the full grid's
-runtime cost:
-
-```bash
-python scripts/00_make_dataset.py --run-id my_run
-python scripts/01_run_fs.py --run-id my_run
-python scripts/02_eval_fs_shap_mcda.py --run-id my_run
-python scripts/03_optimize_models.py --run-id my_run
-python scripts/04_evaluate_and_safeguards.py --run-id my_run
-python scripts/05_select_best_model.py --run-id my_run
-python scripts/06_interpret_champion.py --run-id my_run
-```
+The project's original single-flat-matrix pipeline (predates the A1-A4
+configuration split) is archived under [`scripts/legacy/`](scripts/legacy/README.md)
+for historical reference. It is not maintained, not tested, and not used
+by any current result - use the pipeline above instead.
 
 ## Configuration
 

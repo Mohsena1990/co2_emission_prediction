@@ -113,7 +113,7 @@ class TestToOriginalScale:
     """Regression coverage for spec section 2/17's original-scale
     requirement, and the specific bug found 2026-08-01: this inversion was
     missing entirely from src/pipeline/experiment.py (the new A1-A4
-    orchestrator) and from scripts/04_evaluate_and_safeguards.py's
+    orchestrator) and from scripts/legacy/04_evaluate_and_safeguards.py's
     quarterly-level metrics (only its separate annual-consistency check
     ever called the equivalent inversion)."""
 

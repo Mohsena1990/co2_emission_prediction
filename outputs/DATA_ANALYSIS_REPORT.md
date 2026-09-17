@@ -1,6 +1,22 @@
 # Comprehensive Data Analysis Report
 ## CO2 Emissions Forecasting - UK Quarterly Data (1999-2025)
 
+> **Historical snapshot - read this note before the sections below.**
+> Sections 1-9 describe the raw source data as it stood at an early stage
+> of the project (`run_20260129_1427`) and still reference `TEC`/`CEI` and
+> an `fs_linear`/`fs_consensus` selection framework that have since been
+> fully removed (see `tests/test_tec_cei_removed.py` and
+> `config/feature_registry.yaml` for the current, audited predictor set).
+> They remain here as background EDA context only - do not cite specific
+> feature-selection recommendations from this file. For current,
+> superseding results, see (in order of how you'd actually use them):
+> [`RESEARCH_OVERVIEW.md`](../RESEARCH_OVERVIEW.md) (start here),
+> [`LIMITATIONS.md`](../LIMITATIONS.md) (what to trust and what not to),
+> [`CHANGELOG.md`](../CHANGELOG.md) (what changed and when), and the
+> detailed audit trail in `outputs/audit/` and `outputs/final_rerun_2026/`.
+> A former Section 10 here duplicated that audit trail and has been
+> removed to avoid three documents disagreeing with each other over time.
+
 ---
 
 ## 1. Dataset Overview
@@ -326,223 +342,9 @@ Based on this analysis, you can now proceed with:
 3. **Consider** adding additional feature engineering (rolling statistics)
 4. **Re-run** with fixed LSTM issues (batch_size and tensor shape)
 
----
 
-## 10. Champion Model Interpretability & Robustness Diagnostics (2026-08-23 Addendum)
-
-**Note on scope**: Sections 1-9 above describe the raw source data as it stood in an earlier
-stage of the project (they still list `TEC`/`CEI` as retained variables and `fs_linear`/
-`fs_consensus` from an earlier feature-selection framework). Those two variables have since
-been hard-removed from the feature registry, and the project has moved to the current
-Stream A (no feature selection) / Stream B (5 feature-selection methods) architecture with
-configurations A1-A4. This section documents an audit-and-repair pass on the current
-**validated champion, A3/LightGBM** (WMASE = 0.4541, reproducing the manuscript's reported
-0.454) - the tables and figures below are new, produced 2026-08-23, and sit alongside
-(not in place of) the original dataset diagnostics above.
-
-The trigger for this pass was a bug: the champion's saved regime-specific SHAP values were
-all exactly zero, with an identical "feature ranking" repeated across every regime. That
-bug is diagnosed and fixed below (10.1), and every subsequent table/figure in this section
-is downstream of that fix.
-
-### 10.1 Bug diagnosis
-
-**Table/document**: `outputs/audit/champion_shap_diagnosis.md`
-
-**What it is**: A full root-cause writeup for the all-zero SHAP bug, checked systematically
-against every plausible cause (wrong feature matrix, wrong explainer, index misalignment,
-saving corruption, etc.) before concluding on the real one.
-
-**Interpretation**: The interpretability script refit every model with **library-default
-hyperparameters** instead of the model's actual PSO-tuned ones. For LightGBM on the 28-row
-common-period sample, the default `min_child_samples=20` left no valid split (any split
-puts fewer than 20 rows on one side), so every tree collapsed to a single leaf and the whole
-model predicted one constant number regardless of input (verified prediction std ≈ 1.7e-15).
-A model that ignores every feature necessarily produces exactly-zero SHAP for every feature -
-this was a refitting bug, not a finding about which predictors matter. Fixed by recovering
-each cell's real tuned hyperparameters from the walk-forward provenance already on disk.
-
-### 10.2 SHAP integrity checks
-
-**Table**: `outputs/audit/shap_integrity_checks.csv`
-
-**What it is**: An automated pass/fail check (all-zero values, identical-across-regime
-output, row/feature-count mismatches, NaN/Inf, and a SHAP-additivity reconstruction check)
-run on the corrected SHAP output for all three reported winners (Best_A, Best_B,
-Best_Overall) across all three regimes - 9 rows total.
-
-**Interpretation**: All 9 checks **pass**, with additivity reconstruction error at machine
-precision (~1e-14) - i.e. `expected_value + sum(SHAP) ≈ model prediction` to 14 decimal
-places, the strongest available confirmation that the corrected SHAP values are genuine.
-This check (and the module that produces it, `src/interpretability/integrity_checks.py`) is
-now a permanent part of the pipeline, so a similar refitting bug would be caught
-automatically in future rather than shipping silently.
-
-### 10.3 Champion reproduction
-
-**Table**: `outputs/robustness/champion_reproduction.csv`
-
-**What it is**: Manuscript-reported champion metrics vs. this rerun's metrics, with absolute/
-relative differences and a pass/fail tolerance status per metric.
-
-**Interpretation**: All four headline metrics reproduce within noise: WMASE 0.454 → 0.4541,
-H1 MASE 0.376 → 0.3763, H2 MASE 0.575 → 0.5751, H4 MASE 0.467 → 0.4672. The champion model
-and its evaluation were never actually broken - only the downstream interpretability refit
-was (section 10.1) - so no change to the manuscript's headline forecasting numbers is
-required.
-
-### 10.4 Corrected global SHAP
-
-**Table**: `outputs/interpretability/champion_A3_LightGBM_global_shap.csv`
-
-**What it is**: Mean/median/signed-mean |SHAP|, rank, share of total attribution, and
-predictor family, for all 23 A3 features over the full 28-quarter common-period sample.
-
-**Interpretation**: The top predictor is **`Grid_CI_std`** (electricity-grid carbon-intensity
-*dispersion* within the quarter), holding 31.8% of total attribution - well ahead of
-`Grid_CI_mean` (10.8%) and `Grid_CI_p90` (9.0%). `Air_Temp`, which the old (broken) output
-had misleadingly suggested was important, ranks 8th globally. This reframes the electricity-
-grid story: it is not just "average carbon intensity matters" but specifically that
-**how much carbon intensity varies within a quarter** carries the strongest signal.
-
-### 10.5 Corrected regime-specific SHAP
-
-**Table**: `outputs/interpretability/champion_A3_LightGBM_regime_shap.csv`
-
-**What it is**: The same statistics as 10.4, computed separately for Pre-COVID (n=7), COVID
-(n=8), and Post-COVID (n=13) sub-samples.
-
-**Interpretation**: `Grid_CI_std` is the #1-ranked predictor in **all three regimes**, not
-just on average - the grid signal is not a COVID-period artifact. Grid-family features
-(carbon intensity + generation mix) hold 69.0% / 61.1% / 67.7% of total attribution in
-Pre-COVID / COVID / Post-COVID respectively. SHAP values here are predictive attribution
-only and should not be read as causal effects.
-
-### 10.6 Regime rank-stability
-
-**Table**: `outputs/interpretability/champion_A3_LightGBM_regime_rank_changes.csv`
-
-**What it is**: Spearman rank correlation of feature importance between each pair of
-regimes, top-5 feature overlap between regimes, per-feature rank by regime with maximum
-rank change, and grid vs. non-grid importance share by regime.
-
-**Interpretation**: Spearman correlation between regimes is 0.915-0.965 (Pre-COVID↔COVID
-0.921, Pre-COVID↔Post-COVID 0.965, COVID↔Post-COVID 0.915) - high rank stability, meaning
-the *ordering* of important predictors barely reshuffles across the pandemic. This directly
-contradicts the old (broken) output's superficial impression that COVID changed which
-predictors matter; in the corrected analysis it does not, materially.
-
-### 10.7 Main publication figure: champion regime importance
-
-**Figures**: `outputs/figures/pdf/main/fig_champion_regime_importance.pdf` and the `.png`
-equivalent under `outputs/figures/png/main/`; caption text at
-`outputs/reporting/figure_champion_regime_caption.txt`.
-
-**What it is**: A 3-panel figure - (a) top-10 global predictors by mean |SHAP|; (b) heatmap
-of each top predictor's normalized importance across the three regimes; (c) stacked
-importance-share-by-family evolution across regimes.
-
-**Interpretation**: Visually confirms 10.4-10.6: carbon-intensity variables (dark green,
-panel c) form 50-60%+ of every regime's bar, and panel (b) shows `Grid_CI_std` at or near
-1.0 (its own within-feature maximum) in every regime column, i.e. consistently near its most
-important across the whole study period, not concentrated in one era.
-
-### 10.8 Statistical robustness of the grid signal
-
-**Table**: `outputs/robustness/grid_signal_paired_tests.csv`
-
-**What it is**: Paired comparisons (same LightGBM model, same forecast-origin dates) of A3
-against A1 (baseline), A2 (engineered-features-only), A4 (full fusion), and the seasonal-
-naive reference, by horizon and pooled - paired absolute-error differences, Wilcoxon
-signed-rank and paired t-tests, and Holm-Bonferroni-corrected p-values across the family of
-comparisons.
-
-**Interpretation**: Pooled across all three horizons (n=27 paired forecast origins, an
-explicitly short common-evaluation window, stated rather than hidden): **A3 significantly
-beats A2** (Holm-corrected p=0.031) and the seasonal-naive baseline (p=0.005). A3 beats A1
-and A4 directionally in the majority of paired origins (59.3% each) but this does **not**
-survive multiple-comparison correction at this sample size - reported as non-significant
-rather than reframed or suppressed. The honest conclusion: electricity-grid information
-adds significant value over engineered-history-only features, and a directionally
-consistent (if not yet statistically confirmed at n=27) advantage over the raw baseline and
-full fusion.
-
-### 10.9 Origin-level diagnostic
-
-**Table**: `outputs/robustness/champion_origin_diagnostics.csv`
-**Figure**: `outputs/figures/pdf/sensitivity/fig_origin_level_grid_gain.pdf` (+ `.png` under
-`outputs/figures/png/sensitivity/`)
-
-**What it is**: For every one of the champion's 27 walk-forward (horizon, target-quarter)
-forecasts: prediction, actual, error, absolute error, the seasonal-naive error at the same
-date, the error reduction versus seasonal-naive, the quarter's own grid carbon-intensity
-values, and the top-3 SHAP-contributing features for that quarter (from the full-sample
-champion refit; see the script's docstring for why this differs from a fold-specific
-refit).
-
-**Interpretation**: The grid-informed champion beats the seasonal-naive baseline at roughly
-19 of 27 origin/horizon combinations, with the advantage broadly spread across
-2022Q3-2025Q1 rather than concentrated in one or two exceptional quarters - some of the
-largest gains reach 15,000-19,000 (thousand tonnes CO2e) of error reduction, while the worst
-exceptions (naive wins) cluster at the 4-quarter-ahead horizon in mid-to-late 2024. This
-rules out "the aggregate result is a fluke of one quarter" as an explanation for the
-champion's advantage.
-
-### 10.10 Mobility-treatment robustness (M0-M3)
-
-**Table**: `outputs/robustness/mobility_sensitivity_results.csv`
-**Figure**: `outputs/figures/pdf/sensitivity/fig_mobility_robustness.pdf` (+ `.png`)
-
-**What it is**: Four scenarios testing whether the A3 grid advantage depends on how the 6
-Google mobility predictors are encoded outside their real reporting window (2020-02-15 to
-2022-10-15): **M0** current neutral-zero convention; **M1** mobility dropped entirely; **M2**
-mobility retained + an explicit availability/missingness indicator; **M3** same encoding as
-M2, evaluation restricted to forecast origins near the Google-covered window. All 4
-configurations (A1-A4) × 5 models per scenario.
-
-**Interpretation**: **A3 ranks #1 of the 4 configurations in every one of the four
-scenarios** - the electricity-grid advantage does not depend on the specific mobility-
-encoding convention. The margin narrows under M1 (WMASE gap to A1 shrinks from -0.175 to
--0.090 when mobility is dropped entirely, since mobility itself carried some genuine
-signal) but the ranking never flips. M3 uses a smaller, COVID-window-restricted sample
-(documented as a sensitivity/exploratory check, not a primary comparison), so its absolute
-WMASE values are not directly comparable to M0-M2's, but the *ranking* result (A3 still #1)
-still holds there too.
-
-### 10.11 Grid-signal ablation
-
-**Table**: `outputs/robustness/grid_ablation_results.csv`
-**Figure**: `outputs/figures/pdf/sensitivity/fig_grid_ablation.pdf` (+ `.png`)
-
-**What it is**: Six variants built around the A3 champion, holding the raw+mobility baseline
-and evaluation dates fixed while varying only which grid-derived columns are included:
-`A3_full` (23 features: carbon-intensity + generation-mix + OWID annual-transition);
-`A3_no_grid` (11, baseline only); `A3_no_CI` (18, drops carbon-intensity only); `A3_no_genmix`
-(16, drops generation-mix only); `A3_CI_only` (16, carbon-intensity only); `A3_genmix_only`
-(16, generation-mix only). All 5 models per variant.
-
-**Interpretation**: Best WMASE per variant: `A3_full` 0.455 < `A3_CI_only` 0.589 <
-`A3_no_genmix` 0.636 ≈ `A3_no_grid` 0.637 < `A3_no_CI` 0.664 < `A3_genmix_only` 0.745. This
-answers the study's central mechanism question directly: **the electricity-grid predictive
-gain is driven by carbon-intensity distributional statistics, not generation-mix shares.**
-Carbon-intensity-only already beats dropping all grid information, while generation-mix-only
-is *worse* than having no grid data at all (likely the 5 collinear share features add noise
-without carbon-intensity's signal to anchor them, at this sample size). The full combination
-(`A3_full`) still beats every single-family variant, so carbon-intensity and generation-mix/
-transition information are complementary, not redundant - just unequally important on their
-own.
-
-### 10.12 Where to find the full narrative
-
-A complete before/after narrative tying all of the above together (executive conclusion,
-manuscript-implication classification per section, and a final resubmission recommendation)
-is in `outputs/final_rerun_2026/FINAL_RERUN_REPORT.md`, with a section-by-section
-KEEP/REVISE/REMOVE/NEW-result breakdown for the manuscript in
-`outputs/final_rerun_2026/MANUSCRIPT_UPDATE_TABLE.csv`, and full run provenance (git commit,
-package versions, checksums, seeds) in `outputs/final_rerun_2026/run_manifest.json`.
-
----
-
-*Report generated from analysis of run_20260129_1427 outputs. Section 10 added 2026-08-24
-from the audit/repair pass on the current Stream A/B champion (run namespaces
-`outputs/runs/final_rerun_2026*`).*
+*Report generated from analysis of run_20260129_1427 outputs. A former Section 10
+("Champion Model Interpretability & Robustness Diagnostics", added 2026-08-24) has
+been removed from this file - it duplicated content now maintained canonically in
+`LIMITATIONS.md`, `CHANGELOG.md`, `outputs/audit/`, and `outputs/final_rerun_2026/`.
+See the banner at the top of this file for where to look instead.*

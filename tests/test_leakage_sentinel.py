@@ -284,8 +284,8 @@ class TestLeakageSentinel:
         )
 
     def test_run_all_fs_options_result_invariant_to_contamination(self):
-        """End-to-end regression for the exact fix in scripts/01_run_fs.py
-        (audit finding A-7): the script now builds an isolated tuning CV
+        """End-to-end regression for the exact fix in scripts/legacy/01_run_fs.py
+        (audit finding A-7, archived legacy pipeline): the script now builds an isolated tuning CV
         plan via `build_tuning_cv_plan` and passes it - not the flat outer
         `cv_plan` - into `run_all_fs_options`. Reproduces that call sequence
         and applies the same contamination-invariance property as

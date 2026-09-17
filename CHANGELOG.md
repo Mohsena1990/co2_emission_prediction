@@ -3,6 +3,57 @@
 All notable changes to this project are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.7.0] - 2026-09-18
+
+Repository restructuring for publishability - no forecasting results
+changed; this is entirely documentation/organisation.
+
+### Added
+- `PAPER_MAPPING.md`: verified crosswalk from manuscript Table/Figure
+  numbers to the repository file that actually produced each one. The
+  pipeline's internal `table1`-`table10`/`fig01`-`fig18` filenames follow
+  an early internal build-spec numbering scheme that drifted from the
+  manuscript's final numbering across revisions (verified by row count
+  and column headers, not guessed from filenames) - e.g.
+  `table6_global_factor_summary.csv` is actually manuscript Table 8, and
+  `table10_source_data_quality.csv` is actually manuscript Table 5. This
+  was previously undocumented anywhere.
+- `CONTRIBUTING.md`, `.github/PULL_REQUEST_TEMPLATE.md`,
+  `.github/ISSUE_TEMPLATE/bug_report.md`.
+- A "Documentation map" section at the top of `README.md` indexing all
+  six root-level docs by the question each one answers.
+
+### Changed
+- Archived the original single-flat-matrix pipeline (`scripts/01_run_fs.py`
+  through `06_interpret_champion.py`, superseded by the current A1-A4/
+  Stream-A-B design and never covered by the test suite) to
+  `scripts/legacy/`, with a README explaining why and fixed `sys.path`
+  depth so they still import correctly if run from their new location.
+- Trimmed `outputs/DATA_ANALYSIS_REPORT.md`: removed its Section 10
+  (added 2026-08-24), which fully duplicated content now maintained
+  canonically in `LIMITATIONS.md`/`CHANGELOG.md`/`outputs/audit/`/
+  `outputs/final_rerun_2026/`. Added a banner to the remaining sections
+  1-9 flagging them as an early-stage EDA snapshot (still references
+  `TEC`/`CEI`, since removed) and pointing to current docs.
+- Removed `outputs/runs/full_run_stage1/` - an incomplete, orphaned early
+  run (Stream A only, no Stream B/MCDA/tables) added in the initial
+  commit and referenced nowhere in any script, test, or doc.
+
+### Known, not fixed this pass (flagged for a deliberate future decision)
+- `[tool.setuptools.packages.find] include = ["src*"]` in `pyproject.toml`
+  means `pip install .` installs a package literally named `src` - fixing
+  this properly means renaming the `src/` directory, which touches every
+  `from src.x import y` across ~30 scripts and 28 test files. Not
+  attempted here: high mechanical-rename risk for a codebase that is
+  currently run via `python scripts/N.py`, not imported as an installed
+  library, so the practical benefit is low relative to the risk.
+- `config/` (singular, `feature_registry.yaml`) vs `configs/` (plural, run
+  configs) is a confusing near-duplicate top-level name. Not renamed this
+  pass - `config/feature_registry.yaml`'s path is referenced by both code
+  and the manuscript's spec-section citations; renaming it has a wider
+  blast radius than the clarity gained. Documented instead in the
+  Documentation map.
+
 ## [0.6.0] - 2026-09-17
 
 ### Added
