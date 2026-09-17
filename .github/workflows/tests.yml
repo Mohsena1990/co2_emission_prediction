@@ -23,6 +23,15 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          # Install the CPU-only torch build first: the default PyPI wheel
+          # pulls in the full CUDA toolkit (nvidia-cublas/cudnn/cusolver/...,
+          # several GB combined), which exhausts the GitHub-hosted runner's
+          # disk before the rest of requirements.txt can install - CI never
+          # uses a GPU, so there is no reason to pay that cost here. Pinned
+          # to the same torch version as requirements.txt; installing it
+          # first satisfies that pin so the subsequent requirements.txt
+          # install does not re-fetch the CUDA build.
+          pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
 
       - name: Run test suite
