@@ -32,7 +32,7 @@ openpyxl==3.1.5
 pyarrow==23.0.0
 
 # Grid data ingestion (GB Carbon Intensity API, section 6)
-requests==2.32.5
+requests==2.34.2
 
 # Configuration
 PyYAML==6.0.3
