@@ -44,7 +44,7 @@ jobs:
                  tests/test_feature_leakage_fixes.py -v
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-xml
           path: coverage.xml
