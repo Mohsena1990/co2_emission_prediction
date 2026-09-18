@@ -1,0 +1,8 @@
+Highlights
+(5 bullets, <=85 characters each, per Applied Energy submission requirements)
+
+- Electricity-grid data cuts quarterly UK CO2 forecast error by 62% vs. seasonal-naive.
+- Grid data significantly beats engineered-history-only forecasts (p=0.031, Holm).
+- Dispersion's SHAP weight reflects joint, not standalone, predictive contribution.
+- Nested Pareto-VIKOR selection across 120 candidates avoids ad hoc model choice.
+- A live nowcast from the true current origin shows real operational deployment.
